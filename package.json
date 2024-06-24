@@ -1,0 +1,19 @@
+{
+    "name": "arbitrage-bot",
+    "version": "1.0.0",
+    "description": "An arbitrage bot for Orderly and Binance exchanges",
+    "main": "src/manageOrders.ts",
+    "scripts": {
+      "start": "ts-node src/manageOrders.ts"
+    },
+    "dependencies": {
+      "axios": "^0.21.1",
+      "dotenv": "^8.2.0",
+      "ws": "^7.4.6"
+    },
+    "devDependencies": {
+      "ts-node": "^9.1.1",
+      "typescript": "^4.1.3"
+    }
+  }
+  
