@@ -1,43 +1,60 @@
-import { orderlyAccount, binanceAccount, symbol, orderSize, orderlyAxios, binanceAxios } from './utils';
-import { placeOrder as placeOrderlyOrder } from './orderlyOrders';
-import { placeOrder as placeBinanceOrder } from './binanceOrders';
+import { orderlyAccountInfo, binanceAccountInfo, symbol, orderSize, orderlyAxios, binanceAxios, 
+  ORDERLY_API_URL
+ } from './utils';
+import { placeOrder as placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
+import { signAndSendRequest } from './orderlynetwork/orderlySignRequest'
+import { placeOrder as placeBinanceOrder } from './binance/binanceOrders';
+import { BinanceAccount, OrderlyAccount, BinanceBalance } from './types';
 
 async function getOrderlyPositions() {
-  try {
-    const response = await orderlyAxios.get('/account/balance', {
-      headers: {
-        'API-KEY': orderlyAccount.apiKey,
-      },
-    });
-    const balance = response.data;
-    return balance[symbol.split('/')[0]];
-  } catch (error) {
-    console.error('Error fetching Orderly balance:', error);
-  }
+  const res = await signAndSendRequest(
+    orderlyAccountInfo.accountId,
+    orderlyAccountInfo.apiKey,
+    `${ORDERLY_API_URL}/v1/client/holding`
+  );
+  const json = await res.json();
+  console.log('getClientHolding:', JSON.stringify(json, undefined, 2));
 }
 
+//TODO: futures로 바꿔야함
 async function getBinancePositions() {
   try {
-    const response = await binanceAxios.get('/api/v3/account', {
+    const response = await binanceAxios.get('/fapi/v2/account', {
       headers: {
-        'X-MBX-APIKEY': binanceAccount.apiKey,
+        'X-MBX-APIKEY': binanceAccountInfo.apiKey,
       },
     });
-    const balance = response.data.balances.find(b => b.asset === symbol.split('/')[0]);
+    const balances: BinanceBalance[] = response.data.balances;
+    const baseAsset = symbol.split('/')[0];
+    const balance = balances.find(b => b.asset === baseAsset);
+    if (!balance) {
+      throw new Error(`Asset ${symbol.split('/')[0]} not found in Binance account.`);
+    }
     return parseFloat(balance.free);
   } catch (error) {
     console.error('Error fetching Binance balance:', error);
+    return 0;
   }
 }
 
-async function adjustPosition(account, position, targetPosition, isOrderly) {
-  const marketData = isOrderly ? await orderlyAxios.get(`/market/ticker?symbol=${symbol}`) : await binanceAxios.get(`/api/v3/ticker/price?symbol=${symbol.replace('/', '')}`);
+async function adjustPosition(account: BinanceAccount | OrderlyAccount, position : number, targetPosition : number , isOrderly : boolean) {
+  const marketData = isOrderly 
+    ? await orderlyAxios.get(`/market/ticker?symbol=${symbol}`) 
+    : await binanceAxios.get(`/fapi/v1/ticker/price?symbol=${symbol.replace('/', '')}`);
   const currentPrice = isOrderly ? marketData.data.last : parseFloat(marketData.data.price);
 
   if (position > targetPosition) {
-    await (isOrderly ? placeOrderlyOrder : placeBinanceOrder)(account, 'SELL', currentPrice, position - targetPosition);
-  } else if (position < targetPosition) {
-    await (isOrderly ? placeOrderlyOrder : placeBinanceOrder)(account, 'BUY', currentPrice, targetPosition - position);
+      if (isOrderly) {
+        await placeOrderlyOrder(account as OrderlyAccount, 'SELL', currentPrice, position - targetPosition);
+      } else {
+        await placeBinanceOrder(account as BinanceAccount, 'SELL', currentPrice, position - targetPosition);
+      }
+    } else if (position < targetPosition) {
+      if (isOrderly) {
+        await placeOrderlyOrder(account as OrderlyAccount, 'BUY', currentPrice, targetPosition - position);
+      } else {
+        await placeBinanceOrder(account as BinanceAccount, 'BUY', currentPrice, targetPosition - position);
+    }
   }
 }
 
@@ -49,8 +66,8 @@ export async function manageRisk() {
   const targetPosition = orderSize * 5;
 
   if (totalPosition > targetPosition) {
-    await adjustPosition(binanceAccount, binancePosition, binancePosition + (totalPosition - targetPosition) / 2, false);
+    await adjustPosition(binanceAccountInfo, binancePosition, binancePosition + (totalPosition - targetPosition) / 2, false);
   } else if (totalPosition < -targetPosition) {
-    await adjustPosition(orderlyAccount, orderlyPosition, orderlyPosition - (targetPosition + totalPosition) / 2, true);
+    await adjustPosition(orderlyAccountInfo, orderlyPosition, orderlyPosition - (targetPosition + totalPosition) / 2, true);
   }
 }
