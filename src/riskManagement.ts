@@ -1,8 +1,10 @@
-import { orderlyAccountInfo, binanceAccountInfo, symbol, orderSize, orderlyAxios, binanceAxios, 
-  ORDERLY_API_URL
- } from './utils';
+import axios from 'axios';
+import { orderlyAccountInfo, binanceAccountInfo, symbol, orderSize, 
+  orderlyAxios, binanceAxios, ORDERLY_API_URL
+} from './utils';
 import { placeOrder as placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
 import { signAndSendRequest } from './orderlynetwork/orderlySignRequest'
+import { createBinanceSignature } from './binance/binanceCreateSign';
 import { placeOrder as placeBinanceOrder } from './binance/binanceOrders';
 import { BinanceAccount, OrderlyAccount, BinanceBalance } from './types';
 
@@ -16,25 +18,38 @@ async function getOrderlyPositions() {
   console.log('getClientHolding:', JSON.stringify(json, undefined, 2));
 }
 
-//TODO: futures로 바꿔야함
 async function getBinancePositions() {
-  try {
-    const response = await binanceAxios.get('/fapi/v2/account', {
-      headers: {
-        'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-      },
-    });
-    const balances: BinanceBalance[] = response.data.balances;
-    const baseAsset = symbol.split('/')[0];
-    const balance = balances.find(b => b.asset === baseAsset);
-    if (!balance) {
-      throw new Error(`Asset ${symbol.split('/')[0]} not found in Binance account.`);
+  const timestamp = Date.now();
+    const endpoint = '/fapi/v2/balance';
+    const baseUrl = 'https://fapi.binance.com';
+
+    const queryParams = {
+        timestamp: timestamp.toString(),
+        recvWindow: '5000'
+    };
+
+    const queryString = new URLSearchParams(queryParams).toString();
+    const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
+
+    const finalQueryString = `${queryString}&signature=${signature}`;
+
+    try {
+        const response = await axios.get(`${baseUrl}${endpoint}?${finalQueryString}`, {
+            headers: {
+                'X-MBX-APIKEY': binanceAccountInfo.apiKey,
+            },
+        });
+        //Quesetion: USDT 가져와야하는지 USDC 가져와야하는지??
+        const usdtInfo = response.data.find((account: any) => account.asset === 'USDT');
+        if (usdtInfo) {
+            console.log('USDT Balance:', usdtInfo.balance);
+            return usdtInfo.balance;
+        } else {
+            console.log('USDT Balance: Not found');
+        }
+    } catch (error) {
+        console.error('Error checking account info:', error);
     }
-    return parseFloat(balance.free);
-  } catch (error) {
-    console.error('Error fetching Binance balance:', error);
-    return 0;
-  }
 }
 
 async function adjustPosition(account: BinanceAccount | OrderlyAccount, position : number, targetPosition : number , isOrderly : boolean) {
