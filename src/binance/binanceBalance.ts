@@ -1,12 +1,12 @@
 import axios from "axios";
-import { binanceAccountInfo } from '../utils';
+import { binanceAccountInfo, BINANCE_API_URL } from '../utils';
 import { createBinanceSignature } from "./binanceCreateSign";
 
 //API Description: Query account balance info
 export async function getBinanceBalance() {
     const timestamp = Date.now();
       const endpoint = '/fapi/v2/balance';
-      const baseUrl = 'https://fapi.binance.com';
+      const baseUrl = BINANCE_API_URL;
   
       const queryParams = {
           timestamp: timestamp.toString(),
