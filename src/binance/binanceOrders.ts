@@ -7,14 +7,14 @@ export async function placeOrder(account: BinanceAccount, side: string, price: n
   const timestamp = Date.now();
   const endpoint = '/fapi/v1/order';
 
-  const queryParams = {
+  const queryParams: Record<string, string> = {
     symbol: binanceSymbol,
     side: side,
     type: 'LIMIT',
-    price: price,
-    quantity: amount,
-    timestamp: timestamp,
-    recvWindow: 5000,
+    price: price.toString(),
+    quantity: amount.toString(),
+    timestamp: timestamp.toString(),
+    recvWindow: '5000',
   };
 
   const queryString = new URLSearchParams(queryParams).toString();
@@ -27,7 +27,8 @@ export async function placeOrder(account: BinanceAccount, side: string, price: n
         'X-MBX-APIKEY': account.apiKey,
       },
     });
-    return response.data;
+    console.log('Binance Order Res:', response.data);
+    // return response.data;
   } catch (error) {
     console.error('Error placing Binance order:', error);
   }   
