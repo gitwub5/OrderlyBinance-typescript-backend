@@ -1,23 +1,28 @@
 import axios from 'axios';
 import WebSocket from 'ws';
 import dotenv from 'dotenv';
+import { BinanceAccount, OrderlyAccount } from './types';
+import crypto from 'crypto';
 
 dotenv.config();
 
-const ORDERLY_API_URL = 'https://api.orderly.network';
-const BINANCE_API_URL = 'https://api.binance.com';
+export const ORDERLY_API_URL = 'https://api-evm.orderly.org';
+export const BINANCE_API_URL = 'https://fapi.binance.com';
 
-export const orderlyAccount = {
-  apiKey: process.env.ORDERLY_API_KEY,
-  secret: process.env.ORDERLY_SECRET,
+export const orderlyAccountInfo : OrderlyAccount = {
+  apiKey: process.env.ORDERLY_API_KEY as string,
+  secret: process.env.ORDERLY_SECRET as string,
+  accountId: process.env.ORDERLY_ACCOUNT_ID as string,
 };
 
-export const binanceAccount = {
-  apiKey: process.env.BINANCE_API_KEY,
-  secret: process.env.BINANCE_SECRET,
+export const binanceAccountInfo : BinanceAccount = {
+  apiKey: process.env.BINANCE_API_KEY as string,
+  secret: process.env.BINANCE_SECRET as string,
 };
 
 export const symbol = 'TON/USDT';
+export const binanceSymbol = symbol.replace('/', '');
+export const orderlySymbol = `PERP_${symbol.split('/')[0]}_USDC`;//Orderly에서 사용하는 symbol 형식
 export const orderSize = 10; // 주문 크기 (단위: TON)
 export const interval = 60000; // 1분 (단위시간)
 export const arbitrageThreshold = 0.5; // 아비트리지 허용 임계값 (%)
