@@ -2,7 +2,6 @@ import axios from 'axios';
 import WebSocket from 'ws';
 import dotenv from 'dotenv';
 import { BinanceAccount, OrderlyAccount } from './types';
-import crypto from 'crypto';
 
 dotenv.config();
 
