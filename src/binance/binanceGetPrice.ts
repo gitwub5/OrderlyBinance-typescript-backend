@@ -1,4 +1,3 @@
-//업데이트 예정
 import {symbol, binanceAxios } from '../utils';
 
 export async function getBinancePrice() {

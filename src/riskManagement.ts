@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { orderlyAccountInfo, binanceAccountInfo, 
   symbol, orderSize, 
   orderlyAxios, binanceAxios, 

@@ -1,6 +1,6 @@
 // src/orderlynetwork/signer.ts
 import { getPublicKeyAsync, signAsync } from '@noble/ed25519';
-import { encodeBase58 } from 'ethers';
+import bs58 from 'bs58';
 
 export async function signAndSendRequest(
   orderlyAccountId: string,
@@ -26,11 +26,10 @@ export async function signAndSendRequest(
           : 'application/x-www-form-urlencoded',
       'orderly-timestamp': String(timestamp),
       'orderly-account-id': orderlyAccountId,
-      'orderly-key': `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`,
+      'orderly-key': `ed25519:${bs58.encode(await getPublicKeyAsync(privateKey))}`,
       'orderly-signature': Buffer.from(orderlySignature).toString('base64url'),
       ...(init?.headers ?? {})
     },
     ...(init ?? {})
   });
 }
-
