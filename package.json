@@ -3,12 +3,11 @@
     "version": "1.0.0",
     "description": "An arbitrage bot for Orderly and Binance exchanges",
     "main": "src/manageOrders.ts",
-    "type": "module",
     "scripts": {
         "start": "ts-node src/manageOrders.ts",
-        "build": "tsc"
     },
     "dependencies": {
+        "@noble/curves": "^1.4.0",
         "@noble/ed25519": "^2.1.0",
         "axios": "^1.7.2",
         "bs58": "^6.0.0",
