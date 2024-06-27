@@ -1,32 +1,37 @@
-import { binanceAxios, binanceSymbol} from '../utils';
+import { binanceAxios, binanceSymbol, BINANCE_API_URL} from '../utils';
 import { BinanceAccount } from '../types';
-
+import { createBinanceSignature } from './binanceCreateSign';
+import axios from 'axios';
 
 export async function placeOrder(account: BinanceAccount, side: string, price: number, amount: number) {
   const timestamp = Date.now();
-  const method = 'POST';
   const endpoint = '/fapi/v1/order';
+  const baseUrl = 'BINANCE_API_URL';
 
-  const order = {
+  const queryParams: Record<string, string> = {
     symbol: binanceSymbol,
     side: side,
     type: 'LIMIT',
-    price: price,
-    quantity: amount,
-    timestamp: timestamp,
+    timeInForce: 'GTC',
+    quantity: amount.toString(),
+    price: price.toString(),
+    recvWindow: '5000',
+    timestamp: timestamp.toString(),
   };
 
-//   const payload = `${timestamp}${method}${endpoint}${JSON.stringify(order)}`;
-//   const signature = createBinanceSignature(payload, account.secret);
-    
-//   try {
-//     const response = await binanceAxios.post(endpoint, order, {
-//       headers: {
-//         'X-MBX-APIKEY': account.apiKey,
-//       },
-//     });
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error placing Binance order:', error);
-//   }
-// }
+  const queryString = new URLSearchParams(queryParams).toString();
+  const signature = await createBinanceSignature(queryString, account.secret);
+  const finalQueryString = `${queryString}&signature=${signature}`;
+
+  try {
+    const response = await axios.post(`${baseUrl}${endpoint}?${finalQueryString}`, null, {
+      headers: {
+        'X-MBX-APIKEY': account.apiKey,
+      },
+    });
+    console.log('Binance Order Res:', response.data);
+    // return response.data;
+  } catch (error) {
+    console.error('Error placing Binance order:', error);
+  }   
+}

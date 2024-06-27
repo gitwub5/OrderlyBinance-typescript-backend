@@ -1,17 +1,9 @@
-import { orderlyAccountInfo, binanceAccountInfo, symbol, orderSize, interval, arbitrageThreshold, orderlyAxios, binanceAxios } from './utils';
+import { orderlyAccountInfo, binanceAccountInfo, orderSize, interval, arbitrageThreshold } from './utils';
 import { manageRisk } from './riskManagement';
 import { placeOrder as placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
 import { placeOrder as placeBinanceOrder } from './binance/binanceOrders';
-
-async function getOrderlyPrice() {
-  const marketData = await orderlyAxios.get(`/market/ticker?symbol=${symbol}`);
-  return marketData.data.last;
-}
-
-async function getBinancePrice() {
-  const marketData = await binanceAxios.get(`/fapi/v1/ticker/price?symbol=${symbol.replace('/', '')}`);
-  return parseFloat(marketData.data.price);
-}
+import { getBinancePrice } from './binance/binanceGetPrice';
+import { getOrderlyPrice } from './orderlynetwork/orderlyGetPrice';
 
 async function executeArbitrage() {
   const orderlyPrice = await getOrderlyPrice();
