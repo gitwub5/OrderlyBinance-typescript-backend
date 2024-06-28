@@ -4,7 +4,7 @@
     "description": "An arbitrage bot for Orderly and Binance exchanges",
     "main": "src/manageOrders.ts",
     "scripts": {
-        "start": "ts-node src/manageOrders.ts",
+        "start": "ts-node src/manageOrders.ts"
     },
     "dependencies": {
         "@noble/curves": "^1.4.0",

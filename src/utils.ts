@@ -12,7 +12,6 @@ export const BINANCE_API_URL = 'https://fapi.binance.com';
 const privateKeyBase58 = (process.env.ORDERLY_SECRET as string).replace("ed25519:", "");
 const privateKey = bs58.decode(privateKeyBase58);
 
-
 export const orderlyAccountInfo : OrderlyAccount = {
   orderlyKey: process.env.ORDERLY_API_KEY as string,
   privateKeyBase58: privateKeyBase58,

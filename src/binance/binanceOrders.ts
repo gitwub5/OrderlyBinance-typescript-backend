@@ -30,7 +30,6 @@ export async function placeOrder(account: BinanceAccount, side: string, price: n
       },
     });
     console.log('Binance Order Res:', response.data);
-    // return response.data;
   } catch (error) {
     console.error('Error placing Binance order:', error);
   }   

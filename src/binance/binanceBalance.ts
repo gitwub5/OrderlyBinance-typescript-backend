@@ -25,12 +25,13 @@ export async function getBinanceBalance() {
             },
         });
 
-        //Quesetion: USDT 가져와야하는지 USDC 가져와야하는지??
         const usdtInfo = response.data.find((account: any) => account.asset === 'USDT');
-        console.log('USDT Balance:', usdtInfo.balance);
+        console.log('Binance USDT Balance:', usdtInfo.balance);
         return parseFloat(usdtInfo.balance);
       } catch (error) {
           console.error('Error checking account info:', error);
           return 0;
       }
   }
+
+  //getBinanceBalance();

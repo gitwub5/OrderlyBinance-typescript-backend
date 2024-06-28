@@ -19,7 +19,7 @@ export async function placeOrder(account: OrderlyAccount, side: string, price: n
     });
 
     const json = await res.json();
-    console.log('createOrder:', JSON.stringify(json, undefined, 2));
+    console.log('Orderly Order Res:', JSON.stringify(json, undefined, 2));
   } catch (error) {
     console.error('Error creating order:', error);
   }
