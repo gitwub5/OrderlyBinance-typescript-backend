@@ -2,25 +2,37 @@ import { orderlySymbol, orderlyAccountInfo, ORDERLY_API_URL } from '../utils';
 import { OrderlyAccount } from '../types';
 import { signAndSendRequest } from './orderlySignRequest'
 
-export async function placeOrder(account: OrderlyAccount, side: string, price: number, amount: number) {
-  const body = {
-    symbol: orderlySymbol,
-    order_type: 'LIMIT',
-    side: side,
-    order_price: price,
-    order_quantity: amount
-  };
+export class placeOrderlyOrder {
+  private static async placeOrder(account: OrderlyAccount, orderType: string, side: string, price: number | null, amount: number) {
+    const body: Record<string, any> = {
+      symbol: orderlySymbol,
+      order_type: orderType,
+      side: side,
+      order_quantity: amount
+    };
 
-  try {
-    const res = await signAndSendRequest(account.accountId, account.privateKey, `${ORDERLY_API_URL}/v1/order`, {
-      method: 'POST',
-      body: JSON.stringify(body)
-    });
+    if (orderType === 'LIMIT') {
+      body.order_price = price;
+    }
 
-    const json = await res.json();
-    //console.log('Orderly Order Res:', JSON.stringify(json, undefined, 2));
-  } catch (error) {
-    console.error('Error creating order:', error);
+    try {
+      const res = await signAndSendRequest(account.accountId, account.privateKey, `${ORDERLY_API_URL}/v1/order`, {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+
+      const json = await res.json();
+      //console.log('Orderly Order Response:', JSON.stringify(json, undefined, 2));
+    } catch (error) {
+      console.error('Error creating order:', error);
+    }
+  }
+
+  public static async limitOrder(account: OrderlyAccount, side: string, price: number, amount: number) {
+    await this.placeOrder(account, 'LIMIT', side, price, amount);
+  }
+
+  public static async marketOrder(account: OrderlyAccount, side: string, amount: number) {
+    await this.placeOrder(account, 'MARKET', side, null, amount);
   }
 }
-

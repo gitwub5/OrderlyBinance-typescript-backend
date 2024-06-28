@@ -1,8 +1,8 @@
 import { orderlyAccountInfo, binanceAccountInfo, symbol, orderSize, } from './utils';
 import { getBinancePositions } from './binance/binancePositions';
 import { getOrderlyPositions } from './orderlynetwork/orderlyPositions';
-import { placeOrder as placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
-import { placeOrder as placeBinanceOrder } from './binance/binanceOrders';
+import { placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
+import { placeBinanceOrder } from './binance/binanceOrders';
 import { BinanceAccount, OrderlyAccount } from './types';
 import { getOrderlyPrice } from './orderlynetwork/orderlyGetPrice';
 import { getBinancePrice } from './binance/binanceGetPrice';
@@ -20,17 +20,17 @@ async function adjustPosition(account: BinanceAccount | OrderlyAccount, position
     const adjustmentAmount = position - targetPosition;
     console.log(`Adjusting position by selling ${adjustmentAmount}`);
     if (isOrderly) {
-      await placeOrderlyOrder(account as OrderlyAccount, 'SELL', currentPrice, adjustmentAmount);
+      await placeOrderlyOrder.limitOrder(account as OrderlyAccount, 'SELL', currentPrice, adjustmentAmount);
     } else {
-      await placeBinanceOrder(account as BinanceAccount, 'SELL', currentPrice, adjustmentAmount);
+      await placeBinanceOrder.limitOrder(account as BinanceAccount, 'SELL', currentPrice, adjustmentAmount);
     }
   } else if (position < targetPosition) {
     const adjustmentAmount = targetPosition - position;
     console.log(`Adjusting position by buying ${adjustmentAmount}`);
     if (isOrderly) {
-      await placeOrderlyOrder(account as OrderlyAccount, 'BUY', currentPrice, adjustmentAmount);
+      await placeOrderlyOrder.limitOrder(account as OrderlyAccount, 'BUY', currentPrice, adjustmentAmount);
     } else {
-      await placeBinanceOrder(account as BinanceAccount, 'BUY', currentPrice, adjustmentAmount);
+      await placeBinanceOrder.limitOrder(account as BinanceAccount, 'BUY', currentPrice, adjustmentAmount);
     }
   }
 }

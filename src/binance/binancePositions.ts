@@ -25,14 +25,14 @@ export async function getBinancePositions() : Promise<number | null> {
             },
         });
         const positions = response.data;
-        //console.log('Binanace Positions Data:', positions);
+        console.log('Binanace Positions Data:', positions);
 
         if (Array.isArray(positions) && positions.length > 0) {
           const position = positions[0];
           const positionAmt = position.positionAmt;
 
           //console.log(`Binanace ${binanceSymbol} PositionAmt:`, parseFloat(positionAmt));
-          return parseFloat(positionAmt);
+          return position;
       } else {
           console.error('No positions found in the response.');
           return null;
@@ -43,4 +43,4 @@ export async function getBinancePositions() : Promise<number | null> {
       }
     }
 
-    //getBinancePositions();
+    getBinancePositions();
