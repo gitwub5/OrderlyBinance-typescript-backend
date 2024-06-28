@@ -11,17 +11,26 @@ import { getBinancePrice } from './binance/binanceGetPrice';
 async function adjustPosition(account: BinanceAccount | OrderlyAccount, position : number, targetPosition : number , isOrderly : boolean) {
   const currentPrice = isOrderly ? await getOrderlyPrice() : await getBinancePrice();
 
+  if (position === targetPosition) {
+    console.log('No adjustment needed. Position is already at target.');
+    return;
+  }
+
   if (position > targetPosition) {
-      if (isOrderly) {
-        await placeOrderlyOrder(account as OrderlyAccount, 'SELL', currentPrice, position - targetPosition);
-      } else {
-        await placeBinanceOrder(account as BinanceAccount, 'SELL', currentPrice, position - targetPosition);
-      }
-    } else if (position < targetPosition) {
-      if (isOrderly) {
-        await placeOrderlyOrder(account as OrderlyAccount, 'BUY', currentPrice, targetPosition - position);
-      } else {
-        await placeBinanceOrder(account as BinanceAccount, 'BUY', currentPrice, targetPosition - position);
+    const adjustmentAmount = position - targetPosition;
+    console.log(`Adjusting position by selling ${adjustmentAmount}`);
+    if (isOrderly) {
+      await placeOrderlyOrder(account as OrderlyAccount, 'SELL', currentPrice, adjustmentAmount);
+    } else {
+      await placeBinanceOrder(account as BinanceAccount, 'SELL', currentPrice, adjustmentAmount);
+    }
+  } else if (position < targetPosition) {
+    const adjustmentAmount = targetPosition - position;
+    console.log(`Adjusting position by buying ${adjustmentAmount}`);
+    if (isOrderly) {
+      await placeOrderlyOrder(account as OrderlyAccount, 'BUY', currentPrice, adjustmentAmount);
+    } else {
+      await placeBinanceOrder(account as BinanceAccount, 'BUY', currentPrice, adjustmentAmount);
     }
   }
 }
@@ -29,6 +38,9 @@ async function adjustPosition(account: BinanceAccount | OrderlyAccount, position
 export async function manageRisk() {
   const orderlyPosition = await getOrderlyPositions();
   const binancePosition = await getBinancePositions();
+
+  console.log('Orderly position:', orderlyPosition);
+  console.log('Binance position:', binancePosition);
 
   if (orderlyPosition === null || binancePosition === null) {
     console.error('Failed to fetch positions.');
@@ -39,10 +51,10 @@ export async function manageRisk() {
   const targetPosition = orderSize * 5;
 
   if (totalPosition > targetPosition) {
-    await adjustPosition(binanceAccountInfo, binancePosition, 
-      binancePosition + (totalPosition - targetPosition) / 2, false);
+    await adjustPosition(binanceAccountInfo, binancePosition, binancePosition + (totalPosition - targetPosition) / 2, false);
   } else if (totalPosition < -targetPosition) {
-    await adjustPosition(orderlyAccountInfo, orderlyPosition, 
-      orderlyPosition - (targetPosition + totalPosition) / 2, true);
+    await adjustPosition(orderlyAccountInfo, orderlyPosition, orderlyPosition - (targetPosition + totalPosition) / 2, true);
+  } else {
+    console.log('No position adjustment needed.');
   }
 }

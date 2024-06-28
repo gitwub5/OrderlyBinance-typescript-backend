@@ -12,15 +12,15 @@ export async function placeOrder(account: OrderlyAccount, side: string, price: n
   };
 
   try {
-    console.log('creating order', JSON.stringify(body, undefined, 2));
     const res = await signAndSendRequest(account.accountId, account.privateKey, `${ORDERLY_API_URL}/v1/order`, {
       method: 'POST',
       body: JSON.stringify(body)
     });
 
     const json = await res.json();
-    console.log('Orderly Order Res:', JSON.stringify(json, undefined, 2));
+    //console.log('Orderly Order Res:', JSON.stringify(json, undefined, 2));
   } catch (error) {
     console.error('Error creating order:', error);
   }
 }
+
