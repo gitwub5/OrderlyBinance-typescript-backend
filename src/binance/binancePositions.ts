@@ -3,7 +3,6 @@ import { binanceAccountInfo, BINANCE_API_URL, binanceSymbol } from '../utils';
 import { createBinanceSignature } from "./binanceCreateSign";
 import { BinancePosition } from './binanceTypes';
 
-// 현재 포지션의 데이터를 반환해줌
 export async function getBinancePositions(): Promise<BinancePosition | null> {
   const timestamp = Date.now();
   const endpoint = '/fapi/v2/positionRisk';
@@ -26,25 +25,31 @@ export async function getBinancePositions(): Promise<BinancePosition | null> {
       },
     });
     const positions = response.data;
-    console.log(positions);
 
     if (Array.isArray(positions) && positions.length > 0) {
-      const position = positions[0] as BinancePosition;
-      return position;
+      // `symbol` 필터링 추가
+      const position = positions.find((pos: any) => pos.symbol === binanceSymbol) as BinancePosition;
+      if (position) {
+        return position;
+      } else {
+        console.error(`No position found for symbol ${binanceSymbol}`);
+        return null;
+      }
     } else {
       console.error('No positions found in the response.');
       return null;
     }
+
   } catch (error) {
     console.error('Error checking position info:', error);
     return null;
   }
 }
 
-
 getBinancePositions().then(position => {
   if (position) {
-    console.log('Binance Position:', position);
+    console.log('Binance Position:', position.positionAmt);
+    console.log('type: ', typeof(position.positionAmt) );
   } else {
     console.log('No position data available.');
   }

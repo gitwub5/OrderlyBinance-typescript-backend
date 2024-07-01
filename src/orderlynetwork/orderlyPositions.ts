@@ -2,7 +2,6 @@ import { signAndSendRequest } from "./orderlySignRequest";
 import { orderlyAccountInfo, ORDERLY_API_URL, orderlySymbol } from "../utils";
 import { OrderlyPosition, OrderlyPositionResponse } from "./orderlyTypes";
 
-//현재 포지션의 amount를 반환해줌
 export async function getOrderlyPositions() : Promise<OrderlyPosition | null> {
     try {
         const response = await signAndSendRequest(

@@ -24,3 +24,19 @@ export interface OrderlyPosition {
     data: OrderlyPosition;
     timestamp: number;
   }
+
+  export interface BalanceHolding {
+    updated_time: number;
+    token: string;
+    holding: number;
+    frozen: number;
+    pending_short: number;
+  }
+  
+export interface OrderlyBalanceResponse {
+    success: boolean;
+    data: {
+      holding: BalanceHolding[];
+    };
+    timestamp: number;
+  }
