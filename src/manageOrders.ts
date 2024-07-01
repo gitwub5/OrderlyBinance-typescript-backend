@@ -1,5 +1,4 @@
 import { orderlyAccountInfo, binanceAccountInfo, orderSize, interval, arbitrageThreshold } from './utils';
-import { manageRisk } from './riskManagement';
 import { placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
 import { placeBinanceOrder } from './binance/binanceOrders';
 import { getBinancePrice } from './binance/binanceGetPrice';
@@ -69,7 +68,6 @@ async function closePositions() {
 async function manageOrders() {
   while (!shouldStop) {
     await executeArbitrage();
-    //await manageRisk();
     await new Promise(resolve => setTimeout(resolve, interval));
   }
 
