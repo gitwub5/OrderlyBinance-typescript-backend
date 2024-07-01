@@ -46,11 +46,11 @@ export async function getBinancePositions(): Promise<BinancePosition | null> {
   }
 }
 
-getBinancePositions().then(position => {
-  if (position) {
-    console.log('Binance Position:', position.positionAmt);
-    console.log('type: ', typeof(position.positionAmt) );
-  } else {
-    console.log('No position data available.');
-  }
-});
+// getBinancePositions().then(position => {
+//   if (position) {
+//     console.log('Binance Position:', position.positionAmt);
+//     console.log('type: ', typeof(position.positionAmt) );
+//   } else {
+//     console.log('No position data available.');
+//   }
+// });
