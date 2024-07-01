@@ -1,21 +1,7 @@
 import { signAndSendRequest } from "./orderlySignRequest";
 import { orderlyAccountInfo, orderlySymbol, ORDERLY_API_URL } from "../utils";
+import { OrderlyBalanceResponse } from "./orderlyTypes";
 
-interface Holding {
-    updated_time: number;
-    token: string;
-    holding: number;
-    frozen: number;
-    pending_short: number;
-  }
-  
-  interface OrderlyBalanceResponse {
-    success: boolean;
-    data: {
-      holding: Holding[];
-    };
-    timestamp: number;
-  }
 
 export async function getOrderlyBalance(): Promise<number | null>{
     try{

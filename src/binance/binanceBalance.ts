@@ -1,6 +1,7 @@
 import axios from "axios";
 import { binanceAccountInfo, BINANCE_API_URL } from '../utils';
 import { createBinanceSignature } from "./binanceCreateSign";
+import { BinanceBalance } from "./binanceTypes";
 
 //API Description: Query account balance info
 export async function getBinanceBalance() {
@@ -15,7 +16,6 @@ export async function getBinanceBalance() {
   
       const queryString = new URLSearchParams(queryParams).toString();
       const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-  
       const finalQueryString = `${queryString}&signature=${signature}`;
   
       try {
@@ -25,9 +25,9 @@ export async function getBinanceBalance() {
             },
         });
 
-        const usdtInfo = response.data.find((account: any) => account.asset === 'USDT');
-        console.log('Binance USDT Balance:', usdtInfo.balance);
-        return parseFloat(usdtInfo.balance);
+        const balance = response.data.find((account: any) => account.asset === 'USDT') as BinanceBalance;
+        //console.log('Binance USDT Balance:', balance);
+        return balance;
       } catch (error) {
           console.error('Error checking account info:', error);
           return 0;
