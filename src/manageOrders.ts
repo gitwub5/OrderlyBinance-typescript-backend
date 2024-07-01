@@ -19,8 +19,6 @@ async function hasOpenPositions(): Promise<boolean> {
   console.log('Orderly position_qty:', orderlyPosition ? orderlyAmt : 'null');
   console.log('Binance positionAmt:', binancePosition ? positionAmt : 'null');
 
-  console.log(typeof(binancePosition?.symbol));
-
   return (orderlyAmt !== null && orderlyAmt !== 0) || 
          (positionAmt !== null && positionAmt !== 0);
 }
@@ -106,10 +104,12 @@ async function manageOrders() {
 }
 
 // 종료 신호 핸들러
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   shouldStop = true;
   console.log('Received SIGINT. Stopping manageOrders...');
-  closePositions();
+  await closePositions(); 
+  console.log('Exiting manageOrders...');
+  process.exit(0); 
 });
 
 manageOrders();
