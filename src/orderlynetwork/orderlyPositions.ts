@@ -34,12 +34,12 @@ export async function getOrderlyPositions() : Promise<number | null> {
         `${ORDERLY_API_URL}/v1/position/${orderlySymbol}`
         );
         const json = await response.json();
-        //console.log('getClientPositions:', JSON.stringify(json, undefined, 2));
+        //console.log('Orderly Positions data:', JSON.stringify(json, undefined, 2));
 
         if (json && typeof json === 'object' && 'data' in json && 'success' in json) {
           const data = (json as OrderlyPositionResponse).data;
-          const position = data.mark_price
-          console.log(`Orderly ${orderlySymbol} position: `, position);
+          const position = data.position_qty
+          //console.log(`Orderly ${orderlySymbol} position: `, position);
           return position;
         } else {
           console.error('Invalid response structure:', json);
