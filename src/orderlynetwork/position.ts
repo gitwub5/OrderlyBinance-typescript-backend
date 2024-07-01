@@ -1,6 +1,6 @@
-import { signAndSendRequest } from "./orderlySignRequest";
+import { signAndSendRequest } from "./signer";
 import { orderlyAccountInfo, ORDERLY_API_URL, orderlySymbol } from "../utils";
-import { OrderlyPosition, OrderlyPositionResponse } from "./orderlyTypes";
+import { OrderlyPosition, OrderlyPositionResponse } from "./types";
 
 export async function getOrderlyPositions() : Promise<OrderlyPosition | null> {
     try {

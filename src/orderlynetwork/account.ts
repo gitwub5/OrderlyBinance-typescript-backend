@@ -1,6 +1,6 @@
-import { signAndSendRequest } from "./orderlySignRequest";
+import { signAndSendRequest } from "./signer";
 import { orderlyAccountInfo, orderlySymbol, ORDERLY_API_URL } from "../utils";
-import { OrderlyBalanceResponse } from "./orderlyTypes";
+import { OrderlyBalanceResponse } from "./types";
 
 
 export async function getOrderlyBalance(): Promise<number | null>{
@@ -28,4 +28,14 @@ export async function getOrderlyBalance(): Promise<number | null>{
     }
 }
 
-//getOrderlyBalance();
+export async function getOrderlyOpenOrders(){
+    const res = await signAndSendRequest(
+        orderlyAccountInfo.accountId,
+        orderlyAccountInfo.privateKey,
+      `${ORDERLY_API_URL}/v1/orders?status=INCOMPLETE`
+    );
+    const json = await res.json();
+    //console.log('getOpenOrders:', JSON.stringify(json, undefined, 2));
+    //console.log(json.data.rows);
+    return json.data.rows;
+}

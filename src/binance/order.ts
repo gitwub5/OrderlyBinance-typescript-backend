@@ -1,22 +1,21 @@
-import { binanceSymbol, BINANCE_API_URL } from '../utils';
-import { BinanceAccount } from '../types';
-import { createBinanceSignature } from './binanceCreateSign';
+import { binanceSymbol, BINANCE_API_URL, binanceAccountInfo } from '../utils';
+import { createBinanceSignature } from './signer';
 import axios from 'axios';
 
 export class placeBinanceOrder {
-  private static async placeOrder(account: BinanceAccount, queryParams: Record<string, string>) {
+  private static async placeOrder(queryParams: Record<string, string>) {
     const timestamp = Date.now();
     queryParams.timestamp = timestamp.toString();
     queryParams.recvWindow = '5000';
 
     const queryString = new URLSearchParams(queryParams).toString();
-    const signature = await createBinanceSignature(queryString, account.secret);
+    const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
     const finalQueryString = `${queryString}&signature=${signature}`;
 
     try {
       const response = await axios.post(`${BINANCE_API_URL}/fapi/v1/order?${finalQueryString}`, null, {
         headers: {
-          'X-MBX-APIKEY': account.apiKey,
+          'X-MBX-APIKEY': binanceAccountInfo.apiKey,
         },
       });
       //console.log('Binance Order Response:', response.data);
@@ -25,7 +24,7 @@ export class placeBinanceOrder {
     }
   }
 
-  public static async limitOrder(account: BinanceAccount, side: string, price: number, amount: number) {
+  public static async limitOrder(side: string, price: number, amount: number) {
     const queryParams: Record<string, string> = {
       symbol: binanceSymbol,
       side: side,
@@ -35,10 +34,10 @@ export class placeBinanceOrder {
       price: price.toString(),
     };
 
-    await this.placeOrder(account, queryParams);
+    await this.placeOrder(queryParams);
   }
 
-  public static async marketOrder(account: BinanceAccount, side: string, amount: number) {
+  public static async marketOrder( side: string, amount: number) {
     const queryParams: Record<string, string> = {
       symbol: binanceSymbol,
       side: side,
@@ -46,6 +45,8 @@ export class placeBinanceOrder {
       quantity: amount.toString(),
     };
 
-    await this.placeOrder(account, queryParams);
+    await this.placeOrder(queryParams);
   }
 }
+
+//TODO: cancel order 추가
