@@ -1,6 +1,11 @@
-import { symbol,orderlyAxios } from '../utils';
+import { orderlySymbol,orderlyAxios } from '../utils';
 
 export async function getOrderlyPrice() {
-    const marketData = await orderlyAxios.get(`/market/ticker?symbol=${symbol}`);
-    return marketData.data.last;
+    const response = await orderlyAxios.get(`/v1/public/futures/${orderlySymbol}`);
+    const price = response.data.data.mark_price;
+    
+    console.log(`Orderly ${orderlySymbol} price: `, price);
+    return parseFloat(price);
 }
+
+//getOrderlyPrice();

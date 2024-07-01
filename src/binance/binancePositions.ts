@@ -2,7 +2,7 @@ import axios from "axios";
 import { binanceAccountInfo, BINANCE_API_URL, binanceSymbol } from '../utils';
 import { createBinanceSignature } from "./binanceCreateSign";
 
-export async function getBinancePositions() {
+export async function getBinancePositions() : Promise<number | null> {
     const timestamp = Date.now();
       const endpoint = '/fapi/v2/positionRisk';
       const baseUrl = BINANCE_API_URL;
@@ -29,14 +29,17 @@ export async function getBinancePositions() {
         if (Array.isArray(positions) && positions.length > 0) {
           const position = positions[0];
           const markPrice = position.markPrice;
-          console.log('User Position:', markPrice);
+
+          console.log(`Binanace ${binanceSymbol} Position:`, parseFloat(markPrice));
           return parseFloat(markPrice);
       } else {
           console.error('No positions found in the response.');
-          return 0;
+          return null;
       }
       } catch (error) {
           console.error('Error checking position info:', error);
-          return 0;
+          return null;
       }
-  }
+    }
+
+    //getBinancePositions();

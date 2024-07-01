@@ -11,6 +11,7 @@ export interface BinanceBalance {
 
 export interface OrderlyAccount {
     accountId: string;
-    apiKey: string;
-    secret: string;
+    orderlyKey: string;
+    privateKeyBase58: string;
+    privateKey: Uint8Array;
   }

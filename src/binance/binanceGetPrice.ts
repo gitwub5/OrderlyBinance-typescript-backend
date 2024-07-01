@@ -1,7 +1,11 @@
-//업데이트 예정
-import {symbol, binanceAxios } from '../utils';
+import {symbol, binanceAxios, binanceSymbol } from '../utils';
 
 export async function getBinancePrice() {
     const marketData = await binanceAxios.get(`/fapi/v1/ticker/price?symbol=${symbol.replace('/', '')}`);
-    return parseFloat(marketData.data.price);
+    const price = marketData.data.price;
+
+    console.log(`Binance ${binanceSymbol} price: `,price);
+    return parseFloat(price);
 }
+
+//getBinancePrice();
