@@ -4,13 +4,9 @@ import { getOrderlyPositions } from './orderlynetwork/orderlyPositions';
 import { placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
 import { placeBinanceOrder } from './binance/binanceOrders';
 import { BinanceAccount, OrderlyAccount } from './types';
-import { getOrderlyPrice } from './orderlynetwork/orderlyGetPrice';
-import { getBinancePrice } from './binance/binanceGetPrice';
 
 
 async function adjustPosition(account: BinanceAccount | OrderlyAccount, position : number, targetPosition : number , isOrderly : boolean) {
-  const currentPrice = isOrderly ? await getOrderlyPrice() : await getBinancePrice();
-
   if (position === targetPosition) {
     console.log('No adjustment needed. Position is already at target.');
     return;
@@ -20,17 +16,17 @@ async function adjustPosition(account: BinanceAccount | OrderlyAccount, position
     const adjustmentAmount = position - targetPosition;
     console.log(`Adjusting position by selling ${adjustmentAmount}`);
     if (isOrderly) {
-      await placeOrderlyOrder.limitOrder(account as OrderlyAccount, 'SELL', currentPrice, adjustmentAmount);
+      await placeOrderlyOrder.marketOrder(account as OrderlyAccount, 'SELL', adjustmentAmount);
     } else {
-      await placeBinanceOrder.limitOrder(account as BinanceAccount, 'SELL', currentPrice, adjustmentAmount);
+      await placeBinanceOrder.marketOrder(account as BinanceAccount, 'SELL', adjustmentAmount);
     }
   } else if (position < targetPosition) {
     const adjustmentAmount = targetPosition - position;
     console.log(`Adjusting position by buying ${adjustmentAmount}`);
     if (isOrderly) {
-      await placeOrderlyOrder.limitOrder(account as OrderlyAccount, 'BUY', currentPrice, adjustmentAmount);
+      await placeOrderlyOrder.marketOrder(account as OrderlyAccount, 'BUY', adjustmentAmount);
     } else {
-      await placeBinanceOrder.limitOrder(account as BinanceAccount, 'BUY', currentPrice, adjustmentAmount);
+      await placeBinanceOrder.marketOrder(account as BinanceAccount, 'BUY', adjustmentAmount);
     }
   }
 }
@@ -48,7 +44,7 @@ export async function manageRisk() {
   }
 
   const totalPosition = orderlyPosition - binancePosition;
-  const targetPosition = orderSize * 5;
+  const targetPosition = orderSize * 5; //현재는 고정된 값 사용, 비즈니스 로직에 맞게 동적으로 설정 가능 
 
   if (totalPosition > targetPosition) {
     await adjustPosition(binanceAccountInfo, binancePosition, binancePosition + (totalPosition - targetPosition) / 2, false);

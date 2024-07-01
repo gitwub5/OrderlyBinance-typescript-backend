@@ -19,7 +19,7 @@ export class placeBinanceOrder {
           'X-MBX-APIKEY': account.apiKey,
         },
       });
-      console.log('Binance Order Response:', response.data);
+      //console.log('Binance Order Response:', response.data);
     } catch (error) {
       console.error('Error placing Binance order:', error);
     }

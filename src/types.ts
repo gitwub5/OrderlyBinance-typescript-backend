@@ -3,12 +3,6 @@ export interface BinanceAccount {
     secret: string;
   }
 
-export interface BinanceBalance {
-    asset: string;
-    free: string;
-    locked: string;
-  }
-
 export interface OrderlyAccount {
     accountId: string;
     orderlyKey: string;

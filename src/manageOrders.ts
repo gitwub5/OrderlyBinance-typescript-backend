@@ -8,7 +8,6 @@ import { getOrderlyPositions } from './orderlynetwork/orderlyPositions';
 import { getBinancePositions } from './binance/binancePositions';
 
 let shouldStop = false;
-const profitTarget = 1000; // 수익 목표 예시 (USD 기준)
 
 async function executeArbitrage() {
   const orderlyPrice = await getOrderlyPrice();
@@ -34,6 +33,7 @@ async function executeArbitrage() {
   }
 }
 
+//포지션 청산(Market Order)
 async function closePositions() {
   const orderlyPosition = await getOrderlyPositions();
   const binancePosition = await getBinancePositions();
@@ -41,63 +41,46 @@ async function closePositions() {
   console.log('Closing positions...');
 
   if (orderlyPosition !== null) {
-    if (orderlyPosition > 0) {
+    if (orderlyPosition.position_qty > 0) {
       console.log(`Closing Orderly long position: SELL ${orderlyPosition}`);
-      await placeOrderlyOrder.marketOrder(orderlyAccountInfo, 'SELL', orderlyPosition);
-    } else if (orderlyPosition < 0) {
+      await placeOrderlyOrder.marketOrder(orderlyAccountInfo, 'SELL', orderlyPosition.position_qty);
+    } else if (orderlyPosition.position_qty < 0) {
       console.log(`Closing Orderly short position: BUY ${-orderlyPosition}`);
-      await placeOrderlyOrder.marketOrder(orderlyAccountInfo, 'BUY', -orderlyPosition);
+      await placeOrderlyOrder.marketOrder(orderlyAccountInfo, 'BUY', -orderlyPosition.position_qty);
     }
   } else {
     console.log('No Orderly position to close.');
   }
 
   if (binancePosition !== null) {
-    if (binancePosition > 0) {
+    if (binancePosition.positionAmt > 0) {
       console.log(`Closing Binance long position: SELL ${binancePosition}`);
-      await placeBinanceOrder.marketOrder(binanceAccountInfo, 'SELL', binancePosition);
-    } else if (binancePosition < 0) {
+      await placeBinanceOrder.marketOrder(binanceAccountInfo, 'SELL', binancePosition.positionAmt);
+    } else if (binancePosition.positionAmt < 0) {
       console.log(`Closing Binance short position: BUY ${-binancePosition}`);
-      await placeBinanceOrder.marketOrder(binanceAccountInfo, 'BUY', -binancePosition);
+      await placeBinanceOrder.marketOrder(binanceAccountInfo, 'BUY', -binancePosition.positionAmt);
     }
   } else {
     console.log('No Binance position to close.');
   }
 }
 
-async function checkProfitAndClosePositions() {
-  const orderlyPrice = await getOrderlyPrice();
-  const binancePrice = await getBinancePrice();
-
-  // 수익 계산 (여기서는 간단히 차이만 계산, 실제로는 더 정교한 수익 계산 필요)
-  const currentProfit = (binancePrice - orderlyPrice) * orderSize; // 단순 예시
-
-  console.log('Current Profit:', currentProfit);
-
-  if (currentProfit >= profitTarget) {
-    console.log('Profit target reached. Closing all positions.');
-    await closePositions();
-    shouldStop = true; // 루프 종료를 위해 설정
-  }
-}
 
 async function manageOrders() {
-  while (true) {
-    console.log(`<<<< Timestamp: ${Date.now()} >>>>`);
+  while (!shouldStop) {
     await executeArbitrage();
-    await manageRisk();
-    //TODO: Close Position 구현 -> 목표 이익 설정 밎 포지션 정리
-    await checkProfitAndClosePositions();
+    //await manageRisk();
     await new Promise(resolve => setTimeout(resolve, interval));
-    console.log();
   }
+
+  console.log('Exiting manageOrders...');
 }
 
 // 종료 신호 핸들러
 process.on('SIGINT', () => {
   shouldStop = true;
   console.log('Received SIGINT. Stopping manageOrders...');
-  closePositions(); // 종료 신호를 받으면 포지션을 정리합니다.
+  closePositions();
 });
 
 manageOrders();
