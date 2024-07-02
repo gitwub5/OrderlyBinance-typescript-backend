@@ -3,8 +3,8 @@ import { placeOrderlyOrder } from './orderlynetwork/order';
 import { placeBinanceOrder } from './binance/order';
 import { getBinancePrice } from './binance/market';
 import { getOrderlyPrice } from './orderlynetwork/market';
-import { getOrderlyPositions } from './orderlynetwork/position';
-import { getBinancePositions } from './binance/position';
+import { getOrderlyPositions } from './orderlynetwork/account';
+import { getBinancePositions } from './binance/account';
 import { closePositions } from './closePositioins';
 import { shouldStop } from './globals';
 
@@ -61,6 +61,7 @@ export async function manageOrders() {
   while (!shouldStop) {
     await executeArbitrage();
     await new Promise(resolve => setTimeout(resolve, interval));
+    console.log();
   }
 
   console.log('Exiting manageOrders...');

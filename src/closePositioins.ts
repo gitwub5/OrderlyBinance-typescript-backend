@@ -4,7 +4,7 @@ import { cancelAllBinanceOrders, placeBinanceOrder } from './binance/order';
 import { getBinancePrice } from './binance/market';
 import { getOrderlyPrice } from './orderlynetwork/market';
 import { getOrderlyPositions } from './orderlynetwork/position';
-import { getBinancePositions } from './binance/position';
+import { getBinancePositions } from './binance/account';
 import { recordTrade } from './db/queries';
 import { forceStop } from './globals';
 

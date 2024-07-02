@@ -41,12 +41,12 @@ export const orderlyAxios = axios.create({
   },
 });
 
-export const binanceAxios = axios.create({
-  baseURL: BINANCE_API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// export const binanceAxios = axios.create({
+//   baseURL: BINANCE_API_URL,
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+// });
 
 // export function createOrderlyWebSocket() {
 //   return new WebSocket('wss://ws.orderly.network');
