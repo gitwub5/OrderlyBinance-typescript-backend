@@ -28,14 +28,22 @@ export async function getOrderlyBalance(): Promise<number | null>{
     }
 }
 
-export async function getOrderlyOpenOrders(){
-    const res = await signAndSendRequest(
-        orderlyAccountInfo.accountId,
-        orderlyAccountInfo.privateKey,
-      `${ORDERLY_API_URL}/v1/orders?status=INCOMPLETE`
-    );
-    const json = await res.json();
-    //console.log('getOpenOrders:', JSON.stringify(json, undefined, 2));
-    //console.log(json.data.rows);
-    return json.data.rows;
+//모든 Open Orders 가져오기
+export async function getOrderlyOpenOrders(): Promise<number[] | null> {
+    try{
+        const res = await signAndSendRequest(
+            orderlyAccountInfo.accountId,
+            orderlyAccountInfo.privateKey,
+        `${ORDERLY_API_URL}/v1/orders?status=INCOMPLETE`
+        );
+        const json = await res.json();
+        //console.log('getOpenOrders:', JSON.stringify(json, undefined, 2));
+        //console.log(json.data.rows);
+        const orderIds = json.data.rows.map((order: any) => order.order_id);
+        console.log(orderIds);
+        return orderIds;
+    } catch(error){
+        console.error('Error checking orders info:', error);
+        return null;
+    }
 }
