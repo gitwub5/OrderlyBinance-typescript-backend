@@ -12,16 +12,11 @@ export async function getOrderlyBalance(): Promise<number | null>{
         );
         const json = await response.json();
         //console.log('getClientHolding:', JSON.stringify(json, undefined, 2));
-
-        if (json && typeof json === 'object' && 'data' in json && 'success' in json) {
-            const data = (json as OrderlyBalanceResponse).data;
-            const holding = data.holding[0].holding;
-            console.log(`Orderly ${orderlySymbol} holding: `, holding);
-            return holding;
-        } else {
-            console.error('Invalid response structure:', json);
-            return null;
-        }
+        const data = (json as OrderlyBalanceResponse).data;
+        const holding = data.holding[0].holding;
+        console.log(`Orderly ${orderlySymbol} holding: `, holding);
+        return holding;
+        
     } catch(error){
         console.error('Error checking account info:', error);
         return null;
@@ -37,14 +32,8 @@ export async function getOrderlyPositions() : Promise<OrderlyPosition | null> {
         );
         const json: OrderlyPositionResponse = await response.json();
         //console.log('Orderly Positions data:', JSON.stringify(json, undefined, 2));
-
-        if (json && json.success && json.data) {
-          const position = json.data;
-          return position;
-        } else {
-          console.error('Invalid response structure:', json);
-          return null;
-        }
+        const position = json.data;
+        return position;
 
       } catch (error) {
         console.error('Error:', error);
@@ -61,8 +50,6 @@ export async function getOrderlyOpenOrders(): Promise<number[] | null> {
         `${ORDERLY_API_URL}/v1/orders?status=INCOMPLETE`
         );
         const json = await res.json();
-        //console.log('getOpenOrders:', JSON.stringify(json, undefined, 2));
-        //console.log(json.data.rows);
         const orderIds = json.data.rows.map((order: any) => order.order_id);
         console.log(orderIds);
         return orderIds;
