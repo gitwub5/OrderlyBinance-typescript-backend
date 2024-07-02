@@ -8,10 +8,11 @@ export async function getOrderlyPrice() {
         `${ORDERLY_API_URL}/v1/public/futures/${orderlySymbol}`
     );
     const json = await response.json();
-    console.log(json);
+    const price = json.data.mark_price;
     //console.log(`Orderly ${orderlySymbol} price: `, parseFloat(price));
-   // return parseFloat(price);
+    return parseFloat(price);
 }
+getOrderlyPrice();
 
 //Snapshot of the current orderbook. Price of asks/bids are in descending order.
 type Level = { price: number; quantity: number };
