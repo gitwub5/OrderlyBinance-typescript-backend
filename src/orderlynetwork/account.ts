@@ -71,3 +71,5 @@ export async function getOrderlyOpenOrders(): Promise<number[] | null> {
         return null;
     }
 }
+
+//TODO: 주문 기록 가져오는 함수

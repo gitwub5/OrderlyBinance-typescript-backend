@@ -51,4 +51,4 @@ export async function getBinanceOpenOrders() {
   return null;
 }
 
-getBinanceOpenOrders();
+//TODO: 주문 기록 가져오는 함수

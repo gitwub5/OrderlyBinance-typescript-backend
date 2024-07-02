@@ -29,3 +29,6 @@ export async function getOrderlyOrderbook(maxLevel: number): Promise<OrderbookSn
   console.log('getOrderbook:', JSON.stringify(json, undefined, 2));
   return json;
 }
+
+//TODO: 과거 가격 불러오는 함수
+//나중에 가격갭찾을때 한달이나 일주일 과거 가격 불러와서 비교해서 찾기
