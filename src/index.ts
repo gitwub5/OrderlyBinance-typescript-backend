@@ -1,4 +1,5 @@
-import { manageOrders, closePositions } from './manageOrders';
+import { manageOrders } from './manageOrders';
+import { closePositions } from './closePositioins';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 

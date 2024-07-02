@@ -37,7 +37,7 @@ export class placeOrderlyOrder {
   }
 }
 
-export async function cancelOrderlyOrder(orderId: string) {
+export async function cancelOrderlyOrder(orderId: number) {
   try {
       const response = await signAndSendRequest(
         orderlyAccountInfo.accountId,
@@ -48,7 +48,45 @@ export async function cancelOrderlyOrder(orderId: string) {
           }
         );
         const json = await response.json();
-        console.log('cancelOrder:', JSON.stringify(json, undefined, 2));
+        //console.log('cancelOrder:', JSON.stringify(json, undefined, 2));
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+}
+
+export async function cancelBatchOrderlyOrders(order_ids: number[]) {
+  const orderIdsString = order_ids.join(',');
+
+  try {
+      const response = await signAndSendRequest(
+        orderlyAccountInfo.accountId,
+        orderlyAccountInfo.privateKey,
+        `${ORDERLY_API_URL}/v1/batch-order?order_ids=${orderIdsString}`,
+        {
+          method: 'DELETE'
+        }
+      );
+      const json = await response.json();
+      //console.log('cancelBatchOrder:', JSON.stringify(json, undefined, 2));
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+}
+
+export async function cancelAllOrderlyOrders() {
+  try {
+      const response = await signAndSendRequest(
+        orderlyAccountInfo.accountId,
+        orderlyAccountInfo.privateKey,
+          `${ORDERLY_API_URL}/v1/orders?symbol=${orderlySymbol}`,
+          {
+            method: 'DELETE'
+          }
+        );
+        const json = await response.json();
+        //console.log('cancelAllOrder:', JSON.stringify(json, undefined, 2));
     } catch (error) {
       console.error('Error:', error);
       return null;
