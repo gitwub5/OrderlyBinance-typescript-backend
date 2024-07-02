@@ -2,6 +2,7 @@
 import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from 'bs58';
 
+//TODO: 수정 필요
 export async function signAndSendRequest(
   orderlyAccountId: string,
   privateKey: Uint8Array | string,

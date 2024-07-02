@@ -1,7 +1,7 @@
 import axios from "axios";
 import { binanceAccountInfo, BINANCE_API_URL, binanceSymbol } from '../utils';
-import { createBinanceSignature } from "./binanceCreateSign";
-import { BinancePosition } from './binanceTypes';
+import { createBinanceSignature } from "./signer";
+import { BinancePosition } from './types';
 
 export async function getBinancePositions(): Promise<BinancePosition | null> {
   const timestamp = Date.now();

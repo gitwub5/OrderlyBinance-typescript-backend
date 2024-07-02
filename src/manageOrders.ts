@@ -1,10 +1,10 @@
-import { orderlyAccountInfo, binanceAccountInfo, orderSize, interval, arbitrageThreshold, closeThreshold} from './utils';
-import { placeOrderlyOrder } from './orderlynetwork/orderlyOrders';
-import { placeBinanceOrder } from './binance/binanceOrders';
-import { getBinancePrice } from './binance/binanceGetPrice';
-import { getOrderlyPrice } from './orderlynetwork/orderlyGetPrice';
-import { getOrderlyPositions } from './orderlynetwork/orderlyPositions';
-import { getBinancePositions } from './binance/binancePositions';
+import { orderSize, interval, arbitrageThreshold, closeThreshold} from './utils';
+import { placeOrderlyOrder } from './orderlynetwork/order';
+import { placeBinanceOrder } from './binance/order';
+import { getBinancePrice } from './binance/market';
+import { getOrderlyPrice } from './orderlynetwork/market';
+import { getOrderlyPositions } from './orderlynetwork/position';
+import { getBinancePositions } from './binance/position';
 import { recordTrade } from './db/queries';
 import { shouldStop, forceStop } from './globals';
 
@@ -38,14 +38,14 @@ async function executeArbitrage() {
   if (priceDifference > arbitrageThreshold) {
     // 바이낸스에서 매수, 오덜리에서 매도
     console.log('Executing arbitrage: BUY on Binance, SELL on Orderly');
-    await placeBinanceOrder.limitOrder(binanceAccountInfo, 'BUY', binancePrice, orderSize);
-    await placeOrderlyOrder.limitOrder(orderlyAccountInfo, 'SELL', orderlyPrice, orderSize);
+    await placeBinanceOrder.limitOrder('BUY', binancePrice, orderSize);
+    await placeOrderlyOrder.limitOrder('SELL', orderlyPrice, orderSize);
     
   } else if (priceDifference < -arbitrageThreshold) {
     // 오덜리에서 매수, 바이낸스에서 매도
     console.log('Executing arbitrage: BUY on Orderly, SELL on Binance');
-    await placeOrderlyOrder.limitOrder(orderlyAccountInfo, 'BUY', orderlyPrice, orderSize);
-    await placeBinanceOrder.limitOrder(binanceAccountInfo, 'SELL', binancePrice, orderSize);
+    await placeOrderlyOrder.limitOrder('BUY', orderlyPrice, orderSize);
+    await placeBinanceOrder.limitOrder('SELL', binancePrice, orderSize);
   } else if (Math.abs(priceDifference) < closeThreshold) {
     // 가격 차이가 임계값 이하로 감소하면 포지션 청산
     const hasPositions = await hasOpenPositions();
@@ -61,7 +61,7 @@ async function executeArbitrage() {
 //포지션 청산(Market Order)
 export async function closePositions() {
   console.log('Closing positions...');
-  
+
   const orderlyPosition = await getOrderlyPositions();
   const binancePosition = await getBinancePositions();
 
@@ -76,11 +76,11 @@ export async function closePositions() {
   if (orderlyAmt !== null) {
     if (orderlyAmt > 0) {
       console.log(`Closing Orderly long position: SELL ${orderlyAmt}`);
-      await placeOrderlyOrder.marketOrder(orderlyAccountInfo, 'SELL', orderlyAmt);
+      await placeOrderlyOrder.marketOrder('SELL', orderlyAmt);
       profitLoss += orderlyAmt * (orderlyPrice - binancePrice);
     } else if (orderlyAmt < 0) {
       console.log(`Closing Orderly short position: BUY ${-orderlyAmt}`);
-      await placeOrderlyOrder.marketOrder(orderlyAccountInfo, 'BUY', -orderlyAmt);
+      await placeOrderlyOrder.marketOrder('BUY', -orderlyAmt);
       profitLoss += orderlyAmt * (binancePrice - orderlyPrice);
     }
   } else {
@@ -90,11 +90,11 @@ export async function closePositions() {
   if (binanceAmt !== null) {
     if (binanceAmt > 0) {
       console.log(`Closing Binance long position: SELL ${binanceAmt}`);
-      await placeBinanceOrder.marketOrder(binanceAccountInfo, 'SELL', binanceAmt);
+      await placeBinanceOrder.marketOrder('SELL', binanceAmt);
       profitLoss += binanceAmt * (binancePrice - orderlyPrice);
     } else if (binanceAmt < 0) {
       console.log(`Closing Binance short position: BUY ${-binanceAmt}`);
-      await placeBinanceOrder.marketOrder(binanceAccountInfo, 'BUY', -binanceAmt);
+      await placeBinanceOrder.marketOrder('BUY', -binanceAmt);
       profitLoss += binanceAmt * (orderlyPrice - binancePrice);
     }
   } else {

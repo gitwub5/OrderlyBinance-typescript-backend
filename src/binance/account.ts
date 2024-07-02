@@ -1,7 +1,7 @@
 import axios from "axios";
 import { binanceAccountInfo, BINANCE_API_URL } from '../utils';
-import { createBinanceSignature } from "./binanceCreateSign";
-import { BinanceBalance } from "./binanceTypes";
+import { createBinanceSignature } from "./signer";
+import { BinanceBalance } from "./types";
 
 //API Description: Query account balance info
 export async function getBinanceBalance() {
