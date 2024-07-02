@@ -1,27 +1,10 @@
-import { binanceSymbol, BINANCE_API_URL, binanceAccountInfo, symbol, binanceAxios } from '../utils';
-import { createBinanceSignature } from './signer';
-import axios from 'axios';
+import { binanceSymbol } from '../utils';
+import { createSignAndRequest } from './signer';
 
 export class placeBinanceOrder {
   private static async placeOrder(queryParams: Record<string, string>) {
-    const timestamp = Date.now();
-    queryParams.timestamp = timestamp.toString();
-    queryParams.recvWindow = '5000';
-
-    const queryString = new URLSearchParams(queryParams).toString();
-    const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-    const finalQueryString = `${queryString}&signature=${signature}`;
-
-    try {
-      const response = await axios.post(`${BINANCE_API_URL}/fapi/v1/order?${finalQueryString}`, null, {
-        headers: {
-          'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-        },
-      });
-      //console.log('Binance Order Response:', response.data);
-    } catch (error) {
-      console.error('Error placing Binance order:', error);
-    }
+    const endpoint = '/fapi/v1/order';
+    return await createSignAndRequest(endpoint, queryParams, 'POST');
   }
 
   public static async limitOrder(side: string, price: number, amount: number) {
@@ -37,12 +20,11 @@ export class placeBinanceOrder {
     await this.placeOrder(queryParams);
   }
 
-  public static async marketOrder( side: string, amount: number) {
+  public static async marketOrder(side: string, amount: number) {
     const queryParams: Record<string, string> = {
       symbol: binanceSymbol,
       side: side,
-      type: 'LIMIT',
-      timeInForce: 'GTC',
+      type: 'MARKET',
       quantity: amount.toString()
     };
 
@@ -50,96 +32,35 @@ export class placeBinanceOrder {
   }
 }
 
+
 //TODO: cancel order 추가
 export async function cancelBinanceOrder(orderId: number) {
-  const timestamp = Date.now();
   const endpoint = '/fapi/v1/order';
-  const baseUrl = BINANCE_API_URL;
-
   const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
-      orderId: orderId.toString(),
-      timestamp: timestamp.toString(),
-      recvWindow: '5000'
+    symbol: binanceSymbol,
+    orderId: orderId.toString(),
   };
 
-  const queryString = new URLSearchParams(queryParams).toString();
-  const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-  const finalQueryString = `${queryString}&signature=${signature}`;
-
-  try {
-    const response = await axios.delete(`${baseUrl}${endpoint}?${finalQueryString}`, {
-        headers: {
-            'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-        },
-    });
-    const cancel = response.data;
-    //console.log('cancelOrder:', cancel);
-  
-  } catch(error){
-    console.error('Error:', error);
-    return null;
-    }
+  return await createSignAndRequest(endpoint, queryParams, 'DELETE');
 }
 
+//Cancel multiple orders
 export async function cancelMultipleBinanceOrders(orderIdList: number[]) {
-  const timestamp = Date.now();
   const endpoint = '/fapi/v1/batchOrders';
-  const baseUrl = BINANCE_API_URL;
-
   const queryParams = {
-      symbol: binanceSymbol,
-      orderIdList: JSON.stringify(orderIdList),
-      timestamp: timestamp.toString(),
-      recvWindow: '5000'
+    symbol: binanceSymbol,
+    orderIdList: JSON.stringify(orderIdList),
   };
 
-  const queryString = new URLSearchParams(queryParams).toString();
-  const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-  const finalQueryString = `${queryString}&signature=${signature}`;
-
-  try {
-    const response = await axios.delete(`${baseUrl}${endpoint}?${finalQueryString}`, {
-        headers: {
-            'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-        },
-    });
-    const cancelmultiple = response.data;
-    //console.log('cancelAllOrders:', cancelmultiple);
-  
-  } catch(error){
-    console.error('Error:', error);
-    return null;
-    }
+  return await createSignAndRequest(endpoint, queryParams, 'DELETE');
 }
 
 //Cancel All Open Orders
 export async function cancelAllBinanceOrders() {
-  const timestamp = Date.now();
   const endpoint = '/fapi/v1/allOpenOrders';
-  const baseUrl = BINANCE_API_URL;
-
   const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
-      timestamp: timestamp.toString(),
-      recvWindow: '5000'
+    symbol: binanceSymbol,
   };
 
-  const queryString = new URLSearchParams(queryParams).toString();
-  const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-  const finalQueryString = `${queryString}&signature=${signature}`;
-
-  try {
-    const response = await axios.delete(`${baseUrl}${endpoint}?${finalQueryString}`, {
-        headers: {
-            'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-        },
-    });
-    const cancel = response.data;
-    //console.log('cancelAllOrders:', cancel);
-  
-  } catch(error){
-    console.error('Error:', error);
-    return null;
-    }
+  return await createSignAndRequest(endpoint, queryParams, 'DELETE');
 }

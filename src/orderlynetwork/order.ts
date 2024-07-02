@@ -1,5 +1,4 @@
 import { orderlySymbol, ORDERLY_API_URL, orderlyAccountInfo } from '../utils';
-import { OrderlyAccount } from '../types';
 import { signAndSendRequest } from './signer'
 
 export class placeOrderlyOrder {
@@ -16,12 +15,12 @@ export class placeOrderlyOrder {
     }
 
     try {
-      const res = await signAndSendRequest(orderlyAccountInfo.accountId, orderlyAccountInfo.privateKey, `${ORDERLY_API_URL}/v1/order`, {
+      const response = await signAndSendRequest(orderlyAccountInfo.accountId, orderlyAccountInfo.privateKey, `${ORDERLY_API_URL}/v1/order`, {
         method: 'POST',
         body: JSON.stringify(body)
       });
 
-      const json = await res.json();
+      const json = await response.json();
       //console.log('Orderly Order Response:', JSON.stringify(json, undefined, 2));
     } catch (error) {
       console.error('Error creating order:', error);

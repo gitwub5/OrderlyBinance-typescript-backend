@@ -1,6 +1,6 @@
 import { signAndSendRequest } from "./signer";
 import { orderlyAccountInfo, orderlySymbol, ORDERLY_API_URL } from "../utils";
-import { OrderlyBalanceResponse } from "./types";
+import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "./types";
 
 
 export async function getOrderlyBalance(): Promise<number | null>{
@@ -28,6 +28,30 @@ export async function getOrderlyBalance(): Promise<number | null>{
     }
 }
 
+export async function getOrderlyPositions() : Promise<OrderlyPosition | null> {
+    try {
+        const response = await signAndSendRequest(
+        orderlyAccountInfo.accountId,
+        orderlyAccountInfo.privateKey,
+        `${ORDERLY_API_URL}/v1/position/${orderlySymbol}`
+        );
+        const json: OrderlyPositionResponse = await response.json();
+        //console.log('Orderly Positions data:', JSON.stringify(json, undefined, 2));
+
+        if (json && json.success && json.data) {
+          const position = json.data;
+          return position;
+        } else {
+          console.error('Invalid response structure:', json);
+          return null;
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        return null;
+      }
+}
+
 //모든 Open Orders 가져오기
 export async function getOrderlyOpenOrders(): Promise<number[] | null> {
     try{
@@ -47,3 +71,5 @@ export async function getOrderlyOpenOrders(): Promise<number[] | null> {
         return null;
     }
 }
+
+//TODO: 주문 기록 가져오는 함수

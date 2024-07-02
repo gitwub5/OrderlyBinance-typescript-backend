@@ -1,71 +1,54 @@
-import axios from "axios";
-import { binanceAccountInfo, BINANCE_API_URL, symbol, binanceSymbol } from '../utils';
-import { createBinanceSignature } from "./signer";
+import { binanceSymbol } from '../utils';
+import { createSignAndRequest } from "./signer";
 import { BinanceBalance } from "./types";
+import { BinancePosition } from './types';
 
 //API Description: Query account balance info
-export async function getBinanceBalance() {
-    const timestamp = Date.now();
-      const endpoint = '/fapi/v2/balance';
-      const baseUrl = BINANCE_API_URL;
-  
-      const queryParams = {
-          timestamp: timestamp.toString(),
-          recvWindow: '5000'
-      };
-  
-      const queryString = new URLSearchParams(queryParams).toString();
-      const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-      const finalQueryString = `${queryString}&signature=${signature}`;
-  
-      try {
-        const response = await axios.get(`${baseUrl}${endpoint}?${finalQueryString}`, {
-            headers: {
-                'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-            },
-        });
+// API 설명: 계좌 잔액 정보 조회
+export async function getBinanceBalance(){
+  const endpoint = '/fapi/v2/balance';
+  const queryParams = {
+      recvWindow: '5000'
+  };
 
-        const balance = response.data.find((account: any) => account.asset === 'USDT') as BinanceBalance;
-        //console.log('Binance USDT Balance:', balance);
-        return balance;
-      } catch (error) {
-          console.error('Error checking account info:', error);
-          return null;
-      }
+  const data = await createSignAndRequest(endpoint, queryParams, 'GET');
+  if (data) {
+      const balance = data.find((account: any) => account.asset === 'USDT') as BinanceBalance;
+      return balance.balance;
   }
+  return null;
+}
 
-  //getBinanceBalance();
+// 현재 포지션 정보 조회
+export async function getBinancePositions(): Promise<BinancePosition | null> {
+  const endpoint = '/fapi/v2/positionRisk';
+  const queryParams = {
+      symbol: binanceSymbol,
+      recvWindow: '5000'
+  };
 
-
-  //Get all open orders on a symbol.
-  export async function getBinanceOpenOrders() {
-    const timestamp = Date.now();
-      const endpoint = '/fapi/v1/openOrders';
-      const baseUrl = BINANCE_API_URL;
-  
-      const queryParams: Record<string, string> = {
-        symbol: binanceSymbol,
-        recvWindow: '5000',
-        timestamp: timestamp.toString(),
-      };
-  
-      const queryString = new URLSearchParams(queryParams).toString();
-      const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
-      const finalQueryString = `${queryString}&signature=${signature}`;
-  
-      try {
-        const response = await axios.get(`${baseUrl}${endpoint}?${finalQueryString}`, {
-            headers: {
-                'X-MBX-APIKEY': binanceAccountInfo.apiKey,
-            },
-        });
-
-        const openOrders = response.data;
-        const orderIds = openOrders.map((order: any) => order.orderId);
-        //console.log('Binance Open Orders:', orderIds);
-        return orderIds;
-      } catch (error) {
-          console.error('Error:', error);
-          return null;
-      }
+  const data = await createSignAndRequest(endpoint, queryParams, 'GET');
+  if (data && Array.isArray(data)) {
+      const position = data.find((pos: any) => pos.symbol === binanceSymbol) as BinancePosition;
+      return position || null;
   }
+  return null;
+}
+
+// 심볼의 모든 미체결 주문 조회
+export async function getBinanceOpenOrders() {
+  const endpoint = '/fapi/v1/openOrders';
+  const queryParams: Record<string, string> = {
+      symbol: binanceSymbol,
+      recvWindow: '5000',
+  };
+
+  const data = await createSignAndRequest(endpoint, queryParams, 'GET');
+  if (data) {
+      const orderIds = data.map((order: any) => order.orderId);
+      return orderIds;
+  }
+  return null;
+}
+
+//TODO: 주문 기록 가져오는 함수
