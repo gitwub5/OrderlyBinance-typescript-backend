@@ -2,10 +2,11 @@
     "name": "arbitrage-bot",
     "version": "1.0.0",
     "description": "An arbitrage bot for Orderly and Binance exchanges",
-    "main": "src/manageOrders.ts",
+    "main": "src/index.ts",
     "scripts": {
-       "build": "tsc",
-        "start": "node dist/manageOrders.js"
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "run": "ts-node src/index.ts"
     },
     "dependencies": {
         "@noble/curves": "^1.4.0",
@@ -13,7 +14,8 @@
         "axios": "^1.7.2",
         "bs58": "^6.0.0",
         "crypto": "^1.0.1",
-        "dotenv": "^16.4.5"
+        "dotenv": "^16.4.5",
+        "mysql2": "^3.10.2"
     },
     "devDependencies": {
         "@types/node": "^20.14.9",

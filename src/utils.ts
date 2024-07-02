@@ -2,9 +2,10 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { BinanceAccount, OrderlyAccount } from './types';
 import bs58 from 'bs58';
+import path from 'path';
 // import WebSocket from 'ws';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const ORDERLY_API_URL = 'https://api-evm.orderly.org';
 export const BINANCE_API_URL = 'https://fapi.binance.com';
@@ -31,6 +32,7 @@ export const orderlySymbol = `PERP_${symbol.split('/')[0]}_USDC`;//Orderly에서
 export const orderSize = 5; // 주문 크기 (단위: TON)
 export const interval = 30000; // 1분 ->30초 (단위시간)
 export const arbitrageThreshold = 0.1; // 아비트리지 허용 임계값 (%)
+export const closeThreshold = arbitrageThreshold / 2;
 
 export const orderlyAxios = axios.create({
   baseURL: ORDERLY_API_URL,
