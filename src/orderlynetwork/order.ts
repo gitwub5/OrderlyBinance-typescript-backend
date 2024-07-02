@@ -48,7 +48,7 @@ export async function cancelOrderlyOrder(orderId: number) {
           }
         );
         const json = await response.json();
-        console.log('cancelOrder:', JSON.stringify(json, undefined, 2));
+        //console.log('cancelOrder:', JSON.stringify(json, undefined, 2));
     } catch (error) {
       console.error('Error:', error);
       return null;
@@ -68,7 +68,7 @@ export async function cancelBatchOrderlyOrders(order_ids: number[]) {
         }
       );
       const json = await response.json();
-      console.log('cancelOrder:', JSON.stringify(json, undefined, 2));
+      //console.log('cancelBatchOrder:', JSON.stringify(json, undefined, 2));
     } catch (error) {
       console.error('Error:', error);
       return null;
@@ -86,7 +86,7 @@ export async function cancelAllOrderlyOrders() {
           }
         );
         const json = await response.json();
-        console.log('cancelOrder:', JSON.stringify(json, undefined, 2));
+        //console.log('cancelAllOrder:', JSON.stringify(json, undefined, 2));
     } catch (error) {
       console.error('Error:', error);
       return null;

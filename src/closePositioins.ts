@@ -54,8 +54,9 @@ export async function closePositions() {
     }
 
     //오덜리 & 바이낸스 모든 주문 취소
-    cancelAllBinanceOrders();
-    cancelAllOrderlyOrders();
+    await cancelAllBinanceOrders();
+    await cancelAllOrderlyOrders();
+    console.log('All Open Orders are canceled...');
   
     if (!forceStop) {
       await recordTrade(orderlyPrice, binancePrice, orderlyAmt !== null ? orderlyAmt : 0, profitLoss, arbitrageThreshold, closeThreshold);

@@ -113,7 +113,6 @@ export async function cancelMultipleBinanceOrders(orderIdList: number[]) {
     }
 }
 
-
 //Cancel All Open Orders
 export async function cancelAllBinanceOrders() {
   const timestamp = Date.now();

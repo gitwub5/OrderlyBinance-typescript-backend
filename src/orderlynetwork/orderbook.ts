@@ -15,5 +15,3 @@ export async function getOrderlyOrderbook(maxLevel: number): Promise<OrderbookSn
   console.log('getOrderbook:', JSON.stringify(json, undefined, 2));
   return json;
 }
-
-getOrderlyOrderbook(10);

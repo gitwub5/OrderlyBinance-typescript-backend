@@ -32,7 +32,7 @@ export const orderlySymbol = `PERP_${symbol.split('/')[0]}_USDC`;//Orderly에서
 export const orderSize = 5; // 주문 크기 (단위: TON)
 export const interval = 30000; // 1분 ->30초 (단위시간)
 export const arbitrageThreshold = 0.1; // 아비트리지 허용 임계값 (%)
-export const closeThreshold = arbitrageThreshold / 2;
+export const closeThreshold = arbitrageThreshold / 2; //포지션 청산 임계값
 
 export const orderlyAxios = axios.create({
   baseURL: ORDERLY_API_URL,

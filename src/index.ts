@@ -27,5 +27,3 @@ init().catch(err => {
     console.error('Failed to initialize application:', err);
     process.exit(1);
 });
-
-//TODO: Profit을 따로 계산해서 저장하는데 거의 대부분의 주문이 원하는 가격으로 안들어갈 확률이 높아서 수익률이 정확하지 않을 수 있어서 주문 기록을 거래소에서 가져와서 저장하는거로 바꾸기
