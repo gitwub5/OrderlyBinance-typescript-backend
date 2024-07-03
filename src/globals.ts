@@ -8,3 +8,9 @@ export function setShouldStop(value: boolean) {
 export function setForceStop(value: boolean) {
   forceStop = value;
 }
+
+export let initialPriceDifference: number = 0;
+
+export function setInitialPriceDifference(value: number) {
+  initialPriceDifference = value;
+}
