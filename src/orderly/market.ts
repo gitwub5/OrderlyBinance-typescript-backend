@@ -1,6 +1,8 @@
 import { ORDERLY_API_URL, orderlyAccountInfo, orderlySymbol } from '../utils/utils';
 import { signAndSendRequest } from './signer';
 
+
+
 export async function getOrderlyPrice() {
     const response = await signAndSendRequest(
         orderlyAccountInfo.accountId,
