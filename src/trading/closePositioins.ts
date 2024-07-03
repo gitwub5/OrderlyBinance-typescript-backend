@@ -1,12 +1,13 @@
-import { arbitrageThreshold, closeThreshold} from './utils';
-import { cancelAllOrderlyOrders, placeOrderlyOrder } from './orderlynetwork/order';
-import { cancelAllBinanceOrders, placeBinanceOrder } from './binance/order';
-import { getBinancePrice } from './binance/market';
-import { getOrderlyPrice } from './orderlynetwork/market';
-import { getOrderlyPositions } from './orderlynetwork/account';
-import { getBinancePositions } from './binance/account';
-import { recordTrade } from './db/queries';
-import { forceStop } from './globals';
+import { arbitrageThreshold, closeThreshold} from './stratgy';
+import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../orderly/order';
+import { cancelAllBinanceOrders, placeBinanceOrder } from '../binance/order';
+import { getBinancePrice } from '../binance/market';
+import { getOrderlyPrice } from '../orderly/market';
+import { getOrderlyPositions } from '../orderly/account';
+import { getBinancePositions } from '../binance/account';
+import { recordTrade } from '../db/queries';
+import { forceStop } from '../globals';
+import { createDecipheriv } from 'crypto';
 
 //포지션 청산(Market Order)
 export async function closePositions() {
@@ -59,10 +60,15 @@ export async function closePositions() {
     console.log('All Open Orders are canceled...');
   
     if (!forceStop) {
-      await recordTrade(orderlyPrice, binancePrice, orderlyAmt !== null ? orderlyAmt : 0, profitLoss, arbitrageThreshold, closeThreshold);
+        try{
+          await recordTrade(orderlyPrice, binancePrice, orderlyAmt !== null ? orderlyAmt : 0, profitLoss, arbitrageThreshold, closeThreshold);
+          console.log("recorded at table")
+        }catch(err){
+          console.log("error during recording at table")
+        }
     }
   }
-
+  closePositions();
 
 //TODO: Profit을 따로 계산해서 저장하는데 거의 대부분의 주문이 원하는 가격으로 안들어갈 확률이 높아서 
 //수익률이 정확하지 않을 수 있어서 주문 기록을 거래소에서 가져와서 저장하는거로 바꾸기

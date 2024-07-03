@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import axios from "axios";
-import { binanceAccountInfo, BINANCE_API_URL } from '../utils';
+import { binanceAccountInfo, BINANCE_API_URL } from '../utils/utils';
 
 
 async function createBinanceSignature(

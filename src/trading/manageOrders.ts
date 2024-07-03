@@ -1,12 +1,12 @@
-import { orderSize, interval, arbitrageThreshold, closeThreshold} from './utils';
-import { placeOrderlyOrder } from './orderlynetwork/order';
-import { placeBinanceOrder } from './binance/order';
-import { getBinancePrice } from './binance/market';
-import { getOrderlyPrice } from './orderlynetwork/market';
-import { getOrderlyPositions } from './orderlynetwork/account';
-import { getBinancePositions } from './binance/account';
+import { orderSize, interval, arbitrageThreshold, closeThreshold} from './stratgy';
+import { placeOrderlyOrder } from '../orderly/order';
+import { placeBinanceOrder } from '../binance/order';
+import { getBinancePrice } from '../binance/market';
+import { getOrderlyPrice } from '../orderly/market';
+import { getOrderlyPositions } from '../orderly/account';
+import { getBinancePositions } from '../binance/account';
 import { closePositions } from './closePositioins';
-import { shouldStop } from './globals';
+import { shouldStop } from '../globals';
 
 // 현재 포지션이 있는지 확인하는 함수
 async function hasOpenPositions(): Promise<boolean> {

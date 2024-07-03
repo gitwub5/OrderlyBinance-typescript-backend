@@ -1,4 +1,4 @@
-import { binanceSymbol } from '../utils';
+import { binanceSymbol } from '../utils/utils';
 import { createSignAndRequest } from './signer';
 
 export class placeBinanceOrder {

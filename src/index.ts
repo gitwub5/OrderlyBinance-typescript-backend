@@ -1,5 +1,5 @@
-import { manageOrders } from './manageOrders';
-import { closePositions } from './closePositioins';
+import { manageOrders } from './trading/manageOrders';
+import { closePositions } from './trading/closePositioins';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 
