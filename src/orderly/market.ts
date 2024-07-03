@@ -1,4 +1,4 @@
-import { ORDERLY_API_URL, orderlyAccountInfo, orderlySymbol } from '../utils';
+import { ORDERLY_API_URL, orderlyAccountInfo, orderlySymbol } from '../utils/utils';
 import { signAndSendRequest } from './signer';
 
 export async function getOrderlyPrice() {
@@ -12,7 +12,6 @@ export async function getOrderlyPrice() {
     //console.log(`Orderly ${orderlySymbol} price: `, parseFloat(price));
     return parseFloat(price);
 }
-getOrderlyPrice();
 
 //Snapshot of the current orderbook. Price of asks/bids are in descending order.
 type Level = { price: number; quantity: number };

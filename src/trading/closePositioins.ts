@@ -1,12 +1,13 @@
-import { arbitrageThreshold, closeThreshold} from './utils';
-import { cancelAllOrderlyOrders, placeOrderlyOrder } from './orderlynetwork/order';
-import { cancelAllBinanceOrders, placeBinanceOrder } from './binance/order';
-import { getBinancePrice } from './binance/market';
-import { getOrderlyPrice } from './orderlynetwork/market';
-import { getOrderlyPositions } from './orderlynetwork/account';
-import { getBinancePositions } from './binance/account';
-import { recordTrade } from './db/queries';
-import { forceStop } from './globals';
+import { arbitrageThreshold, closeThreshold} from './stratgy';
+import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../orderly/order';
+import { cancelAllBinanceOrders, placeBinanceOrder } from '../binance/order';
+import { getBinancePrice } from '../binance/market';
+import { getOrderlyPrice } from '../orderly/market';
+import { getOrderlyPositions } from '../orderly/account';
+import { getBinancePositions } from '../binance/account';
+import { recordTrade } from '../db/queries';
+import { forceStop } from '../globals';
+import { createDecipheriv } from 'crypto';
 
 //포지션 청산(Market Order)
 export async function closePositions() {
@@ -59,7 +60,12 @@ export async function closePositions() {
     console.log('All Open Orders are canceled...');
   
     if (!forceStop) {
-      await recordTrade(orderlyPrice, binancePrice, orderlyAmt !== null ? orderlyAmt : 0, profitLoss, arbitrageThreshold, closeThreshold);
+        try{
+          await recordTrade(orderlyPrice, binancePrice, orderlyAmt !== null ? orderlyAmt : 0, profitLoss, arbitrageThreshold, closeThreshold);
+          console.log("recorded at table")
+        }catch(err){
+          console.log("error during recording at table")
+        }
     }
   }
 

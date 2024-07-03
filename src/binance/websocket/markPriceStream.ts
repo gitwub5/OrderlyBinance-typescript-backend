@@ -1,4 +1,5 @@
 import WebSocketStreamBase from './wsStreamBase';
+import { binanceSymbol } from 'utils/utils';
 
 //Mark price and funding rate for a single symbol pushed every 3 seconds or every second.
 class MarkPriceStream extends WebSocketStreamBase {
@@ -22,7 +23,7 @@ class MarkPriceStream extends WebSocketStreamBase {
 export default MarkPriceStream;
 
 
-const markPriceClient = new MarkPriceStream('btcusdt', '1s');
+const markPriceClient = new MarkPriceStream(binanceSymbol, '1s');
 
 markPriceClient.setMessageCallback((data: any) => {
     const { p: markPrice } = data;

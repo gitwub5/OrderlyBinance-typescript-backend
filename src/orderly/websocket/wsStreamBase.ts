@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { orderlyAccountInfo, WS_PUBLIC_URL } from '../../utils';
+import { orderlyAccountInfo, WS_PUBLIC_URL } from '../../utils/utils';
 
 abstract class WebSocketStreamBase {
   private ws: WebSocket | null = null;

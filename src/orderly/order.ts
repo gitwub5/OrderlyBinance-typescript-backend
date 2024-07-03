@@ -1,4 +1,4 @@
-import { orderlySymbol, ORDERLY_API_URL, orderlyAccountInfo } from '../utils';
+import { orderlySymbol, ORDERLY_API_URL, orderlyAccountInfo } from '../utils/utils';
 import { signAndSendRequest } from './signer'
 
 export class placeOrderlyOrder {

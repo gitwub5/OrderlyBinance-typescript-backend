@@ -1,5 +1,5 @@
 import WebSocketStreamBase from './wsStreamBase';
-import { orderlySymbol } from '../../utils';
+import { orderlySymbol } from '../../utils/utils';
 
 class MarkPriceWSClient extends WebSocketStreamBase {
     constructor() {

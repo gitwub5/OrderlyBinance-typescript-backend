@@ -6,4 +6,4 @@ export const recordTrade = async (buyPrice: number, sellPrice: number, amount: n
       [buyPrice, sellPrice, amount, profit, arbitrageThreshold, closeThreshold]
     );
     return result;
-  };
+};

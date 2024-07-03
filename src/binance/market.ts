@@ -1,4 +1,4 @@
-import { binanceSymbol, symbol } from '../utils';
+import { binanceSymbol, symbol } from '../utils/utils';
 import { createSignAndRequest } from './signer';
 
 //Latest price for a symbol or symbols.
