@@ -9,6 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const ORDERLY_API_URL = 'https://api-evm.orderly.org';
 export const BINANCE_API_URL = 'https://fapi.binance.com';
+export const WS_PUBLIC_URL = 'wss://ws-evm.orderly.org/ws/stream/';
 
 const privateKeyBase58 = (process.env.ORDERLY_SECRET as string).replace("ed25519:", "");
 const privateKey = bs58.decode(privateKeyBase58);
