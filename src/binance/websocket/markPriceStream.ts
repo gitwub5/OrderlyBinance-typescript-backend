@@ -1,10 +1,10 @@
-import WebSocketStreamBase from './wsStreamBase';
-import { binanceSymbol } from 'utils/utils';
+import { WebSocketStreamBase } from './wsStreamBase';
+import { binanceSymbol } from '../../utils/utils';
 
 //Mark price and funding rate for a single symbol pushed every 3 seconds or every second.
-class MarkPriceStream extends WebSocketStreamBase {
-  constructor(symbol: string, interval: '3s' | '1s' = '3s') {
-    super(symbol, `@markPrice@${interval}`);
+export class MarkPriceStreamClient extends WebSocketStreamBase {
+  constructor(interval: '3s' | '1s' = '3s') {
+    super(binanceSymbol, `@markPrice@${interval}`);
   }
 
   protected handleMessage(data: any) {
@@ -20,13 +20,11 @@ class MarkPriceStream extends WebSocketStreamBase {
   }
 }
 
-export default MarkPriceStream;
 
+// const markPriceClient = new MarkPriceStreamClient('1s');
 
-const markPriceClient = new MarkPriceStream(binanceSymbol, '1s');
-
-markPriceClient.setMessageCallback((data: any) => {
-    const { p: markPrice } = data;
-    console.log('Received Mark Price:', markPrice);
-    // 여기서 markPrice를 사용하세요.
-  });
+// markPriceClient.setMessageCallback((data: any) => {
+//     const { p: markPrice } = data;
+//     console.log('Received Mark Price:', markPrice);
+//     // 여기서 markPrice를 사용하세요.
+//   });

@@ -1,8 +1,9 @@
 import WebSocket from 'ws';
 
-abstract class WebSocketStreamBase {
+export abstract class WebSocketStreamBase {
   private ws: WebSocket | null = null;
   private messageCallback: ((data: any) => void) | null = null;
+  private pingInterval: NodeJS.Timeout | null = null;
 
   constructor(protected symbol: string, private endpoint: string) {
     this.connect(endpoint);
@@ -35,31 +36,47 @@ abstract class WebSocketStreamBase {
     });
 
     this.ws.on('pong', () => {
-      console.log('Received pong from server');
+      //console.log('Received pong from server');
     });
 
     this.ws.on('ping', () => {
-      console.log('Received ping from server');
+      //console.log('Received ping from server');
       this.ws?.pong();
     });
 
-    this.heartBeat();
+    this.startHeartBeat();
   }
 
-  protected abstract handleMessage(data: any): void;
-
-  private heartBeat() {
-    setInterval(() => {
+  private startHeartBeat() {
+    this.pingInterval = setInterval(() => {
       if (this.ws?.readyState === WebSocket.OPEN) {
         this.ws.ping();
-        console.log('Ping server');
+        //console.log('Ping server');
       }
     }, 5000);
   }
 
+  private stopHeartBeat() {
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval);
+      this.pingInterval = null;
+      //console.log('Ping stopped');
+    }
+  }
+
+  protected abstract handleMessage(data: any): void;
+
   setMessageCallback(callback: (data: any) => void) {
     this.messageCallback = callback;
   }
-}
 
-export default WebSocketStreamBase;
+  stop() {
+    if (this.ws) {
+      this.ws.removeAllListeners();
+      this.stopHeartBeat();
+      this.ws.close();
+      this.ws = null;
+      console.log('WebSocket connection stopped.');
+    }
+  }
+}
