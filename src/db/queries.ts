@@ -1,9 +1,18 @@
 import connection from './config';
 
-export const recordTrade = async (buyPrice: number, sellPrice: number, amount: number, profit: number, arbitrageThreshold: number, closeThreshold: number) => {
-    const [result] = await connection.query(
-      'INSERT INTO trades (buy_price, sell_price, amount, profit, arbitrage_threshold, close_threshold) VALUES (?, ?, ?, ?, ?, ?)',
-      [buyPrice, sellPrice, amount, profit, arbitrageThreshold, closeThreshold]
-    );
-    return result;
+export const recordTrade = async (
+  arbitrageThreshold: number,
+  trailingThreshold: number,
+  initialPriceDifference: number,
+  closePriceDifference: number,
+  amount: number,
+  profit: number,
+  buyPrice: number,
+  sellPrice: number
+) => {
+  const [result] = await connection.query(
+    'INSERT INTO trades (arbitrage_threshold, trailing_threshold, initial_price_difference, close_price_difference, amount, profit, buy_price, sell_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [arbitrageThreshold, trailingThreshold, initialPriceDifference, closePriceDifference, amount, profit, buyPrice, sellPrice]
+  );
+  return result;
 };
