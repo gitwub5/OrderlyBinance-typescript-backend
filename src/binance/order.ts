@@ -1,10 +1,14 @@
 import { binanceSymbol } from '../utils/utils';
 import { createSignAndRequest } from './signer';
+import { BatchOrder } from './types';
 
+//Send in a new order.
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/New-Order
 export class placeBinanceOrder {
   private static async placeOrder(queryParams: Record<string, string>) {
     const endpoint = '/fapi/v1/order';
-    return await createSignAndRequest(endpoint, queryParams, 'POST');
+    const response = await createSignAndRequest(endpoint, queryParams, 'POST');
+    return response;
   }
 
   public static async limitOrder(side: string, price: number, amount: number) {
@@ -17,7 +21,8 @@ export class placeBinanceOrder {
       price: price.toString(),
     };
 
-    await this.placeOrder(queryParams);
+    const response = await this.placeOrder(queryParams);
+    return response;
   }
 
   public static async marketOrder(side: string, amount: number) {
@@ -28,12 +33,13 @@ export class placeBinanceOrder {
       quantity: amount.toString()
     };
 
-    await this.placeOrder(queryParams);
+    const response = await this.placeOrder(queryParams);
+    return response;
   }
 }
 
-
-//TODO: cancel order 추가
+//Cancel an active order.
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Cancel-Order
 export async function cancelBinanceOrder(orderId: number) {
   const endpoint = '/fapi/v1/order';
   const queryParams: Record<string, string> = {
@@ -45,6 +51,7 @@ export async function cancelBinanceOrder(orderId: number) {
 }
 
 //Cancel multiple orders
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Cancel-Multiple-Orders
 export async function cancelMultipleBinanceOrders(orderIdList: number[]) {
   const endpoint = '/fapi/v1/batchOrders';
   const queryParams = {
@@ -56,6 +63,7 @@ export async function cancelMultipleBinanceOrders(orderIdList: number[]) {
 }
 
 //Cancel All Open Orders
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Cancel-All-Open-Orders
 export async function cancelAllBinanceOrders() {
   const endpoint = '/fapi/v1/allOpenOrders';
   const queryParams: Record<string, string> = {
@@ -63,4 +71,32 @@ export async function cancelAllBinanceOrders() {
   };
 
   return await createSignAndRequest(endpoint, queryParams, 'DELETE');
+}
+
+//Order modify function, currently only LIMIT order modification is supported, modified orders will be reordered in the match queue
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Order
+export async function modifyBinanceOrders(orderId: number, side: string, price: number, amount : number) {
+  const endpoint = '/fapi/v1/order';
+  const queryParams: Record<string, string> = {
+    symbol: binanceSymbol,
+    orderId: orderId.toString(),
+    side: side,
+    quantity: amount.toString(),
+    price: price.toString(),
+  };
+
+  return await createSignAndRequest(endpoint, queryParams, 'PUT');
+}
+
+//Modify Multiple Orders (TRADE)
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Multiple-Orders
+export async function modifyBinanceBatchOrders(batchOrders: BatchOrder[]) {
+  const endpoint = '/fapi/v1/batchOrders';
+  const queryParams: Record<string, string> = {
+    batchOrders: JSON.stringify(batchOrders),
+    recvWindow: '5000',
+  };
+
+  const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
+  return response;
 }

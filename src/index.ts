@@ -1,4 +1,4 @@
-import { manageOrders } from './trading/manageOrders';
+import { manageOrders } from './trading/apiArbitrage';
 import { closePositions } from './trading/closePositioins';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';

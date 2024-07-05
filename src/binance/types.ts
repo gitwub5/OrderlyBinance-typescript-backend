@@ -30,3 +30,14 @@ export interface BinanceBalance {
     marginAvailable: boolean;
     updateTime: number;
   }
+
+  export interface BatchOrder {
+    orderId: string;
+    origClientOrderId?: string;
+    symbol: string;
+    side: 'SELL' | 'BUY';
+    quantity: number;
+    price: number;
+    recvWindow?: number;
+    timestamp: number;
+  }

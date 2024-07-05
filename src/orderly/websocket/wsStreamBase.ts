@@ -1,11 +1,12 @@
 import WebSocket from 'ws';
 import { orderlyAccountInfo, WS_PUBLIC_URL } from '../../utils/utils';
 
-abstract class WebSocketStreamBase {
+export abstract class WebSocketStreamBase {
   private ws: WebSocket | null = null;
   private messageCallback: ((data: any) => void) | null = null;
   private pingInterval: number = 10000; // Ping interval in milliseconds
   private pingTimer: NodeJS.Timeout | null = null;
+  protected shouldStop = false;
 
   constructor(private subscription: string) {
     const account_id = orderlyAccountInfo.accountId;
@@ -17,13 +18,22 @@ abstract class WebSocketStreamBase {
     this.ws = new WebSocket(url);
 
     this.ws.on('open', () => {
+      if (this.shouldStop) {
+        this.ws?.close();
+        return;
+      }
       console.log('WebSocket connection established.');
       this.sendSubscription(this.subscription);
       this.startPing();
     });
 
+
     this.ws.on('message', (data: WebSocket.Data) => {
       const message = JSON.parse(data.toString());
+      if (message.event === 'ping') {
+        this.ws?.pong();
+        return; // ping 이벤트는 별도로 처리하고 로그에 출력하지 않음
+      }
       if (this.messageCallback) {
         this.messageCallback(message);
       }
@@ -31,6 +41,7 @@ abstract class WebSocketStreamBase {
     });
 
     this.ws.on('close', () => {
+      if (this.shouldStop) return;
       console.warn('WebSocket connection closed. Reconnecting...');
       this.stopPing();
       setTimeout(() => this.connect(url), 1000);
@@ -41,7 +52,7 @@ abstract class WebSocketStreamBase {
     this.pingTimer = setInterval(() => {
       if (this.ws?.readyState === WebSocket.OPEN) {
         this.ws.ping();
-        console.log('Ping server');
+        //console.log('Ping server');
       }
     }, this.pingInterval);
   }
@@ -50,11 +61,11 @@ abstract class WebSocketStreamBase {
     if (this.pingTimer) {
       clearInterval(this.pingTimer);
       this.pingTimer = null;
-      console.log('Stopped ping requests.');
+      //console.log('Stopped ping requests.');
     }
   }
 
-  sendSubscription(subscription: string) {
+   sendSubscription(subscription: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(subscription);
       console.log('Sent subscription:', subscription);
@@ -71,7 +82,14 @@ abstract class WebSocketStreamBase {
     this.messageCallback = callback;
   }
 
+  stop() {
+    this.shouldStop = true;
+    this.ws?.removeAllListeners();
+    this.ws?.close();
+    this.stopPing();
+    this.ws = null;
+    console.log('WebSocket connection stopped.');
+  }
+
   protected abstract handleMessage(data: any): void;
 }
-
-export default WebSocketStreamBase;

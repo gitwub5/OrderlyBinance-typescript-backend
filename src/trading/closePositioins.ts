@@ -8,7 +8,7 @@ import { getBinancePositions } from '../binance/account';
 import { recordTrade } from '../db/queries';
 import { forceStop, initialPriceDifference } from '../globals';
 
-//포지션 청산(Market Order)
+//포지션 청산(Market Order) 및 DB에 기록
 export async function closePositions() {
     console.log('Closing positions...');
 

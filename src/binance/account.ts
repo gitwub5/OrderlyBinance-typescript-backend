@@ -57,14 +57,18 @@ export async function getBinanceOpenOrders() {
 
 //TODO: 주문 기록 가져오는 함수 (start_time ~ end_time)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/All-Orders
-export async function getBinanceAllOrders(startTime : number, endTime : number) {
+export async function getBinanceAllOrders(startTime?: number, endTime?: number) {
   const endpoint = '/fapi/v1/allOrders';
   const queryParams: Record<string, string> = {
       symbol: binanceSymbol,
-      startTime: startTime.toString(),
-      endTime: endTime.toString(),
       recvWindow: '5000',
   };
+  if (startTime) {
+    queryParams.startTime = startTime.toString();
+  }
+  if (endTime) {
+    queryParams.endTime = endTime.toString();
+  }
 
   const data = await createSignAndRequest(endpoint, queryParams, 'GET');
   if (data) {
@@ -73,18 +77,21 @@ export async function getBinanceAllOrders(startTime : number, endTime : number) 
   }
   return null;
 }
-
 
 //Query income history (start_time ~ end_time)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Get-Income-History
-export async function getBinanceIncomeHis(startTime : number, endTime : number) {
+export async function getBinanceIncomeHis(startTime?: number, endTime?: number) {
   const endpoint = '/fapi/v1/income';
   const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
-      startTime: startTime.toString(),
-      endTime: endTime.toString(),
-      recvWindow: '5000',
-  };
+    symbol: binanceSymbol,
+    recvWindow: '5000',
+};
+if (startTime) {
+  queryParams.startTime = startTime.toString();
+}
+if (endTime) {
+  queryParams.endTime = endTime.toString();
+}
 
   const data = await createSignAndRequest(endpoint, queryParams, 'GET');
   if (data) {
@@ -93,3 +100,12 @@ export async function getBinanceIncomeHis(startTime : number, endTime : number) 
   }
   return null;
 }
+
+// async function main() {
+//   const position = await getBinancePositions();
+//   console.log(position?.positionAmt);
+// }
+
+// main().catch(error => {
+//   console.error('Error in main function:', error);
+// });
