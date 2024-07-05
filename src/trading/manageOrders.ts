@@ -12,7 +12,7 @@ function fixPrecision(value: number): number {
 
 // 오덜리 시장가에 맞춰 바이낸스에 아비트리지 임계값 차이만큼 매수, 매도 포지션 걸어놓기
 // 리턴값은 주문 걸어놓은 long position과 short position의 orderId
-export async function placeOrder(orderlyPrice: number) {
+export async function placeOrder(orderlyPrice: number, arbitrageThreshold: number) {
   try {
     // 매도가 (Short Position) - orderlyPrice + arbitrageThreshold%
     const shortPositionPrice = fixPrecision(orderlyPrice * (1 + arbitrageThreshold / 100));
@@ -40,7 +40,8 @@ export async function placeOrder(orderlyPrice: number) {
 }
 
 //현재 오덜리의 시장가에 따라 롱 포지션, 숏 포지션 수정
-export async function handleOrder(orderlyPrice:number, longPositionId: number, shortPositionId: number){
+export async function handleOrder(orderlyPrice:number, arbitrageThreshold: number, 
+  longPositionId: number, shortPositionId: number){
   const shortPositionPrice = fixPrecision(orderlyPrice * (1 + arbitrageThreshold / 100));
   const longPositionPrice = fixPrecision(orderlyPrice * (1 - arbitrageThreshold / 100));
   
@@ -52,39 +53,50 @@ export async function handleOrder(orderlyPrice:number, longPositionId: number, s
   console.log(`[Binance] Modified orders -> Long Pos: ${longPositionPrice} | Short Pos: ${shortPositionPrice}`);
 }
 
-export async function enterPosition(positionAmt: number, longPositionId: number, shortPositionId: number) {
-  let price : number = 0;
-  if (positionAmt > 0) {
-    // 포지션이 양수인 경우, 바이낸스 long 포지션이므로 오덜리에서 short 포지션으로 진입
-    const response = await placeOrderlyOrder.marketOrder('SELL', positionAmt);
-    const orderId = response.order_id;
-    const response2 = await getOrderlyOrderById(orderId);
-    price = response2.average_executed_price;
-    
-    console.log('<<<< Excuteing arbitrage: BUY on Binance, SELL on Orderly >>>>');
-    console.log(`[Orderly] Avg executed price (Short Position): ${price}`);
+// 바이낸스가 롱 포지션일 때, 오덜리에서 숏 포지션으로 진입
+export async function enterShortPosition(amount: number, shortPositionId: number) {
+  try {
+      const response = await placeOrderlyOrder.marketOrder('SELL', amount);
+      const orderId = response.order_id;
+      const response2 = await getOrderlyOrderById(orderId);
+      const orderlyPrice = response2.average_executed_price;
 
-    // 매도 주문을 취소
-    await cancelBinanceOrder(shortPositionId);
-    console.log('[Binance] Short position order canceled');
+      console.log('<<<< Executing arbitrage: BUY on Binance, SELL on Orderly >>>>');
+      console.log(`[Orderly] Avg executed price (Short Position): ${orderlyPrice}`);
 
-  } else if (positionAmt < 0) {
-    // 포지션이 음수인 경우, 바이낸스 short 포지션이므로 오덜리에서 long 포지션으로 진입
-    const response = await placeOrderlyOrder.marketOrder('BUY', positionAmt);
-    const orderId = response.order_id;
-    const response2 = await getOrderlyOrderById(orderId);
-    price = response2.average_executed_price;
+      // 바이낸스 숏 포지션 주문을 취소
+      await cancelBinanceOrder(shortPositionId);
+      console.log('[Binance] Short position order canceled');
 
-    console.log('<<<< Excuteing arbitrage: SELL on Binance, BUY on Orderly >>>>');
-    console.log(`[Orderly] Avg executed price (Long Position): ${price}`);
+      // 초기 가격 갭 저장
+      const binancePrice = await getBinancePrice();
+      const priceDifference = ((parseFloat(binancePrice.toString()) - orderlyPrice) / orderlyPrice) * 100;
+      setInitialPriceDifference(priceDifference);
+  } catch (error) {
+      console.error('Error in enterShortPosition:', error);
+  }
+}
 
-    // 메수 주문을 취소
-    await cancelBinanceOrder(longPositionId);
-    console.log('[Binance] Long position order canceled');
-  } 
+export async function enterLongPosition(amount: number, longPositionId: number) {
+  try {
+      const response = await placeOrderlyOrder.marketOrder('BUY', amount);
+      const orderId = response.order_id;
+      const response2 = await getOrderlyOrderById(orderId);
+      const orderlyPrice = response2.average_executed_price;
 
-  const binancePrice = getBinancePrice();
-  const priceDifference = ((parseFloat(binancePrice.toString()) - price) / price) * 100;
-  setInitialPriceDifference(priceDifference);
+      console.log('<<<< Executing arbitrage: SELL on Binance, BUY on Orderly >>>>');
+      console.log(`[Orderly] Avg executed price (Long Position): ${orderlyPrice}`);
+
+      // 바이낸스 롱 포지션 주문을 취소
+      await cancelBinanceOrder(longPositionId);
+      console.log('[Binance] Long position order canceled');
+
+      // 초기 가격 갭 저장
+      const binancePrice = await getBinancePrice();
+      const priceDifference = ((parseFloat(binancePrice.toString()) - orderlyPrice) / orderlyPrice) * 100;
+      setInitialPriceDifference(priceDifference);
+  } catch (error) {
+      console.error('Error in enterLongPosition:', error);
+  }
 }
 
