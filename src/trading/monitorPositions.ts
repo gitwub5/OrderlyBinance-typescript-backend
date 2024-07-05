@@ -2,7 +2,7 @@ import { getOrderlyPositions } from "../orderly/account";
 import { getBinancePositions } from "../binance/account";
 import { getBinancePrice } from "../binance/market";
 import { getOrderlyPrice } from "../orderly/market";
-import { shortInterval, closeThreshold, trailingThreshold } from "./stratgy";
+import { shortInterval, closeThreshold} from "./stratgy";
 import { closePositions } from "./closePositioins";
 
 // 현재 포지션이 있는지 확인하는 함수
@@ -19,36 +19,28 @@ export async function hasOpenPositions(): Promise<boolean> {
   }
 
   export async function monitorClosePositions() {
- 
     let isClosePosition : boolean = false;
-    let maxPriceDifference : number = 0
 
-    while(!isClosePosition){
+    while (!isClosePosition) {
         const [orderlyPrice, binancePrice] = await Promise.all([getOrderlyPrice(), getBinancePrice()]);
 
-        //가격차이(%) -> 양수이면 바이낸스 가격이 높은거고, 음수이면 오덜리 가격이 높은거
-        //바이낸스에서 숏포지션, 오덜리에서 롱포지션이면 -> 가격차이가 양수이여야함
-        //바이낸스에서 롱포지션, 오덜리에서 숏포지션이면 -> 가격차이가 음수여야함
+        // 가격차이(%) -> 양수이면 바이낸스 가격이 높은거고, 음수이면 오덜리 가격이 높은거
+        // 바이낸스에서 숏포지션, 오덜리에서 롱포지션이면 -> 가격차이가 양수여야함
+        // 바이낸스에서 롱포지션, 오덜리에서 숏포지션이면 -> 가격차이가 음수여야함
         const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
 
-        // 가격 차이가 가장 컸던 값 업데이트
-        if (Math.abs(priceDifference) > Math.abs(maxPriceDifference)) {
-            maxPriceDifference = priceDifference;
-        }
-
-        console.log(`<<<< Price Difference: ${priceDifference}%, Max Price Difference: ${maxPriceDifference}% >>>>`);
+        console.log(`<<<< Price Difference: ${priceDifference}% >>>>`);
 
         // 청산 조건 확인
-        const shouldClosePosition = Math.abs(priceDifference) < closeThreshold ||
-            Math.abs(priceDifference) > Math.abs(maxPriceDifference - trailingThreshold);
+        const shouldClosePosition = Math.abs(priceDifference) <= closeThreshold;
 
         if (shouldClosePosition) {
-            console.log('<<<< Closing positions due to close threshold or trailing stop >>>>.');
+            console.log('<<<< Closing positions due to close threshold >>>>.');
             await closePositions();
             isClosePosition = true;
         }
 
-        //shortInterval 간격으로 반복 
+        // shortInterval 간격으로 반복
         await new Promise(resolve => setTimeout(resolve, shortInterval));
     }
   }

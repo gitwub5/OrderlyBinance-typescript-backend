@@ -1,4 +1,3 @@
-
 export interface token {
     symbol : string;
     orderSize : number;
