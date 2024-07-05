@@ -61,7 +61,7 @@ export async function enterPosition(positionAmt: number, longPositionId: number,
     const response2 = await getOrderlyOrderById(orderId);
     price = response2.average_executed_price;
     
-    console.log('<<<<Excuteing arbitrage: BUY on Binance, SELL on Orderly>>>>');
+    console.log('<<<< Excuteing arbitrage: BUY on Binance, SELL on Orderly >>>>');
     console.log(`[Orderly] Avg executed price (Short Position): ${price}`);
 
     // 매도 주문을 취소
@@ -75,7 +75,7 @@ export async function enterPosition(positionAmt: number, longPositionId: number,
     const response2 = await getOrderlyOrderById(orderId);
     price = response2.average_executed_price;
 
-    console.log('<<<<Excuteing arbitrage: SELL on Binance, BUY on Orderly>>>>');
+    console.log('<<<< Excuteing arbitrage: SELL on Binance, BUY on Orderly >>>>');
     console.log(`[Orderly] Avg executed price (Long Position): ${price}`);
 
     // 메수 주문을 취소
@@ -87,3 +87,4 @@ export async function enterPosition(positionAmt: number, longPositionId: number,
   const priceDifference = ((parseFloat(binancePrice.toString()) - price) / price) * 100;
   setInitialPriceDifference(priceDifference);
 }
+

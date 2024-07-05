@@ -1,4 +1,6 @@
-//통합테스트: 주문 크기 5로 설정, 아비트리지 임계앖 0.1 설정
+import { token } from "../types/tokenTypes";
+
+
 export const orderSize = 2; // 주문 크기 (단위: TON)
 export const interval = 3000; // 3초 (단위시간)
 export const shortInterval = 1000; // 1초
@@ -20,6 +22,11 @@ export const trailingThreshold = 0.1;
 // 거래 수수료 합계를 고려하여, 수익이 발생하기 위해 최소 갭은 0.08% 이상이어야 함.
 // 임계값을 약간 여유 있게 설정하여, 슬리피지와 기타 비용을 고려.
 
-// 아비트리지 실행 임계값 (arbitrageThreshold): 0.12% (수수료 합계 0.08% + 여유분 0.04%)
-// 포지션 청산 임계값 (closeThreshold): 0.04% (수수료 합계와 수익을 고려한 적절한 값)
+// 아비트리지 실행 임계값 (arbitrageThreshold): 0.3% 
+// 포지션 청산 임계값 (closeThreshold): 0.15% (수수료 합계와 수익을 고려한 적절한 값)
 
+// export const TONUSDT : token = {
+//     symbol: 'TON',
+    
+
+// }
