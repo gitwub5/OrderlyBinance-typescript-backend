@@ -4,10 +4,11 @@ import { getBinancePrice } from "../binance/market";
 import { getOrderlyPrice } from "../orderly/market";
 import { shortInterval} from "./stratgy";
 import { closePositions } from "./closePositioins";
+import { token } from "types/tokenTypes";
 
 // 현재 포지션이 있는지 확인하는 함수
-export async function hasOpenPositions(): Promise<boolean> {
-    const [orderlyPosition, binancePosition] = await Promise.all([getOrderlyPositions(), getBinancePositions()]);
+export async function hasOpenPositions(token: token): Promise<boolean> {
+    const [orderlyPosition, binancePosition] = await Promise.all([getOrderlyPositions(token.orderlySymbol), getBinancePositions(token.orderlySymbol)]);
   
     const orderlyAmt = orderlyPosition ? parseFloat(orderlyPosition.position_qty.toString()) : null;
     const positionAmt = binancePosition ? parseFloat(binancePosition.positionAmt.toString()) : null;
@@ -18,11 +19,14 @@ export async function hasOpenPositions(): Promise<boolean> {
     return (orderlyAmt !== null && orderlyAmt !== 0) || (positionAmt !== null && positionAmt !== 0);
   }
 
-  export async function monitorClosePositions(closeThreshold: number) {
+  export async function monitorClosePositions(token:token) {
     let isClosePosition : boolean = false;
 
     while (!isClosePosition) {
-        const [orderlyPrice, binancePrice] = await Promise.all([getOrderlyPrice(), getBinancePrice()]);
+        const [orderlyPrice, binancePrice] = await Promise.all([
+            getOrderlyPrice(token.orderlySymbol), 
+            getBinancePrice(token.binanceSymbol)
+        ]);
 
         // 가격차이(%) -> 양수이면 바이낸스 가격이 높은거고, 음수이면 오덜리 가격이 높은거
         // 바이낸스에서 숏포지션, 오덜리에서 롱포지션이면 -> 가격차이가 양수여야함
@@ -32,11 +36,11 @@ export async function hasOpenPositions(): Promise<boolean> {
         console.log(`<<<< Price Difference: ${priceDifference}% >>>>`);
 
         // 청산 조건 확인
-        const shouldClosePosition = Math.abs(priceDifference) <= closeThreshold;
+        const shouldClosePosition = Math.abs(priceDifference) <= token.closeThreshold;
 
         if (shouldClosePosition) {
             console.log('<<<< Closing positions due to close threshold >>>>.');
-            await closePositions();
+            await closePositions(token);
             isClosePosition = true;
         }
 

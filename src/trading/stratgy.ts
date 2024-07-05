@@ -1,6 +1,30 @@
 import { token } from "../types/tokenTypes";
 import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/getSymbols";
 
+export const tokens: token[] = [
+    {
+        binanceSymbol : reconstructBinanceSymbol('TON'), //바이낸스 버전 심볼 -> TONUSDT
+        orderlySymbol : reconstructOrderlySymbol('TON'), //오덜리 버전 심볼 -> PERP_TON_USDC
+        orderSize : 2, //주문수량
+        arbitrageThreshold : 0.3, // 아비트리지 허용 임계값 (%)
+        closeThreshold : 0.15 //청산 포지션 임계값(%)
+    },
+    {
+        binanceSymbol : reconstructBinanceSymbol('BTC'),
+        orderlySymbol : reconstructOrderlySymbol('BTC'),
+        orderSize : 2,
+        arbitrageThreshold : 0.3,
+        closeThreshold : 0.15
+    },
+    {
+        binanceSymbol : reconstructBinanceSymbol('WOO'),
+        orderlySymbol : reconstructOrderlySymbol('WOO'),
+        orderSize : 2,
+        arbitrageThreshold : 0.3,
+        closeThreshold : 0.15
+    }
+];
+
 export const TON : token = {
     binanceSymbol : reconstructBinanceSymbol('TON'),
     orderlySymbol : reconstructOrderlySymbol('TON'),
@@ -12,9 +36,10 @@ export const TON : token = {
 export const orderSize = 2; // 주문 크기 (단위: TON)
 export const interval = 3000; // 3초 (단위시간)
 export const shortInterval = 1000; // 1초
-export const arbitrageThreshold = 0.3; // 아비트리지 허용 임계값 (%)
-export const closeThreshold = 0.15;
-//export const closeThreshold = arbitrageThreshold / 2; //포지션 청산 임계값
+
+
+// export const arbitrageThreshold = 0.3; 
+// export const closeThreshold = 0.15;
 
 // 수수료
 // Binance: Taker 0.05%, Maker 0.02%
@@ -31,9 +56,3 @@ export const closeThreshold = 0.15;
 
 // 아비트리지 실행 임계값 (arbitrageThreshold): 0.3% 
 // 포지션 청산 임계값 (closeThreshold): 0.15% (수수료 합계와 수익을 고려한 적절한 값)
-
-// export const TONUSDT : token = {
-//     symbol: 'TON',
-    
-
-// }

@@ -1,11 +1,10 @@
 import { WebSocketStreamBase } from './wsStreamBase';
-import { orderlySymbol } from '../../utils/utils';
 
 export class markPriceWSClient extends WebSocketStreamBase {
-  constructor() {
+  constructor(symbol:string) {
     const subscriptionMessage = JSON.stringify({
       id: `id-${Math.random().toString(36).substring(7)}`,
-      topic: `${orderlySymbol}@markprice`,
+      topic: `${symbol}@markprice`,
       event: "subscribe",
     });
     super(subscriptionMessage);
@@ -33,11 +32,11 @@ export class markPriceWSClient extends WebSocketStreamBase {
   }
 }
     
-    const orderlyClient = new markPriceWSClient();
-    orderlyClient.setMessageCallback((data: any) => {
-      const price = data.price;
-      if (price !== undefined) {
-        console.log('Received Orderly Mark Price:', price);
-      }
-    }
-  );
+  //   const orderlyClient = new markPriceWSClient('PERP_TON_USDT');
+  //   orderlyClient.setMessageCallback((data: any) => {
+  //     const price = data.price;
+  //     if (price !== undefined) {
+  //       console.log('Received Orderly Mark Price:', price);
+  //     }
+  //   }
+  // );

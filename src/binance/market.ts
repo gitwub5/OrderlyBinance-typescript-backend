@@ -1,11 +1,10 @@
-import { binanceSymbol, symbol } from '../utils/utils';
 import { createSignAndRequest } from './signer';
 
 //Latest price for a symbol or symbols.
-export async function getBinancePrice() {
+export async function getBinancePrice(symbol: string) {
     const endpoint = '/fapi/v1/ticker/price';
     const queryParams = {
-        symbol: binanceSymbol,
+        symbol: symbol,
         recvWindow: '5000'
     };
 
@@ -15,14 +14,14 @@ export async function getBinancePrice() {
 }
 
 //Query symbol orderbook (TODO: limit 값 몇으로 설정해야할지 수정필요)
-export async function getBinanceOrderBook(limit: number) {
+export async function getBinanceOrderBook(symbol: string, limit: number) {
     if (![5, 10, 20, 50, 100, 500, 1000, 5000].includes(limit)) {
         throw new Error('Invalid limit value. Valid values are 5, 10, 20, 50, 100, 500, 1000, 5000.');
       }
 
     const endpoint = '/fapi/v1/depth';
     const queryParams = {
-        symbol: binanceSymbol,
+        symbol: symbol,
         limit: limit.toString(),
     };
 

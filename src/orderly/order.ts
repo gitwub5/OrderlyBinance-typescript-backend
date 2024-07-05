@@ -1,10 +1,10 @@
-import { orderlySymbol, ORDERLY_API_URL, orderlyAccountInfo } from '../utils/utils';
+import { ORDERLY_API_URL, orderlyAccountInfo } from '../utils/utils';
 import { signAndSendRequest } from './signer'
 
 export class placeOrderlyOrder {
-  private static async placeOrder(orderType: string, side: string, price: number | null, amount: number) {
+  private static async placeOrder(symbol: string, orderType: string, side: string, price: number | null, amount: number) {
     const body: Record<string, any> = {
-      symbol: orderlySymbol,
+      symbol: symbol,
       order_type: orderType,
       side: side,
       order_quantity: amount
@@ -28,21 +28,21 @@ export class placeOrderlyOrder {
     }
   }
 
-  public static async limitOrder(side: string, price: number, amount: number) {
-    return await this.placeOrder('LIMIT', side, price, amount);
+  public static async limitOrder(symbol: string, side: string, price: number, amount: number) {
+    return await this.placeOrder(symbol, 'LIMIT', side, price, amount);
   }
 
-  public static async marketOrder(side: string, amount: number) {
-    return await this.placeOrder('MARKET', side, null, amount);
+  public static async marketOrder(symbol: string, side: string, amount: number) {
+    return await this.placeOrder(symbol, 'MARKET', side, null, amount);
   }
 }
 
-export async function cancelOrderlyOrder(orderId: number) {
+export async function cancelOrderlyOrder(symbol: string, orderId: number) {
   try {
       const response = await signAndSendRequest(
         orderlyAccountInfo.accountId,
         orderlyAccountInfo.privateKey,
-          `${ORDERLY_API_URL}/v1/order?order_id=${orderId}&symbol=${orderlySymbol}`,
+          `${ORDERLY_API_URL}/v1/order?order_id=${orderId}&symbol=${symbol}`,
           {
             method: 'DELETE'
           }
@@ -75,12 +75,12 @@ export async function cancelBatchOrderlyOrders(order_ids: number[]) {
     }
 }
 
-export async function cancelAllOrderlyOrders() {
+export async function cancelAllOrderlyOrders(symbol: string) {
   try {
       const response = await signAndSendRequest(
         orderlyAccountInfo.accountId,
         orderlyAccountInfo.privateKey,
-          `${ORDERLY_API_URL}/v1/orders?symbol=${orderlySymbol}`,
+          `${ORDERLY_API_URL}/v1/orders?symbol=${symbol}`,
           {
             method: 'DELETE'
           }

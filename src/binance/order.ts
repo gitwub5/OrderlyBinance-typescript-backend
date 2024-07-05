@@ -1,4 +1,3 @@
-import { binanceSymbol } from '../utils/utils';
 import { createSignAndRequest } from './signer';
 import { BatchOrder } from './types';
 
@@ -11,9 +10,9 @@ export class placeBinanceOrder {
     return response;
   }
 
-  public static async limitOrder(side: string, price: number, amount: number) {
+  public static async limitOrder(symbol: string, side: string, price: number, amount: number) {
     const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
+      symbol: symbol,
       side: side,
       type: 'LIMIT',
       timeInForce: 'GTC',
@@ -25,9 +24,9 @@ export class placeBinanceOrder {
     return response;
   }
 
-  public static async marketOrder(side: string, amount: number) {
+  public static async marketOrder(symbol: string, side: string, amount: number) {
     const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
+      symbol: symbol,
       side: side,
       type: 'MARKET',
       quantity: amount.toString()
@@ -40,10 +39,10 @@ export class placeBinanceOrder {
 
 //Cancel an active order.
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Cancel-Order
-export async function cancelBinanceOrder(orderId: number) {
+export async function cancelBinanceOrder(symbol: string, orderId: number) {
   const endpoint = '/fapi/v1/order';
   const queryParams: Record<string, string> = {
-    symbol: binanceSymbol,
+    symbol: symbol,
     orderId: orderId.toString(),
   };
 
@@ -52,10 +51,10 @@ export async function cancelBinanceOrder(orderId: number) {
 
 //Cancel multiple orders
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Cancel-Multiple-Orders
-export async function cancelMultipleBinanceOrders(orderIdList: number[]) {
+export async function cancelMultipleBinanceOrders(symbol: string, orderIdList: number[]) {
   const endpoint = '/fapi/v1/batchOrders';
   const queryParams = {
-    symbol: binanceSymbol,
+    symbol: symbol,
     orderIdList: JSON.stringify(orderIdList),
   };
 
@@ -64,10 +63,10 @@ export async function cancelMultipleBinanceOrders(orderIdList: number[]) {
 
 //Cancel All Open Orders
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Cancel-All-Open-Orders
-export async function cancelAllBinanceOrders() {
+export async function cancelAllBinanceOrders(symbol: string) {
   const endpoint = '/fapi/v1/allOpenOrders';
   const queryParams: Record<string, string> = {
-    symbol: binanceSymbol,
+    symbol: symbol,
   };
 
   return await createSignAndRequest(endpoint, queryParams, 'DELETE');
@@ -75,10 +74,10 @@ export async function cancelAllBinanceOrders() {
 
 //Order modify function, currently only LIMIT order modification is supported, modified orders will be reordered in the match queue
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Order
-export async function modifyBinanceOrders(orderId: number, side: string, price: number, amount : number) {
+export async function modifyBinanceOrders(symbol: string, orderId: number, side: string, price: number, amount : number) {
   const endpoint = '/fapi/v1/order';
   const queryParams: Record<string, string> = {
-    symbol: binanceSymbol,
+    symbol: symbol,
     orderId: orderId.toString(),
     side: side,
     quantity: amount.toString(),
@@ -104,10 +103,10 @@ export async function modifyBinanceBatchOrders(batchOrders: BatchOrder[]) {
 
 // 심볼의 모든 미체결 주문 조회 (Get all open orders on a symbol.)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Current-All-Open-Orders
-export async function getBinanceOpenOrders() {
+export async function getBinanceOpenOrders(symbol:string) {
   const endpoint = '/fapi/v1/openOrders';
   const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
+      symbol: symbol,
       recvWindow: '5000',
   };
 
@@ -121,10 +120,10 @@ export async function getBinanceOpenOrders() {
 
 //Check an order's status.
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Query-Order
-export async function getOrderStatus(orderId: number) {
+export async function getBinanceOrderStatus(symbol: string, orderId: number) {
   const endpoint = '/fapi/v1/order';
   const queryParams = {
-    symbol: binanceSymbol,
+    symbol: symbol,
     orderId: orderId.toString(),
     recvWindow: '5000'
   };
@@ -138,10 +137,10 @@ export async function getOrderStatus(orderId: number) {
 
 //TODO: 주문 기록 가져오는 함수 (start_time ~ end_time)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/All-Orders
-export async function getBinanceAllOrders(startTime?: number, endTime?: number) {
+export async function getBinanceAllOrders(symbol:string, startTime?: number, endTime?: number) {
   const endpoint = '/fapi/v1/allOrders';
   const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
+      symbol: symbol,
       recvWindow: '5000',
   };
   if (startTime) {

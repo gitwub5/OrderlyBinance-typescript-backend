@@ -1,10 +1,9 @@
 import { WebSocketStreamBase } from './wsStreamBase';
-import { binanceSymbol } from '../../utils/utils';
 
 //Mark price and funding rate for a single symbol pushed every 3 seconds or every second.
 export class MarkPriceStreamClient extends WebSocketStreamBase {
-  constructor(interval: '3s' | '1s' = '3s') {
-    super(binanceSymbol, `@markPrice@${interval}`);
+  constructor(symbol:string, interval: '3s' | '1s' = '3s') {
+    super(symbol, `@markPrice@${interval}`);
   }
 
   protected handleMessage(data: any) {

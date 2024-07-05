@@ -1,6 +1,5 @@
 import { MarkPriceStreamClient } from "../../binance/websocket/markPriceStream";
 import { markPriceWSClient } from "../../orderly/websocket/markPriceStream";
-import { closeThreshold } from "../stratgy";
 import { closePositions } from "../closePositioins";
 
 // //모니터링 웹소켓 ver

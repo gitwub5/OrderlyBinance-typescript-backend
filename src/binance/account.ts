@@ -1,5 +1,3 @@
-import { timeStamp } from 'console';
-import { binanceSymbol } from '../utils/utils';
 import { createSignAndRequest } from "./signer";
 import { BinanceBalance } from "./types";
 import { BinancePosition } from './types';
@@ -23,16 +21,16 @@ export async function getBinanceBalance(){
 
 // 현재 포지션 정보 조회
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Position-Information-V2
-export async function getBinancePositions(): Promise<BinancePosition | null> {
+export async function getBinancePositions(symbol: string): Promise<BinancePosition | null> {
   const endpoint = '/fapi/v2/positionRisk';
   const queryParams = {
-      symbol: binanceSymbol,
+      symbol: symbol,
       recvWindow: '5000'
   };
 
   const data = await createSignAndRequest(endpoint, queryParams, 'GET');
   if (data && Array.isArray(data)) {
-      const position = data.find((pos: any) => pos.symbol === binanceSymbol) as BinancePosition;
+      const position = data.find((pos: any) => pos.symbol === symbol) as BinancePosition;
       return position;
   }
   return null;
@@ -41,10 +39,10 @@ export async function getBinancePositions(): Promise<BinancePosition | null> {
 
 //Query income history (start_time ~ end_time)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Get-Income-History
-export async function getBinanceIncomeHis(startTime?: number, endTime?: number) {
+export async function getBinanceIncomeHis(symbol: string, startTime?: number, endTime?: number) {
   const endpoint = '/fapi/v1/income';
   const queryParams: Record<string, string> = {
-    symbol: binanceSymbol,
+    symbol: symbol,
     recvWindow: '5000',
 };
 if (startTime) {

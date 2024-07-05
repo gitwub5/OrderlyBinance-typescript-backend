@@ -24,8 +24,3 @@ export const binanceAccountInfo : BinanceAccount = {
   apiKey: process.env.BINANCE_API_KEY as string,
   secret: process.env.BINANCE_SECRET as string,
 };
-
-
-export const symbol = commonSymbols[40]; //TON
-export const binanceSymbol = reconstructBinanceSymbol(symbol);
-export const orderlySymbol = reconstructOrderlySymbol(symbol);

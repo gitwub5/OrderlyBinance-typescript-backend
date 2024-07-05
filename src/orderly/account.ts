@@ -1,5 +1,5 @@
 import { signAndSendRequest } from "./signer";
-import { orderlyAccountInfo, orderlySymbol, ORDERLY_API_URL } from "../utils/utils";
+import { orderlyAccountInfo, ORDERLY_API_URL } from "../utils/utils";
 import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "./types";
 import { formatDate } from "./utils/formatDate";
 
@@ -24,12 +24,12 @@ export async function getOrderlyBalance(): Promise<number | null>{
     }
 }
 
-export async function getOrderlyPositions() : Promise<OrderlyPosition | null> {
+export async function getOrderlyPositions(symbol: string) : Promise<OrderlyPosition | null> {
     try {
         const response = await signAndSendRequest(
         orderlyAccountInfo.accountId,
         orderlyAccountInfo.privateKey,
-        `${ORDERLY_API_URL}/v1/position/${orderlySymbol}`
+        `${ORDERLY_API_URL}/v1/position/${symbol}`
         );
         const json: OrderlyPositionResponse = await response.json();
         //console.log('Orderly Positions data:', JSON.stringify(json, undefined, 2));

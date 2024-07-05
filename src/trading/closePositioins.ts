@@ -6,17 +6,21 @@ import { getOrderlyPositions } from '../orderly/account';
 import { getBinancePositions } from '../binance/account';
 import { recordTrade } from '../db/queries';
 import { forceStop, initialPriceDifference } from '../globals';
+import { token } from 'types/tokenTypes';
 
 // 포지션 청산(Market Order) 및 DB에 기록
-export async function closePositions() {
+export async function closePositions(token : token) {
   console.log('Closing positions...');
 
-  const [orderlyPosition, binancePosition] = await Promise.all([getOrderlyPositions(), getBinancePositions()]);
+  const [orderlyPosition, binancePosition] = await Promise.all([
+    getOrderlyPositions(token.orderlySymbol), 
+    getBinancePositions(token.binanceSymbol)
+    ]);
 
   const orderlyAmt = orderlyPosition ? parseFloat(orderlyPosition.position_qty.toString()) : null;
   const binanceAmt = binancePosition ? parseFloat(binancePosition.positionAmt.toString()) : null;
   
-  const [orderlyPrice, binancePrice] = await Promise.all([getOrderlyPrice(), getBinancePrice()]);
+  const [orderlyPrice, binancePrice] = await Promise.all([getOrderlyPrice(token.orderlySymbol), getBinancePrice(token.binanceSymbol)]);
 
   const closePriceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
 
@@ -28,13 +32,13 @@ export async function closePositions() {
   if (orderlyAmt !== null) {
       if (orderlyAmt > 0) {
           console.log(`Closing Orderly long position: SELL ${orderlyAmt}`);
-          await placeOrderlyOrder.marketOrder('SELL', orderlyAmt);
+          await placeOrderlyOrder.marketOrder(token.orderlySymbol,'SELL', orderlyAmt);
           //profitLoss += orderlyAmt * (orderlyPrice - binancePrice);
           buyPrice = orderlyPrice; // 롱 포지션의 경우, 오덜리 가격이 매수 가격
           sellPrice = binancePrice; // 롱 포지션의 경우, 바이낸스 가격이 매도 가격
       } else if (orderlyAmt < 0) {
           console.log(`Closing Orderly short position: BUY ${-orderlyAmt}`);
-          await placeOrderlyOrder.marketOrder('BUY', -orderlyAmt);
+          await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', -orderlyAmt);
           //profitLoss += orderlyAmt * (binancePrice - orderlyPrice);
           buyPrice = binancePrice; // 숏 포지션의 경우, 바이낸스 가격이 매수 가격
           sellPrice = orderlyPrice; // 숏 포지션의 경우, 오덜리 가격이 매도 가격
@@ -47,7 +51,7 @@ export async function closePositions() {
   if (binanceAmt !== null) {
       if (binanceAmt > 0) {
           console.log(`Closing Binance long position: SELL ${binanceAmt}`);
-          await placeBinanceOrder.marketOrder('SELL', binanceAmt);
+          await placeBinanceOrder.marketOrder(token.binanceSymbol, 'SELL', binanceAmt);
           //profitLoss += binanceAmt * (binancePrice - orderlyPrice);
           if (orderlyAmt === null) { // 오덜리 포지션이 없는 경우 바이낸스 포지션으로 buyPrice와 sellPrice 설정
               buyPrice = binancePrice;
@@ -55,7 +59,7 @@ export async function closePositions() {
           }
       } else if (binanceAmt < 0) {
           console.log(`Closing Binance short position: BUY ${-binanceAmt}`);
-          await placeBinanceOrder.marketOrder('BUY', -binanceAmt);
+          await placeBinanceOrder.marketOrder(token.binanceSymbol, 'BUY', -binanceAmt);
           //profitLoss += binanceAmt * (orderlyPrice - binancePrice);
           if (orderlyAmt === null) { // 오덜리 포지션이 없는 경우 바이낸스 포지션으로 buyPrice와 sellPrice 설정
               buyPrice = orderlyPrice;
@@ -67,8 +71,8 @@ export async function closePositions() {
   }
 
   // 오덜리 & 바이낸스 모든 주문 취소
-  await cancelAllBinanceOrders();
-  await cancelAllOrderlyOrders();
+  await cancelAllBinanceOrders(token.binanceSymbol);
+  await cancelAllOrderlyOrders(token.orderlySymbol);
   console.log('All Open Orders are canceled...');
 
   if (!forceStop) {

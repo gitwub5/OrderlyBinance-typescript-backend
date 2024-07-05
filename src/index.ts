@@ -12,6 +12,8 @@ import { TON } from './trading/stratgy';
 
 async function init() {
 
+    //tokens[] = token1, token2, ....여러개의 인터페이스
+
     await createTables();
 
     process.on('SIGINT', async () => {
@@ -19,7 +21,7 @@ async function init() {
         setShouldStop(true);
         console.log('Received SIGINT. Stopping manageOrders...');
         try {
-            await closePositions();
+            await closePositions(TON);
         } catch (err) {
             console.error('Error during closing positions:', err);
         } finally {
@@ -34,6 +36,6 @@ async function init() {
 
 init().catch(async err => {
     console.error('Failed to initialize application:', err);
-    await closePositions();
+    await closePositions(TON);
     process.exit(1);
 });
