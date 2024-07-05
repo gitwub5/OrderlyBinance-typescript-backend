@@ -33,11 +33,11 @@ export class markPriceWSClient extends WebSocketStreamBase {
   }
 }
     
-  //   const orderlyClient = new markPriceWSClient();
-  //   orderlyClient.setMessageCallback((data: any) => {
-  //     const price = data.price;
-  //     if (price !== undefined) {
-  //       console.log('Received Orderly Mark Price:', price);
-  //     }
-  //   }
-  // );
+    const orderlyClient = new markPriceWSClient();
+    orderlyClient.setMessageCallback((data: any) => {
+      const price = data.price;
+      if (price !== undefined) {
+        console.log('Received Orderly Mark Price:', price);
+      }
+    }
+  );
