@@ -14,3 +14,15 @@ export let initialPriceDifference: number = 0;
 export function setInitialPriceDifference(value: number) {
   initialPriceDifference = value;
 }
+
+export let buy_price: number = 0;
+
+export function setBuyPrice(value: number) {
+  buy_price = value;
+}
+
+export let sell_price: number = 0;
+
+export function setSellPrice(value: number) {
+  sell_price = value;
+}

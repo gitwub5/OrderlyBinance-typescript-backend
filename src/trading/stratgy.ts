@@ -1,10 +1,10 @@
 //통합테스트: 주문 크기 5로 설정, 아비트리지 임계앖 0.1 설정
-export const orderSize = 5; // 주문 크기 (단위: TON)
-export const interval = 30000; // 1분 ->30초 (단위시간)
-export const shortInterval = 10000; // 10초
-export const arbitrageThreshold = 0.12; // 아비트리지 허용 임계값 (%)
-export const closeThreshold = 0.05;
-export const trailingThreshold = 0.05;
+export const orderSize = 2; // 주문 크기 (단위: TON)
+export const interval = 3000; // 3초 (단위시간)
+export const shortInterval = 1000; // 1초
+export const arbitrageThreshold = 0.3; // 아비트리지 허용 임계값 (%)
+export const closeThreshold = 0.15;
+export const trailingThreshold = 0.1;
 //export const closeThreshold = arbitrageThreshold / 2; //포지션 청산 임계값
 
 // 수수료
