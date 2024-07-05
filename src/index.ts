@@ -13,6 +13,7 @@ import { TON } from './trading/stratgy';
 async function init() {
 
     //tokens[] = token1, token2, ....여러개의 인터페이스
+    //현재는 TON으로 실행
 
     await createTables();
 

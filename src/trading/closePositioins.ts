@@ -78,6 +78,7 @@ export async function closePositions(token : token) {
   if (!forceStop) {
     try {
         await recordTrade(
+            token.binanceSymbol,
             initialPriceDifference,
             closePriceDifference,
             buyPrice,
