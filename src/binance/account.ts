@@ -33,7 +33,7 @@ export async function getBinancePositions(): Promise<BinancePosition | null> {
   const data = await createSignAndRequest(endpoint, queryParams, 'GET');
   if (data && Array.isArray(data)) {
       const position = data.find((pos: any) => pos.symbol === binanceSymbol) as BinancePosition;
-      return position || null;
+      return position;
   }
   return null;
 }

@@ -3,7 +3,7 @@ import { orderlyAccountInfo, WS_PUBLIC_URL } from '../../utils/utils';
 
 export abstract class WebSocketStreamBase {
   private ws: WebSocket | null = null;
-  private messageCallback: ((data: any) => void) | null = null;
+  protected messageCallback: ((data: any) => void) | null = null;
   private pingInterval: number = 10000; // Ping interval in milliseconds
   private pingTimer: NodeJS.Timeout | null = null;
   protected shouldStop = false;

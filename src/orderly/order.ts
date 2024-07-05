@@ -22,17 +22,18 @@ export class placeOrderlyOrder {
 
       const json = await response.json();
       //console.log('Orderly Order Response:', JSON.stringify(json, undefined, 2));
+      return json.data;
     } catch (error) {
       console.error('Error creating order:', error);
     }
   }
 
   public static async limitOrder(side: string, price: number, amount: number) {
-    await this.placeOrder('LIMIT', side, price, amount);
+    return await this.placeOrder('LIMIT', side, price, amount);
   }
 
   public static async marketOrder(side: string, amount: number) {
-    await this.placeOrder('MARKET', side, null, amount);
+    return await this.placeOrder('MARKET', side, null, amount);
   }
 }
 
@@ -91,3 +92,37 @@ export async function cancelAllOrderlyOrders() {
       return null;
     }
 }
+
+export async function getOrderlyOrderById(order_id: string) {
+  try {
+    const response = await signAndSendRequest(
+      orderlyAccountInfo.accountId,
+      orderlyAccountInfo.privateKey,
+      `${ORDERLY_API_URL}/v1/order/${order_id}`,
+      {
+        method: 'GET'
+      }
+    );
+    const json = await response.json();
+    return json.data;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+}
+
+// async function main() {
+//     try {
+//       const response2 = await getOrderlyOrderById('2389775311');
+//       const price = response2.average_executed_price;
+//       console.log(response2);
+//       console.log(`[Orderly] Average executed Price : ${price}`);
+//     } catch (error) {
+//         console.error('Error in main function:', error);
+//     }
+// }
+
+// main().catch(error => {
+//   console.error('Unhandled error in main function:', error);
+// });
+// getOrderlyOrderById('247353798');

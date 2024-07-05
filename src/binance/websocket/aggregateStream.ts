@@ -1,4 +1,4 @@
-import WebSocketStreamBase from './wsStreamBase';
+import { WebSocketStreamBase } from './wsStreamBase';
 
 //The Aggregate Trade Streams push market trade information that is aggregated for fills with same price and taking side every 100 milliseconds.
 class AggregateTradeStream extends WebSocketStreamBase {
