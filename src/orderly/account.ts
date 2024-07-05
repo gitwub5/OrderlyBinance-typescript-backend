@@ -95,7 +95,7 @@ export async function getOrderlyDailyStats(
 
 //Retrieve the historical PnL settlement history of the account.
 //PnL 정산 내역 불러오기: 발생한 손익(PnL, Profit and Loss)을 정산한 기록
-//문제: 현재 제대로 값을 불러오지 못하고 있음!!
+//문제: PnL settlement를 해야지 됨
 export async function getOrderlyPnLHis(
     start_t : number,
     end_t: number

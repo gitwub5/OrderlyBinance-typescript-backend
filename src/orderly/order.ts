@@ -113,10 +113,10 @@ export async function getOrderlyOrderById(order_id: string) {
 
 // async function main() {
 //     try {
-//       const response2 = await getOrderlyOrderById('2389775311');
-//       const price = response2.average_executed_price;
+//       const response2 = await await placeOrderlyOrder.marketOrder('BUY', 2)
+//       const price = response2.order_id;
 //       console.log(response2);
-//       console.log(`[Orderly] Average executed Price : ${price}`);
+//       console.log(price);
 //     } catch (error) {
 //         console.error('Error in main function:', error);
 //     }
@@ -125,4 +125,3 @@ export async function getOrderlyOrderById(order_id: string) {
 // main().catch(error => {
 //   console.error('Unhandled error in main function:', error);
 // });
-// getOrderlyOrderById('247353798');

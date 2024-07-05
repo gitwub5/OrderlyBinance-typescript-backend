@@ -38,45 +38,6 @@ export async function getBinancePositions(): Promise<BinancePosition | null> {
   return null;
 }
 
-// 심볼의 모든 미체결 주문 조회 (Get all open orders on a symbol.)
-//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Current-All-Open-Orders
-export async function getBinanceOpenOrders() {
-  const endpoint = '/fapi/v1/openOrders';
-  const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
-      recvWindow: '5000',
-  };
-
-  const data = await createSignAndRequest(endpoint, queryParams, 'GET');
-  if (data) {
-      const orderIds = data.map((order: any) => order.orderId);
-      return orderIds;
-  }
-  return null;
-}
-
-//TODO: 주문 기록 가져오는 함수 (start_time ~ end_time)
-//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/All-Orders
-export async function getBinanceAllOrders(startTime?: number, endTime?: number) {
-  const endpoint = '/fapi/v1/allOrders';
-  const queryParams: Record<string, string> = {
-      symbol: binanceSymbol,
-      recvWindow: '5000',
-  };
-  if (startTime) {
-    queryParams.startTime = startTime.toString();
-  }
-  if (endTime) {
-    queryParams.endTime = endTime.toString();
-  }
-
-  const data = await createSignAndRequest(endpoint, queryParams, 'GET');
-  if (data) {
-      console.log(data);
-      return data;
-  }
-  return null;
-}
 
 //Query income history (start_time ~ end_time)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Get-Income-History

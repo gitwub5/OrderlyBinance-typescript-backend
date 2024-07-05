@@ -1,12 +1,19 @@
 import { token } from "../types/tokenTypes";
+import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/getSymbols";
 
+export const TON : token = {
+    binanceSymbol : reconstructBinanceSymbol('TON'),
+    orderlySymbol : reconstructOrderlySymbol('TON'),
+    orderSize : 2,
+    arbitrageThreshold : 0.3,
+    closeThreshold : 0.15
+};
 
 export const orderSize = 2; // 주문 크기 (단위: TON)
 export const interval = 3000; // 3초 (단위시간)
 export const shortInterval = 1000; // 1초
 export const arbitrageThreshold = 0.3; // 아비트리지 허용 임계값 (%)
 export const closeThreshold = 0.15;
-export const trailingThreshold = 0.1;
 //export const closeThreshold = arbitrageThreshold / 2; //포지션 청산 임계값
 
 // 수수료

@@ -2,7 +2,7 @@ import { getOrderlyPositions } from "../orderly/account";
 import { getBinancePositions } from "../binance/account";
 import { getBinancePrice } from "../binance/market";
 import { getOrderlyPrice } from "../orderly/market";
-import { shortInterval, closeThreshold} from "./stratgy";
+import { shortInterval} from "./stratgy";
 import { closePositions } from "./closePositioins";
 
 // 현재 포지션이 있는지 확인하는 함수
@@ -18,7 +18,7 @@ export async function hasOpenPositions(): Promise<boolean> {
     return (orderlyAmt !== null && orderlyAmt !== 0) || (positionAmt !== null && positionAmt !== 0);
   }
 
-  export async function monitorClosePositions() {
+  export async function monitorClosePositions(closeThreshold: number) {
     let isClosePosition : boolean = false;
 
     while (!isClosePosition) {
