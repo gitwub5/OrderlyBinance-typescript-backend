@@ -46,9 +46,9 @@ export async function executeArbitrage(token: token) {
           }
       }
   } catch (error) {
-      console.error('Error in executeArbitrage:', error);
-      throw error;
-  }
+    console.error('Error in executeArbitrage:', error);
+    throw error;
+}
 }
 
 export async function manageArbitrage(token: token) {
@@ -60,7 +60,6 @@ export async function manageArbitrage(token: token) {
         }
     } catch (error) {
         console.error('Error in manageArbitrage:', error);
-        await closePositions(token);
         throw error;
     } finally {
         console.log('Exiting manageOrders...');

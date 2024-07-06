@@ -55,9 +55,10 @@ export async function handleOrder(binanceSymbol: string, orderlyPrice: number, a
     console.log(`[Binance] Modified orders -> Long Pos: ${longPositionPrice} | Short Pos: ${shortPositionPrice}`);
   } catch (error) {
     console.error('Error in modifying orders:', error);
-    throw error;
+    throw new Error('Order modification failed');
   }
 }
+
 
 // 공통 함수: 포지션 진입 및 초기 가격 차이 설정
 async function enterPosition(token: token, positionType: 'BUY' | 'SELL', positionId: number, cancelPositionId: number) {
@@ -80,7 +81,7 @@ async function enterPosition(token: token, positionType: 'BUY' | 'SELL', positio
     setInitialPriceDifference(priceDifference);
   } catch (error) {
     console.error(`Error in enter${positionType === 'BUY' ? 'Long' : 'Short'}Position:`, error);
-    throw error;
+    throw new Error('Enter poition failed');
   }
 }
 

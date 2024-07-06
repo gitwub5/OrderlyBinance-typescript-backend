@@ -35,7 +35,7 @@ export const TON : token = {
 
 export const orderSize = 2; // 주문 크기 (단위: TON)
 export const interval = 3000; // 3초 (단위시간)
-export const shortInterval = 1000; // 1초
+export const shortInterval = 500; // 0.5초
 
 
 // export const arbitrageThreshold = 0.3; 

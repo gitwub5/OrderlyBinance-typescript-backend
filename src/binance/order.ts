@@ -74,7 +74,7 @@ export async function cancelAllBinanceOrders(symbol: string) {
 
 //Order modify function, currently only LIMIT order modification is supported, modified orders will be reordered in the match queue
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Order
-export async function modifyBinanceOrders(symbol: string, orderId: number, side: string, price: number, amount : number) {
+export async function modifyBinanceOrders(symbol: string, orderId: number, side: string, price: number, amount: number) {
   const endpoint = '/fapi/v1/order';
   const queryParams: Record<string, string> = {
     symbol: symbol,
@@ -84,7 +84,16 @@ export async function modifyBinanceOrders(symbol: string, orderId: number, side:
     price: price.toString(),
   };
 
-  return await createSignAndRequest(endpoint, queryParams, 'PUT');
+  try {
+    const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
+    if (response.status !== 200) {
+      throw new Error(`Failed to modify order: ${response.data.msg}`);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error modifying Binance order:', error);
+    throw error;
+  }
 }
 
 //Modify Multiple Orders (TRADE)

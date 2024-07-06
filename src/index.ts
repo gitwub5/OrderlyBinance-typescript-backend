@@ -14,10 +14,6 @@ import { TON } from './trading/stratgy';
 // TODO: 코인 별로 가격 차이값(%) 가져와서 분석시키기 -> 최적 아비트리지 값 찾기
 
 async function init() {
-
-    //tokens[] = token1, token2, ....여러개의 인터페이스
-    //현재는 TON으로 실행
-
     await createTables();
 
     process.on('SIGINT', async () => {
@@ -33,7 +29,7 @@ async function init() {
             process.exit(0);
         }
     });
-    
+
     await manageArbitrage(TON);
     //await manageMultipleTokens(tokens);
 }
