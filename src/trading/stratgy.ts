@@ -20,8 +20,8 @@ export const tokens: token[] = [
         binanceSymbol : reconstructBinanceSymbol('WOO'),
         orderlySymbol : reconstructOrderlySymbol('WOO'),
         orderSize : 2,
-        arbitrageThreshold : 0.3,
-        closeThreshold : 0.15
+        arbitrageThreshold : 0.25,
+        closeThreshold : 0.12
     }
 ];
 
@@ -29,8 +29,8 @@ export const TON : token = {
     binanceSymbol : reconstructBinanceSymbol('TON'),
     orderlySymbol : reconstructOrderlySymbol('TON'),
     orderSize : 2,
-    arbitrageThreshold : 0.3,
-    closeThreshold : 0.15
+    arbitrageThreshold : 0.25,
+    closeThreshold : 0.12
 };
 
 export const orderSize = 2; // 주문 크기 (단위: TON)
