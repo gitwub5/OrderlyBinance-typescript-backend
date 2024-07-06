@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 import { BinanceAccount, OrderlyAccount } from '../types/accountTypes';
 import bs58 from 'bs58';
-import { commonSymbols } from './commonSymbols';
-import { reconstructBinanceSymbol, reconstructOrderlySymbol} from './getSymbols'
 
 dotenv.config();
 

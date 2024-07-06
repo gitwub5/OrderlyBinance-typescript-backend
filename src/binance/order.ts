@@ -160,10 +160,13 @@ export async function getBinanceAllOrders(symbol:string, startTime?: number, end
 
 
 // async function main() {
-//   const position = await getBinanceOpenOrders();
+//   const ton = "TONUSDT";
+//   const position = await getBinanceOpenOrders(ton);
 //   console.log(position);
-//   const res = await getOrderStatus(1517124565);
-//   console.log(res);
+//   // const res = await getOrderStatus(1517124565);
+//   // console.log(res);
+//   const longPositionStatus = await getBinanceOrderStatus(ton, 1529189098);
+//   console.log(longPositionStatus)
 // }
 
 // main().catch(error => {

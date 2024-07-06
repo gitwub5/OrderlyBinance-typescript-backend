@@ -22,7 +22,7 @@ import { token } from '../types/tokenTypes';
           getBinanceOrderStatus(token.binanceSymbol, shortPositionId)
         ]);
         
-        if(longPositionStatus && longPositionStatus.status === 'FILLED'){
+        if(longPositionStatus.status === 'FILLED'){
           console.log(`<<<< Long Position filled on Binance >>>>`);
           enterShortPosition(token, shortPositionId);
 
@@ -31,7 +31,7 @@ import { token } from '../types/tokenTypes';
           positionFilled = true;
           return;
         }
-        else if(shortPositionStatus && shortPositionStatus.status === 'FILLED'){
+        else if(shortPositionStatus.status === 'FILLED'){
           console.log(`<<<< Short Position filled on Binance >>>>`);
           enterLongPosition(token, longPositionId);
 

@@ -10,6 +10,9 @@ import { TON } from './trading/stratgy';
 //     await Promise.all(tasks);
 // }
 
+// TODO: 바이낸스랑 오덜리 함수들 클래스화
+// TODO: 코인 별로 가격 차이값(%) 가져와서 분석시키기 -> 최적 아비트리지 값 찾기
+
 async function init() {
 
     //tokens[] = token1, token2, ....여러개의 인터페이스
