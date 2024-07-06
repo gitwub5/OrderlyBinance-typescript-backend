@@ -5,7 +5,7 @@ import { getOrderlyPrice } from '../orderly/market';
 import { getOrderlyPositions } from '../orderly/account';
 import { getBinancePositions } from '../binance/account';
 import { recordTrade } from '../db/queries';
-import { forceStop, initialPriceDifference } from '../globals';
+import { forceStop, initialPriceDifference, closePriceDifference} from '../globals';
 import { token } from 'types/tokenTypes';
 
 // 포지션 청산(Market Order) 및 DB에 기록
@@ -25,8 +25,6 @@ export async function closePositions(token : token) {
   const [orderlyPrice, binancePrice] = await Promise.all([
     getOrderlyPrice(token.orderlySymbol),
      getBinancePrice(token.binanceSymbol)]);
-
-  const closePriceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
 
   //let profitLoss = 0;
   let buyPrice = 0;

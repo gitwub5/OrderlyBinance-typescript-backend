@@ -15,6 +15,12 @@ export function setInitialPriceDifference(value: number) {
   initialPriceDifference = value;
 }
 
+export let closePriceDifference: number = 0;
+
+export function setClosePriceDifference(value: number) {
+  initialPriceDifference = value;
+}
+
 export let buy_price: number = 0;
 
 export function setBuyPrice(value: number) {
