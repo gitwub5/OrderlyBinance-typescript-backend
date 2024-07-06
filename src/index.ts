@@ -1,5 +1,5 @@
 import { manageArbitrage } from './trading/executeArbitrage';
-import { closePositions } from './trading/closePositioins';
+import { closePositions } from './trading/closePositions';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 import { TON } from './trading/stratgy';

@@ -17,10 +17,14 @@ export async function closePositions(token : token) {
     getBinancePositions(token.binanceSymbol)
     ]);
 
-  const orderlyAmt = orderlyPosition ? parseFloat(orderlyPosition.position_qty.toString()) : null;
-  const binanceAmt = binancePosition ? parseFloat(binancePosition.positionAmt.toString()) : null;
+  const orderlyAmt = orderlyPosition ?
+   parseFloat(orderlyPosition.position_qty.toString()) : null;
+  const binanceAmt = binancePosition ?
+   parseFloat(binancePosition.positionAmt.toString()) : null;
   
-  const [orderlyPrice, binancePrice] = await Promise.all([getOrderlyPrice(token.orderlySymbol), getBinancePrice(token.binanceSymbol)]);
+  const [orderlyPrice, binancePrice] = await Promise.all([
+    getOrderlyPrice(token.orderlySymbol),
+     getBinancePrice(token.binanceSymbol)]);
 
   const closePriceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
 
@@ -88,8 +92,8 @@ export async function closePositions(token : token) {
     } catch (err) {
         console.log('Error during recording at table', err);
     }
-}
-}
+    }
+}  
 
 //DB에 저장할 값 변경하기!
 //TODO: Profit을 따로 계산해서 저장하는데 거의 대부분의 주문이 원하는 가격으로 안들어갈 확률이 높아서 
