@@ -86,9 +86,6 @@ export async function modifyBinanceOrders(symbol: string, orderId: number, side:
 
   try {
     const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
-    if (response.status !== 200) {
-      throw new Error(`Failed to modify order: ${response.data.msg}`);
-    }
     return response.data;
   } catch (error) {
     console.error('Error modifying Binance order:', error);

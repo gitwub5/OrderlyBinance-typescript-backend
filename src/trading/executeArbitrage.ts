@@ -16,6 +16,9 @@ export async function executeArbitrage(token: token) {
       let positionFilled = false;
       let previousOrderlyPrice = orderlyPrice;
 
+      //1초 정도 대기
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       while (!positionFilled) {
           const [longPositionStatus, shortPositionStatus] = await Promise.all([
               getBinanceOrderStatus(token.binanceSymbol, longPositionId),
