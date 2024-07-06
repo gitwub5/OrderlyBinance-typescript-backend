@@ -22,16 +22,18 @@ export async function executeArbitrage(token: token) {
               getBinanceOrderStatus(token.binanceSymbol, shortPositionId)
           ]);
 
-          if (longPositionStatus.status === 'FILLED') {
+          if (longPositionStatus === 'FILLED') {
               console.log(`<<<< Long Position filled on Binance >>>>`);
               await enterShortPosition(token, shortPositionId);
               await monitorClosePositions(token);
               positionFilled = true;
-          } else if (shortPositionStatus.status === 'FILLED') {
+              return;
+          } else if (shortPositionStatus === 'FILLED') {
               console.log(`<<<< Short Position filled on Binance >>>>`);
               await enterLongPosition(token, longPositionId);
               await monitorClosePositions(token);
               positionFilled = true;
+              return;
           } else {
               orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
               console.log(`[Orderly] ${token.orderlySymbol} Mark Price: `, orderlyPrice);
