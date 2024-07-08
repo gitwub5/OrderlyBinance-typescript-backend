@@ -25,47 +25,47 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('LINK'),
         orderlySymbol : reconstructOrderlySymbol('LINK'),
         orderSize : 2,
-        arbitrageThreshold : 0.30,
-        closeThreshold : 0.12,
-        precision: 3,
-        state: new TokenState()
-    },
-    {
-        binanceSymbol : reconstructBinanceSymbol('ZRO'),
-        orderlySymbol : reconstructOrderlySymbol('ZRO'),
-        orderSize : 3,
-        arbitrageThreshold : 0.35,
+        arbitrageThreshold : 0.60,
         closeThreshold : 0.15,
         precision: 3,
         state: new TokenState()
     },
-    {
-        binanceSymbol : reconstructBinanceSymbol('ONDO'),
-        orderlySymbol : reconstructOrderlySymbol('ONDO'),
-        orderSize : 12,
-        arbitrageThreshold : 0.35,
-        closeThreshold : 0.15,
-        precision: 4,
-        state: new TokenState()
-    },
-    {
-        binanceSymbol : reconstructBinanceSymbol('WIF'),
-        orderlySymbol : reconstructOrderlySymbol('WIF'),
-        orderSize : 7,
-        arbitrageThreshold : 0.40,
-        closeThreshold : 0.15,
-        precision: 4,
-        state: new TokenState()
-    },
-    {
-        binanceSymbol : reconstructBinanceSymbol('TIA'),
-        orderlySymbol : reconstructOrderlySymbol('TIA'),
-        orderSize : 2,
-        arbitrageThreshold : 0.40,
-        closeThreshold : 0.20,
-        precision: 4,
-        state: new TokenState()
-    },
+    // {
+    //     binanceSymbol : reconstructBinanceSymbol('ZRO'),
+    //     orderlySymbol : reconstructOrderlySymbol('ZRO'),
+    //     orderSize : 3,
+    //     arbitrageThreshold : 0.35,
+    //     closeThreshold : 0.15,
+    //     precision: 3,
+    //     state: new TokenState()
+    // },
+    // {
+    //     binanceSymbol : reconstructBinanceSymbol('ONDO'),
+    //     orderlySymbol : reconstructOrderlySymbol('ONDO'),
+    //     orderSize : 12,
+    //     arbitrageThreshold : 0.35,
+    //     closeThreshold : 0.15,
+    //     precision: 4,
+    //     state: new TokenState()
+    // },
+    // {
+    //     binanceSymbol : reconstructBinanceSymbol('WIF'),
+    //     orderlySymbol : reconstructOrderlySymbol('WIF'),
+    //     orderSize : 7,
+    //     arbitrageThreshold : 0.40,
+    //     closeThreshold : 0.15,
+    //     precision: 4,
+    //     state: new TokenState()
+    // },
+    // {
+    //     binanceSymbol : reconstructBinanceSymbol('TIA'),
+    //     orderlySymbol : reconstructOrderlySymbol('TIA'),
+    //     orderSize : 2,
+    //     arbitrageThreshold : 0.40,
+    //     closeThreshold : 0.20,
+    //     precision: 4,
+    //     state: new TokenState()
+    // },
 ];
 
 export const orderSize = 2; // 주문 크기 (단위: TON)
