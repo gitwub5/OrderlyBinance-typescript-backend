@@ -4,7 +4,7 @@ import { token } from '../types/tokenTypes';
 
 function fixPrecision(value: number, precision: number): number {
   const factor = Math.pow(10, precision);
-  return Math.floor(value * factor) / factor;
+  return Math.round(value * factor) / factor;
 }
 
 // TODO: db에 주문이 들어갔을 때 가격 밖에 없어서 아비트리지가 일어나야할 시점의 가격을 추가해서 확인 원하는 가격이랑 주문 가격이 비슷한지 확인!
