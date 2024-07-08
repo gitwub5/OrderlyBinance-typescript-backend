@@ -4,12 +4,12 @@ export const recordTrade = async (
   tokenName: string,
   initialPriceDifference: number,
   closePriceDifference: number,
-  buyPrice: number,
-  sellPrice: number
+  enterPrice: number,
+  closePrice: number
 ) => {
   const [result] = await connection.query(
-    'INSERT INTO trades (token_name, initial_price_difference, close_price_difference, buy_price, sell_price) VALUES (?, ?, ?, ?, ?)',
-    [tokenName, initialPriceDifference, closePriceDifference, buyPrice, sellPrice]
+    'INSERT INTO trades (token_name, initial_price_difference, close_price_difference, orderly_enter_price, orderly_close_price) VALUES (?, ?, ?, ?, ?)',
+    [tokenName, initialPriceDifference, closePriceDifference, enterPrice, closePrice]
   );
   return result;
 };

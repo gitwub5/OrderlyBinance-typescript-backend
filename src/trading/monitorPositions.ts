@@ -3,9 +3,8 @@ import { getBinancePositions } from "../binance/account";
 import { getBinancePrice } from "../binance/market";
 import { getOrderlyPrice } from "../orderly/market";
 import { shortInterval } from "./stratgy";
-import { closePositions } from "./closePositions";
-import { token } from "types/tokenTypes";
-import { setClosePriceDifference } from "../globals";
+import { cancelAllOrders, closePositions } from "./closePositions";
+import { token } from "../types/tokenTypes";
 
 // 현재 포지션이 있는지 확인하는 함수
 export async function hasOpenPositions(token: token): Promise<boolean> {
@@ -48,9 +47,13 @@ export async function monitorClosePositions(token: token) {
             // 청산 조건 확인
             if (Math.abs(priceDifference) <= token.closeThreshold) {
                 console.log('<<<< Closing positions due to close threshold >>>>.');
-                setClosePriceDifference(priceDifference);
+
                 await closePositions(token);
+                await cancelAllOrders(token);
+
                 isClosePosition = true;
+                token.state.setClosePriceDifference(priceDifference);
+                return;
             }
 
             // shortInterval 간격으로 반복

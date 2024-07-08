@@ -3,7 +3,7 @@ import { orderlyAccountInfo, ORDERLY_API_URL } from "../utils/utils";
 import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "./types";
 import { formatDate } from "./utils/formatDate";
 
-//문제: 현재 제대로 값을 불러오지 못하고 있음!!
+//문제: PnL settlement를 해야지 됨
 export async function getOrderlyBalance(): Promise<number | null>{
     try{
         const response = await signAndSendRequest(

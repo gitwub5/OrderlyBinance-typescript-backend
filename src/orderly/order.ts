@@ -113,10 +113,11 @@ export async function getOrderlyOrderById(order_id: string) {
 
 // async function main() {
 //     try {
-//       const response2 = await await placeOrderlyOrder.marketOrder('BUY', 2)
-//       const price = response2.order_id;
-//       console.log(response2);
-//       console.log(price);
+//       const response = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'BUY', 2)
+//       const orderId = response.order_id;
+//       const response2 = await getOrderlyOrderById(orderId);
+//       const orderlyPrice = response2.average_executed_price;
+//       //console.log(price);
 //     } catch (error) {
 //         console.error('Error in main function:', error);
 //     }
