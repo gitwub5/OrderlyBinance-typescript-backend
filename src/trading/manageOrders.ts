@@ -42,7 +42,7 @@ export async function placeNewOrder(token: token, orderlyPrice: number) {
 export async function handleOrder(token: token, orderlyPrice: number, longPositionId: number, shortPositionId: number) {
   const shortPositionPrice = fixPrecision(orderlyPrice * (1 + token.arbitrageThreshold / 100), token.precision);
   const longPositionPrice = fixPrecision(orderlyPrice * (1 - token.arbitrageThreshold / 100), token.precision);
-  
+
   try {
     await Promise.all([
       modifyBinanceOrders(token.binanceSymbol, longPositionId, 'BUY', longPositionPrice, token.orderSize),
@@ -56,7 +56,6 @@ export async function handleOrder(token: token, orderlyPrice: number, longPositi
     throw new Error('Order modification failed');
   }
 }
-
 // 오덜리 숏 포지션 진입 (바이낸스가 롱 포지션일 때)
 export async function enterShortPosition(token: token, shortPositionId: number, binancePrice: number) {
   try {

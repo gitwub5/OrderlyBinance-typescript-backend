@@ -9,8 +9,9 @@ import { token } from '../types/tokenTypes';
 async function closePositionAndPrice(token: token, side: 'BUY' | 'SELL', amount: number) {
   const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, side, amount);
   const orderId = response.order_id;
-  const response2 = await getOrderlyOrderById(orderId);
-  token.state.setClosePrice(response2.average_executed_price);
+  const order = await getOrderlyOrderById(orderId);
+  const orderlyPrice = order.average_executed_price;
+  token.state.setClosePrice(orderlyPrice);
 }
 
 async function closeOrderlyPositions(token: token, orderlyAmt: number) {

@@ -2,12 +2,15 @@ import { token } from "../types/tokenTypes";
 import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/getSymbols";
 import { TokenState } from "../types/tokenState";
 
+export const interval = 2000; // 3초 (단위시간)
+export const shortInterval = 500; // 0.5초
+
 export const tokensArray: token[] = [
     {
         binanceSymbol : reconstructBinanceSymbol('TON'), //바이낸스 버전 심볼 -> TONUSDT
         orderlySymbol : reconstructOrderlySymbol('TON'), //오덜리 버전 심볼 -> PERP_TON_USDC
         orderSize : 2, //주문수량
-        arbitrageThreshold : 0.25, // 아비트리지 허용 임계값 (%)
+        arbitrageThreshold : 0.3, // 아비트리지 허용 임계값 (%)
         closeThreshold : 0.12, //청산 포지션 임계값(%)
         precision: 4,
         state: new TokenState()
@@ -16,7 +19,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('ARB'),
         orderlySymbol : reconstructOrderlySymbol('ARB'),
         orderSize : 25,
-        arbitrageThreshold : 0.28,
+        arbitrageThreshold : 0.3,
         closeThreshold : 0.10,
         precision: 4,
         state: new TokenState()
@@ -25,7 +28,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('LINK'),
         orderlySymbol : reconstructOrderlySymbol('LINK'),
         orderSize : 2,
-        arbitrageThreshold : 0.60,
+        arbitrageThreshold : 0.55,
         closeThreshold : 0.15,
         precision: 3,
         state: new TokenState()
@@ -68,9 +71,6 @@ export const tokensArray: token[] = [
     },
 ];
 
-export const orderSize = 2; // 주문 크기 (단위: TON)
-export const interval = 3000; // 3초 (단위시간)
-export const shortInterval = 500; // 0.5초
 
 // 수수료
 // Binance: Taker 0.05%, Maker 0.02%
