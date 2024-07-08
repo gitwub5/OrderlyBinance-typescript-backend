@@ -9,7 +9,7 @@ import { token } from '../types/tokenTypes';
 export async function executeArbitrage(token: token) {
   try {
       let orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
-      console.log(`[Orderly] ${token.orderlySymbol} Mark Price: `, orderlyPrice);
+      console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
       
       const { longPositionId, shortPositionId } = await placeNewOrder(token, orderlyPrice);
       let positionFilled = false;
@@ -27,20 +27,20 @@ export async function executeArbitrage(token: token) {
           ]);
 
           if (longPositionStatus === 'FILLED') {
-              console.log(`<<<< Long Position filled on Binance >>>>`);
+              console.log(`<<<< [${token.binanceSymbol}] Long Position filled on Binance >>>>`);
               await enterShortPosition(token, shortPositionId, longPositionPrice);
               await monitorClosePositions(token);
               positionFilled = true;
               return;
           } else if (shortPositionStatus === 'FILLED') {
-              console.log(`<<<< Short Position filled on Binance >>>>`);
+              console.log(`<<<< [${token.binanceSymbol}] Short Position filled on Binance >>>>`);
               await enterLongPosition(token, longPositionId, shortPositionPrice);
               await monitorClosePositions(token);
               positionFilled = true;
               return;
           } else {
               orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
-              console.log(`[Orderly] ${token.orderlySymbol} Mark Price: `, orderlyPrice);
+              console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
 
               if (orderlyPrice !== previousOrderlyPrice) {
                 ({ longPositionPrice, shortPositionPrice } = await handleOrder(token, orderlyPrice, longPositionId, shortPositionId));
@@ -57,9 +57,10 @@ export async function executeArbitrage(token: token) {
 
 export async function manageArbitrage(token: token) {
     try {
+        //TODO: shouldStop의 조건은 balance가 없을 때가 되어야함
         while (!shouldStop) {
             await executeArbitrage(token);
-            console.log('<<<< Arbitrage iteration completed >>>>');
+            console.log(`<<<< [${token.binanceSymbol}] Arbitrage iteration completed >>>>`);
             await new Promise(resolve => setTimeout(resolve, 5000));
         }
     } catch (error) {

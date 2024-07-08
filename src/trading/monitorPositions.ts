@@ -17,8 +17,8 @@ export async function hasOpenPositions(token: token): Promise<boolean> {
         const orderlyAmt = orderlyPosition ? parseFloat(orderlyPosition.position_qty.toString()) : null;
         const positionAmt = binancePosition ? parseFloat(binancePosition.positionAmt.toString()) : null;
 
-        console.log('Orderly position_qty:', orderlyAmt !== null ? orderlyAmt : 'null');
-        console.log('Binance positionAmt:', positionAmt !== null ? positionAmt : 'null');
+        console.log(`Orderly position_qty:', orderlyAmt !== null ? orderlyAmt : 'null`);
+        console.log(`Binance positionAmt:', positionAmt !== null ? positionAmt : 'null`);
 
         return (orderlyAmt !== null && orderlyAmt !== 0) || (positionAmt !== null && positionAmt !== 0);
     } catch (error) {
@@ -37,16 +37,13 @@ export async function monitorClosePositions(token: token) {
                 getBinancePrice(token.binanceSymbol)
             ]);
 
-            // 가격차이(%) -> 양수이면 바이낸스 가격이 높은거고, 음수이면 오덜리 가격이 높은거
-            // 바이낸스에서 숏포지션, 오덜리에서 롱포지션이면 -> 가격차이가 양수여야함
-            // 바이낸스에서 롱포지션, 오덜리에서 숏포지션이면 -> 가격차이가 음수여야함
             const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
 
-            console.log(`<<<< Price Difference: ${priceDifference}% >>>>`);
+            console.log(`<<<< [${token.binanceSymbol}] Price Difference: ${priceDifference}% >>>>`);
 
             // 청산 조건 확인
             if (Math.abs(priceDifference) <= token.closeThreshold) {
-                console.log('<<<< Closing positions due to close threshold >>>>.');
+                console.log(`<<<< [${token.binanceSymbol}] Closing positions due to close threshold >>>>`);
 
                 await closePositions(token);
                 await cancelAllOrders(token);

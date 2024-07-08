@@ -6,5 +6,6 @@ export interface token {
     orderSize : number;
     arbitrageThreshold : number;
     closeThreshold : number;
+    precision : number;
     state: TokenState; 
 }

@@ -15,31 +15,31 @@ async function closePositionAndPrice(token: token, side: 'BUY' | 'SELL', amount:
 
 async function closeOrderlyPositions(token: token, orderlyAmt: number) {
   if (orderlyAmt > 0) {
-    console.log(`<<<< Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
+    console.log(`<<<< [${token.binanceSymbol}] Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
     await closePositionAndPrice(token, 'SELL', orderlyAmt);
   } else if (orderlyAmt < 0) {
-    console.log(`<<<< Closing Orderly short position: BUY ${-orderlyAmt} >>>>`);
+    console.log(`<<<< [${token.binanceSymbol}] Closing Orderly short position: BUY ${-orderlyAmt} >>>>`);
     await closePositionAndPrice(token, 'BUY', -orderlyAmt);
   } else {
-    console.log('No Orderly position to close.');
+    console.log(`[${token.binanceSymbol}] No Orderly position to close.`);
   }
 }
 
 async function closeBinancePositions(token: token, binanceAmt: number) {
   if (binanceAmt > 0) {
-    console.log(`<<<< Closing Binance long position: SELL ${binanceAmt} >>>>`);
+    console.log(`<<<< [${token.binanceSymbol}] Closing Binance long position: SELL ${binanceAmt} >>>>`);
     await placeBinanceOrder.marketOrder(token.binanceSymbol, 'SELL', binanceAmt);
   } else if (binanceAmt < 0) {
-    console.log(`<<<< Closing Binance short position: BUY ${-binanceAmt} >>>>`);
+    console.log(`<<<< [${token.binanceSymbol}] Closing Binance short position: BUY ${-binanceAmt} >>>>`);
     await placeBinanceOrder.marketOrder(token.binanceSymbol, 'BUY', -binanceAmt);
   } else {
-    console.log('No Binance position to close.');
+    console.log(`[${token.binanceSymbol}] No Binance position to close.`);
   }
 }
 
 // 포지션 청산(Market Order) 및 DB에 기록
 export async function closePositions(token: token) {
-  console.log(`<<<< ${token.binanceSymbol} Closing positions >>>>`);
+  console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
 
   const [orderlyPosition, binancePosition] = await Promise.all([
     getOrderlyPositions(token.orderlySymbol),
@@ -74,7 +74,7 @@ export async function closePositions(token: token) {
         token.state.enterPrice,
         token.state.closePrice
       );
-      console.log('Recorded at table');
+      console.log(`[${token.binanceSymbol}] Recorded at table`);
     } catch (err) {
       console.log('Error during recording at table', err);
     }
@@ -91,7 +91,7 @@ export async function cancelAllOrders(token : token){
 
   try {
     await Promise.all(cancelOrderPromises);
-    console.log('All Open Orders are canceled...');
+    console.log(`[${token.binanceSymbol}] All Open Orders are canceled...`);
   } catch (error) {
     console.error('Error during order cancelation:', error);
   }

@@ -9,6 +9,7 @@ export const tokensArray: token[] = [
         orderSize : 2, //주문수량
         arbitrageThreshold : 0.25, // 아비트리지 허용 임계값 (%)
         closeThreshold : 0.12, //청산 포지션 임계값(%)
+        precision: 4,
         state: new TokenState()
     },
     {
@@ -17,25 +18,59 @@ export const tokensArray: token[] = [
         orderSize : 25,
         arbitrageThreshold : 0.28,
         closeThreshold : 0.10,
+        precision: 4,
         state: new TokenState()
     },
-    // {
-    //     binanceSymbol : reconstructBinanceSymbol('LINK'),
-    //     orderlySymbol : reconstructOrderlySymbol('LINK'),
-    //     orderSize : 1,
-    //     arbitrageThreshold : 0.25,
-    //     closeThreshold : 0.12,
-    //     state: new TokenState()
-    // }
+    {
+        binanceSymbol : reconstructBinanceSymbol('LINK'),
+        orderlySymbol : reconstructOrderlySymbol('LINK'),
+        orderSize : 2,
+        arbitrageThreshold : 0.30,
+        closeThreshold : 0.12,
+        precision: 3,
+        state: new TokenState()
+    },
+    {
+        binanceSymbol : reconstructBinanceSymbol('ZRO'),
+        orderlySymbol : reconstructOrderlySymbol('ZRO'),
+        orderSize : 3,
+        arbitrageThreshold : 0.30,
+        closeThreshold : 0.12,
+        precision: 3,
+        state: new TokenState()
+    },
+    {
+        binanceSymbol : reconstructBinanceSymbol('ONDO'),
+        orderlySymbol : reconstructOrderlySymbol('ONDO'),
+        orderSize : 12,
+        arbitrageThreshold : 0.30,
+        closeThreshold : 0.12,
+        precision: 4,
+        state: new TokenState()
+    },
+    {
+        binanceSymbol : reconstructBinanceSymbol('WIF'),
+        orderlySymbol : reconstructOrderlySymbol('WIF'),
+        orderSize : 7,
+        arbitrageThreshold : 0.30,
+        closeThreshold : 0.12,
+        precision: 4,
+        state: new TokenState()
+    },
+    {
+        binanceSymbol : reconstructBinanceSymbol('TIA'),
+        orderlySymbol : reconstructOrderlySymbol('TIA'),
+        orderSize : 2,
+        arbitrageThreshold : 0.30,
+        closeThreshold : 0.12,
+        precision: 4,
+        state: new TokenState()
+    },
 ];
 
 export const orderSize = 2; // 주문 크기 (단위: TON)
 export const interval = 3000; // 3초 (단위시간)
 export const shortInterval = 500; // 0.5초
-
-
-// export const arbitrageThreshold = 0.3; 
-// export const closeThreshold = 0.15;
 
 // 수수료
 // Binance: Taker 0.05%, Maker 0.02%
@@ -49,6 +84,3 @@ export const shortInterval = 500; // 0.5초
 // 임계값 설정:
 // 거래 수수료 합계를 고려하여, 수익이 발생하기 위해 최소 갭은 0.08% 이상이어야 함.
 // 임계값을 약간 여유 있게 설정하여, 슬리피지와 기타 비용을 고려.
-
-// 아비트리지 실행 임계값 (arbitrageThreshold): 0.3% 
-// 포지션 청산 임계값 (closeThreshold): 0.15% (수수료 합계와 수익을 고려한 적절한 값)

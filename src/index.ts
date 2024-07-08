@@ -14,6 +14,18 @@ async function manageMultipleTokens(tokens: token[]) {
 // TODO: 바이낸스랑 오덜리 함수들 클래스화
 // TODO: 코인 별로 가격 차이값(%) 가져와서 분석시키기 -> 최적 아비트리지 값 찾기
 async function init() {
+    //토큰 선택
+    const selectedTokens = [
+        tokensArray[0],
+        tokensArray[1],
+        tokensArray[2],
+        tokensArray[3],
+        tokensArray[4],
+        tokensArray[5],
+        tokensArray[6]
+    ];
+    // const selectedTokens = tokensArray.slice(0, 5);
+
     await createTables();
 
     process.on('SIGINT', async () => {
@@ -31,7 +43,7 @@ async function init() {
         }
     });
 
-    await manageMultipleTokens(tokensArray);
+    await manageMultipleTokens(selectedTokens);
 }
 
 init().catch(async err => {
