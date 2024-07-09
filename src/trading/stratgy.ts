@@ -2,7 +2,7 @@ import { token } from "../types/tokenTypes";
 import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/getSymbols";
 import { TokenState } from "../types/tokenState";
 
-export const interval = 2000; // 3초 (단위시간)
+export const interval = 2000; // 2초 (단위시간)
 export const shortInterval = 500; // 0.5초
 
 export const tokensArray: token[] = [

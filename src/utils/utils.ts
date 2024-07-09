@@ -22,3 +22,5 @@ export const binanceAccountInfo : BinanceAccount = {
   apiKey: process.env.BINANCE_API_KEY as string,
   secret: process.env.BINANCE_SECRET as string,
 };
+
+export const userWalletAddress = process.env.METAMASK_WALLET_ADDRESS as string;

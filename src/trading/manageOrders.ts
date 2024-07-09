@@ -39,16 +39,31 @@ export async function placeNewOrder(token: token, orderlyPrice: number) {
 
 // 현재 오덜리의 시장가에 따라 바이낸스 롱 포지션, 숏 포지션 수정
 // 롱 포지션, 숏 포지션 가격 반환
-export async function handleOrder(token: token, orderlyPrice: number, longPositionId: number, shortPositionId: number) {
+export async function handleOrder(
+  token: token, 
+  orderlyPrice: number, 
+  longPositionId: number, 
+  shortPositionId: number, 
+  previousLongPositionPrice: number, 
+  previousShortPositionPrice: number
+) {
   const shortPositionPrice = fixPrecision(orderlyPrice * (1 + token.arbitrageThreshold / 100), token.precision);
   const longPositionPrice = fixPrecision(orderlyPrice * (1 - token.arbitrageThreshold / 100), token.precision);
 
-  try {
-    await Promise.all([
-      modifyBinanceOrders(token.binanceSymbol, longPositionId, 'BUY', longPositionPrice, token.orderSize),
-      modifyBinanceOrders(token.binanceSymbol, shortPositionId, 'SELL', shortPositionPrice, token.orderSize)
-    ]);
+  // 수정할 필요가 없는 가격인지 확인
+  const modifications = [];
+  if (longPositionPrice !== previousLongPositionPrice) {
+    modifications.push(modifyBinanceOrders(token.binanceSymbol, longPositionId, 'BUY', longPositionPrice, token.orderSize));
+  }
+  if (shortPositionPrice !== previousShortPositionPrice) {
+    modifications.push(modifyBinanceOrders(token.binanceSymbol, shortPositionId, 'SELL', shortPositionPrice, token.orderSize));
+  } 
+  if (modifications.length === 0) {
+    return { longPositionPrice, shortPositionPrice };
+  }
 
+  try {
+    await Promise.all(modifications);
     console.log(`[${token.binanceSymbol}][B] Modified orders -> BUY: ${longPositionPrice} | SELL: ${shortPositionPrice}`);
     return { longPositionPrice, shortPositionPrice };
   } catch (error) {
@@ -56,24 +71,22 @@ export async function handleOrder(token: token, orderlyPrice: number, longPositi
     throw new Error('Order modification failed');
   }
 }
+
 // 오덜리 숏 포지션 진입 (바이낸스가 롱 포지션일 때)
-export async function enterShortPosition(token: token, shortPositionId: number, binancePrice: number) {
+export async function enterShortPosition(token: token, shortPositionId: number) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', token.orderSize);
       const orderId = response.order_id;
       const order = await getOrderlyOrderById(orderId);
-      const orderlyPrice = order.average_executed_price;
-      token.state.setEnterPrice(orderlyPrice);
+      const sellPrice = order.average_executed_price;
+      token.state.setEnterPrice(sellPrice);
 
       console.log(`<<<< Executing [${token.binanceSymbol}] arbitrage: BUY on Binance, SELL on Orderly >>>>`);
-      console.log(`<<<< [${token.binanceSymbol}][O] Avg executed price (Short Position): ${orderlyPrice} >>>>`);
 
       await cancelBinanceOrder(token.binanceSymbol, shortPositionId);
       console.log('<<<< [${token.binanceSymbol}][B] Short position order canceled >>>>');
 
-      const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
-
-      token.state.setInitialPriceDifference(priceDifference);
+      return sellPrice;
   } catch (error) {
       console.error('Error in enterShortPosition:', error);
       throw error;
@@ -81,22 +94,20 @@ export async function enterShortPosition(token: token, shortPositionId: number, 
 }
 
 // 오덜리 롱 포지션 진입 (바이낸스가 숏 포지션일 때)
-export async function enterLongPosition(token: token, longPositionId: number, binancePrice : number) {
+export async function enterLongPosition(token: token, longPositionId: number) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', token.orderSize);
       const orderId = response.order_id;
       const order = await getOrderlyOrderById(orderId);
-      const orderlyPrice = order.average_executed_price;
-      token.state.setEnterPrice(orderlyPrice);
+      const buyPrice = order.average_executed_price;
+      token.state.setEnterPrice(buyPrice);
 
       console.log(`<<<< Executing [${token.binanceSymbol}] arbitrage: SELL on Binance, BUY on Orderly >>>>`);
-      console.log(`<<<< [${token.binanceSymbol}][O] Avg executed price (Long Position): ${orderlyPrice} >>>>`);
 
       await cancelBinanceOrder(token.binanceSymbol, longPositionId);
       console.log('<<<< [${token.binanceSymbol}][B] Long position order canceled >>>>');
 
-      const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
-      token.state.setInitialPriceDifference(priceDifference);
+      return buyPrice;
   } catch (error) {
       console.error('Error in enterLongPosition:', error);
       throw error;

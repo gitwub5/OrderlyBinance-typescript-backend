@@ -6,6 +6,19 @@ import { shortInterval } from "./stratgy";
 import { cancelAllOrders, closePositions } from "./closePositions";
 import { token } from "../types/tokenTypes";
 
+//현재 보유한 포지션 갯수
+export async function getPositionAmounts(token: token) {
+    const [orderlyPosition, binancePosition] = await Promise.all([
+        getOrderlyPositions(token.orderlySymbol),
+        getBinancePositions(token.binanceSymbol)
+    ]);
+
+    const orderlyAmt = orderlyPosition ? parseFloat(orderlyPosition.position_qty.toString()) : null;
+    const binanceAmt = binancePosition ? parseFloat(binancePosition.positionAmt.toString()) : null;
+
+    return { orderlyAmt, binanceAmt };
+}
+
 // 현재 포지션이 있는지 확인하는 함수
 export async function hasOpenPositions(token: token): Promise<boolean> {
     try {

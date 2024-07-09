@@ -7,53 +7,70 @@ import { getBinanceOrderStatus } from '../binance/order';
 import { token } from '../types/tokenTypes';
 
 export async function executeArbitrage(token: token) {
-  try {
+    try {
+      // 초기 시장가 가져오기
       let orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
       console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
-      
+  
+      // 새로운 주문 배치
       const { longPositionId, shortPositionId } = await placeNewOrder(token, orderlyPrice);
       let positionFilled = false;
       let previousOrderlyPrice = orderlyPrice;
-      let longPositionPrice = 0;
-      let shortPositionPrice = 0;
-
-      //1초 정도 대기
+      let binanceBuyPrice = 0;
+      let binanceSellPrice = 0;
+  
+      // 1초 대기
       await new Promise(resolve => setTimeout(resolve, 1000));
-
+  
       while (!positionFilled) {
-          const [longPositionStatus, shortPositionStatus] = await Promise.all([
-              getBinanceOrderStatus(token.binanceSymbol, longPositionId),
-              getBinanceOrderStatus(token.binanceSymbol, shortPositionId)
-          ]);
-
-          if (longPositionStatus === 'FILLED') {
-              console.log(`<<<< [${token.binanceSymbol}] Long Position filled on Binance >>>>`);
-              await enterShortPosition(token, shortPositionId, longPositionPrice);
-              await monitorClosePositions(token);
-              positionFilled = true;
-              return;
-          } else if (shortPositionStatus === 'FILLED') {
-              console.log(`<<<< [${token.binanceSymbol}] Short Position filled on Binance >>>>`);
-              await enterLongPosition(token, longPositionId, shortPositionPrice);
-              await monitorClosePositions(token);
-              positionFilled = true;
-              return;
-          } else {
-              orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
-              console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
-
-              if (orderlyPrice !== previousOrderlyPrice) {
-                ({ longPositionPrice, shortPositionPrice } = await handleOrder(token, orderlyPrice, longPositionId, shortPositionId));
-                previousOrderlyPrice = orderlyPrice;
-            }
-              await new Promise(resolve => setTimeout(resolve, interval));
+        const [longPositionStatus, shortPositionStatus] = await Promise.all([
+          getBinanceOrderStatus(token.binanceSymbol, longPositionId),
+          getBinanceOrderStatus(token.binanceSymbol, shortPositionId)
+        ]);
+  
+        // 롱 포지션이 채워졌을 때
+        if (longPositionStatus === 'FILLED') {
+          console.log(`<<<< [${token.binanceSymbol}] Long Position filled on Binance >>>>`);
+          const orderlySellPrice = await enterShortPosition(token, shortPositionId);
+  
+          await monitorClosePositions(token);
+  
+          const priceDifference = ((binanceBuyPrice - orderlySellPrice) / orderlySellPrice) * 100;
+          token.state.setInitialPriceDifference(priceDifference);
+          positionFilled = true;
+          return;
+        } 
+        // 숏 포지션이 채워졌을 때
+        else if (shortPositionStatus === 'FILLED') {
+          console.log(`<<<< [${token.binanceSymbol}] Short Position filled on Binance >>>>`);
+          const orderlyBuyPrice = await enterLongPosition(token, longPositionId);
+  
+          await monitorClosePositions(token);
+  
+          const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
+          token.state.setInitialPriceDifference(priceDifference);
+          positionFilled = true;
+          return;
+        } 
+        // 포지션이 채워지지 않았을 때
+        else {
+          orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
+          console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
+  
+          if (orderlyPrice !== previousOrderlyPrice) {
+            const { longPositionPrice, shortPositionPrice } = await handleOrder(token, orderlyPrice, longPositionId, shortPositionId, binanceBuyPrice, binanceSellPrice);
+            binanceBuyPrice = longPositionPrice;
+            binanceSellPrice = shortPositionPrice;
+            previousOrderlyPrice = orderlyPrice;
           }
+          await new Promise(resolve => setTimeout(resolve, interval));
+        }
       }
-  } catch (error) {
-    console.error('Error in executeArbitrage:', error);
-    throw error;
-}
-}
+    } catch (error) {
+      console.error('Error in executeArbitrage:', error);
+      throw error;
+    }
+  }
 
 export async function manageArbitrage(token: token) {
     try {
@@ -61,7 +78,7 @@ export async function manageArbitrage(token: token) {
         while (!shouldStop) {
             await executeArbitrage(token);
             console.log(`<<<< [${token.binanceSymbol}] Arbitrage iteration completed >>>>`);
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
     } catch (error) {
         console.error('Error in manageArbitrage:', error);

@@ -1,4 +1,4 @@
-import { signAndSendRequest } from "./signer";
+import { signPnLMessage, signAndSendRequest } from "./signer";
 import { orderlyAccountInfo, ORDERLY_API_URL } from "../utils/utils";
 import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "./types";
 import { formatDate } from "./utils/formatDate";
@@ -96,32 +96,107 @@ export async function getOrderlyDailyStats(
 //Retrieve the historical PnL settlement history of the account.
 //PnL 정산 내역 불러오기: 발생한 손익(PnL, Profit and Loss)을 정산한 기록
 //문제: PnL settlement를 해야지 됨
-export async function getOrderlyPnLHis(
-    start_t : number,
-    end_t: number
-){
-    const query: Record<string, any> = {
-        start_t: start_t,
-        end_t: end_t,
-    };
+export async function getPnLSettleLHis(start_t?: number, end_t?: number) {
+    const query: Record<string, any> = {};
+
+    if (start_t !== undefined) {
+        query.start_t = start_t;
+    }
+
+    if (end_t !== undefined) {
+        query.end_t = end_t;
+    }
 
     // Query string 생성
     const queryString = new URLSearchParams(query).toString();
+    const url = queryString ? `${ORDERLY_API_URL}/v1/pnl_settlement/history/?${queryString}` : `${ORDERLY_API_URL}/v1/pnl_settlement/history/`;
 
     try {
         const res = await signAndSendRequest(
             orderlyAccountInfo.accountId,
             orderlyAccountInfo.privateKey,
-            `${ORDERLY_API_URL}/v1/pnl_settlement/history/?${queryString}`,
+            url,
             {
                 method: 'GET',
             }
         );
         const json = await res.json();
-        console.log(json.data);
-        return json.data.rows;
+        return json.data;
     } catch (error) {
         console.error('Error checking daily status:', error);
         return null;
     }
 }
+
+//Retrieve a nonce used for requesting a withdrawal on Orderly Network. Each nonce can only be used once.
+//https://orderly.network/docs/build-on-evm/evm-api/restful-api/private/get-settle-pnl-nonce
+//Limit: 10 requests per 1 second
+export async function getSettlePnLNonce(){
+    try {
+        const res = await signAndSendRequest(
+            orderlyAccountInfo.accountId,
+            orderlyAccountInfo.privateKey,
+            `${ORDERLY_API_URL}/v1/settle_nonce`,
+            {
+                method: 'GET',
+            }
+        );
+        const json = await res.json();
+        return json.data.settle_nonce;
+    } catch (error) {
+        console.error('Error checking Settle PnL Nonce:', error);
+        return null;
+    }
+}
+
+// verifyingContract should use: 0x6F7a338F2aA472838dEFD3283eB360d4Dff5D203.
+// https://orderly.network/docs/build-on-evm/evm-api/restful-api/private/request-pnl-settlement
+export async function reqPnLSettlement(){
+    try {
+        const settle_nonce = await getSettlePnLNonce();
+        const messageObject = {
+            brokerId: 'orderly',
+            chainId: 42161, // Orderly Network의 체인 ID
+            settleNonce: settle_nonce,
+            timestamp: Date.now(),
+        };
+
+        const [walletAddress, signature] = await signPnLMessage(orderlyAccountInfo.privateKey, messageObject);
+        
+        const body: Record<string, any> = {
+            signature: signature,
+            userAddress: walletAddress,
+            verifyingContract: '0x6F7a338F2aA472838dEFD3283eB360d4Dff5D203',
+            message: messageObject
+        };
+
+        const res = await signAndSendRequest(
+            orderlyAccountInfo.accountId,
+            orderlyAccountInfo.privateKey,
+            `${ORDERLY_API_URL}/v1/settle_pnl`,
+            {
+                method: 'POST',
+                body: JSON.stringify(body)
+            }
+        );
+
+        const json = await res.json();
+        return json;
+    } catch (error) {
+        console.error('Error request PnL settlement:', error);
+        return null;
+    }
+}
+
+// async function main() {
+//     try {
+//     //   console.log(await getSettlePnLNonce());
+//     //   console.log(await getPnLSettleLHis());
+//       console.log(await reqPnLSettlement());
+//     } catch (error) {
+//         console.error('Error in main function:', error);
+//     }
+// }
+// main().catch(error => {
+//   console.error('Unhandled error in main function:', error);
+// });

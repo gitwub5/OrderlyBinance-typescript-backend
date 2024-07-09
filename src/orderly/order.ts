@@ -15,10 +15,15 @@ export class placeOrderlyOrder {
     }
 
     try {
-      const response = await signAndSendRequest(orderlyAccountInfo.accountId, orderlyAccountInfo.privateKey, `${ORDERLY_API_URL}/v1/order`, {
-        method: 'POST',
-        body: JSON.stringify(body)
-      });
+      const response = await signAndSendRequest(
+        orderlyAccountInfo.accountId, 
+        orderlyAccountInfo.privateKey, 
+        `${ORDERLY_API_URL}/v1/order`, 
+        {
+          method: 'POST',
+          body: JSON.stringify(body)
+        }
+      );
 
       const json = await response.json();
       //console.log('Orderly Order Response:', JSON.stringify(json, undefined, 2));
@@ -114,9 +119,9 @@ export async function getOrderlyOrderById(order_id: string) {
 // async function main() {
 //     try {
 //       const response = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'BUY', 2)
-//       const orderId = response.order_id;
-//       const response2 = await getOrderlyOrderById(orderId);
-//       const orderlyPrice = response2.average_executed_price;
+//       // const orderId = response.order_id;
+//       // const response2 = await getOrderlyOrderById(orderId);
+//       // const orderlyPrice = response2.average_executed_price;
 //       //console.log(price);
 //     } catch (error) {
 //         console.error('Error in main function:', error);

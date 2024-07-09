@@ -1,7 +1,6 @@
 import { cancelAllOrderlyOrders, placeOrderlyOrder, getOrderlyOrderById } from '../orderly/order';
 import { cancelAllBinanceOrders, placeBinanceOrder } from '../binance/order';
-import { getOrderlyPositions } from '../orderly/account';
-import { getBinancePositions } from '../binance/account';
+import { getPositionAmounts } from './monitorPositions'
 import { recordTrade } from '../db/queries';
 import { forceStop} from '../globals';
 import { token } from '../types/tokenTypes';
@@ -38,27 +37,12 @@ async function closeBinancePositions(token: token, binanceAmt: number) {
   }
 }
 
-// 포지션 청산(Market Order) 및 DB에 기록
+// 구매 수량만큼 포지션 청산(Market Order) 및 DB에 기록
 export async function closePositions(token: token) {
   console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
-
-  const [orderlyPosition, binancePosition] = await Promise.all([
-    getOrderlyPositions(token.orderlySymbol),
-    getBinancePositions(token.binanceSymbol)
-  ]);
-
-  const orderlyAmt = orderlyPosition ? parseFloat(orderlyPosition.position_qty.toString()) : null;
-  const binanceAmt = binancePosition ? parseFloat(binancePosition.positionAmt.toString()) : null;
-
   const closeOrderPromises = [];
-
-  if (orderlyAmt !== null) {
-    closeOrderPromises.push(closeOrderlyPositions(token, orderlyAmt));
-  }
-
-  if (binanceAmt !== null) {
-    closeOrderPromises.push(closeBinancePositions(token, binanceAmt));
-  }
+  closeOrderPromises.push(closeOrderlyPositions(token, token.orderSize));
+  closeOrderPromises.push(closeBinancePositions(token, token.orderSize));
 
   try {
     await Promise.all(closeOrderPromises);
@@ -79,6 +63,30 @@ export async function closePositions(token: token) {
     } catch (err) {
       console.log('Error during recording at table', err);
     }
+  }
+}
+
+
+//모든 수량 포지션 청산(Market Order)
+export async function closeAllPositions(token: token) {
+  console.log(`<<<< [${token.binanceSymbol}] Closing All positions >>>>`);
+
+  const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
+
+  const closeOrderPromises = [];
+
+  if (orderlyAmt !== null) {
+      closeOrderPromises.push(closeOrderlyPositions(token, orderlyAmt));
+  }
+
+  if (binanceAmt !== null) {
+      closeOrderPromises.push(closeBinancePositions(token, binanceAmt));
+  }
+
+  try {
+      await Promise.all(closeOrderPromises);
+  } catch (error) {
+      console.error('Error during position close:', error);
   }
 }
 
