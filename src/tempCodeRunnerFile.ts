@@ -1,0 +1,2 @@
+
+    await manageMultipleTokens(selectedTokens);

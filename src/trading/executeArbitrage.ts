@@ -9,15 +9,16 @@ import { token } from '../types/tokenTypes';
 export async function executeArbitrage(token: token) {
     try {
       // 초기 시장가 가져오기
-      let orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
+
+      const orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
       console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
-  
       // 새로운 주문 배치
-      const { longPositionId, shortPositionId } = await placeNewOrder(token, orderlyPrice);
+      const { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice } = await placeNewOrder(token, orderlyPrice);
+      
       let positionFilled = false;
       let previousOrderlyPrice = orderlyPrice;
-      let binanceBuyPrice = 0;
-      let binanceSellPrice = 0;
+      let binanceBuyPrice = longPositionPrice;
+      let binanceSellPrice = shortPositionPrice;
   
       // 1초 대기
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -54,7 +55,7 @@ export async function executeArbitrage(token: token) {
         } 
         // 포지션이 채워지지 않았을 때
         else {
-          orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
+          const orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
           console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
   
           if (orderlyPrice !== previousOrderlyPrice) {

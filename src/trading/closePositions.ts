@@ -4,6 +4,7 @@ import { getPositionAmounts } from './monitorPositions'
 import { recordTrade } from '../db/queries';
 import { forceStop } from '../globals';
 import { token } from '../types/tokenTypes';
+import { getOrderlyPositions } from '../orderly/account';
 
 async function closeOrderlyPosAndRecord(token: token, side: 'BUY' | 'SELL', amount: number) {
   const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, side, amount);
@@ -39,14 +40,20 @@ async function closeBinancePositions(token: token, binanceAmt: number) {
 
 // 모든 포지션 청산(Market Order) 및 DB에 기록
 export async function closeAllPositions(token: token) {
-  console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
-  const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
-
   try {
+    console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
+    const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
+
     await Promise.all([
       closeOrderlyPositions(token, orderlyAmt),
       closeBinancePositions(token, binanceAmt)
     ]);
+    
+    //임시로 한 번 더 오덜리 포지션 청산되었는지 확인 (오덜리만 포지션 청산이 안되는 오류 발생해서)
+    const checkOrderlyPosition = await getOrderlyPositions(token.orderlySymbol); 
+    if(checkOrderlyPosition.position_qty !== 0){
+      await closeOrderlyPositions(token, checkOrderlyPosition.position_qty);
+    }
   } catch (error) {
     console.error('Error during position close:', error);
   }

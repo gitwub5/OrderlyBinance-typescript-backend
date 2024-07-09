@@ -29,7 +29,7 @@ export async function placeNewOrder(token: token, orderlyPrice: number) {
     const shortPositionId = shortPosition.orderId;
     console.log(`[${token.binanceSymbol}][B] Long Position ID, Short Position ID: `, longPositionId, shortPositionId);
     // 주문 ID 반환
-    return { longPositionId, shortPositionId };
+    return { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice };
 
   } catch (error) {
     console.error('Error placing orders:', error);
