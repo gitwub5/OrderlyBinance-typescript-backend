@@ -1,22 +1,52 @@
 export class TokenState {
-    public initialPriceDifference: number = 0;
-    public closePriceDifference: number = 0;
-    public enterPrice: number = 0;
-    public closePrice: number = 0;
+  private initialPriceDifference: number;
+  private closePriceDifference: number;
+  private enterPrice: number;
+  private closePrice: number;
 
-    setInitialPriceDifference(value: number) {
-        this.initialPriceDifference = value;
-    }
+  constructor() {
+    this.initialPriceDifference = 0;
+    this.closePriceDifference = 0;
+    this.enterPrice = 0;
+    this.closePrice = 0;
+  }
 
-    setClosePriceDifference(value: number) {
-        this.closePriceDifference = value;
-    }
+  setInitialPriceDifference(value: number) {
+    this.initialPriceDifference = value;
+  }
 
-    setEnterPrice(value: number) {
-        this.enterPrice = value;
-    }
+  getInitialPriceDifference() {
+    return this.initialPriceDifference;
+  }
 
-    setClosePrice(value: number) {
-        this.closePrice = value;
-    }
+  setClosePriceDifference(value: number) {
+    this.closePriceDifference = value;
+  }
+
+  getClosePriceDifference() {
+    return this.closePriceDifference;
+  }
+
+  setEnterPrice(value: number) {
+    this.enterPrice = value;
+  }
+
+  getEnterPrice() {
+    return this.enterPrice;
+  }
+
+  setClosePrice(value: number) {
+    this.closePrice = value;
+  }
+
+  getClosePrice() {
+    return this.closePrice;
+  }
+
+  reset() {
+    this.initialPriceDifference = 0;
+    this.closePriceDifference = 0;
+    this.enterPrice = 0;
+    this.closePrice = 0;
+  }
 }

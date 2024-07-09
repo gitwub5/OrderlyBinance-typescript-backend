@@ -24,7 +24,7 @@ export async function getOrderlyBalance(): Promise<number | null>{
     }
 }
 
-export async function getOrderlyPositions(symbol: string) : Promise<OrderlyPosition | null> {
+export async function getOrderlyPositions(symbol: string){
     try {
         const response = await signAndSendRequest(
         orderlyAccountInfo.accountId,
@@ -35,10 +35,9 @@ export async function getOrderlyPositions(symbol: string) : Promise<OrderlyPosit
         //console.log('Orderly Positions data:', JSON.stringify(json, undefined, 2));
         const position = json.data;
         return position;
-
       } catch (error) {
         console.error('Error:', error);
-        return null;
+        throw error;
       }
 }
 

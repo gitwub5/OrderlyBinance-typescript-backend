@@ -21,7 +21,7 @@ export async function getBinanceBalance(){
 
 // 현재 포지션 정보 조회
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Position-Information-V2
-export async function getBinancePositions(symbol: string): Promise<BinancePosition | null> {
+export async function getBinancePositions(symbol: string){
   const endpoint = '/fapi/v2/positionRisk';
   const queryParams = {
       symbol: symbol,
@@ -30,10 +30,9 @@ export async function getBinancePositions(symbol: string): Promise<BinancePositi
 
   const data = await createSignAndRequest(endpoint, queryParams, 'GET');
   if (data && Array.isArray(data)) {
-      const position = data.find((pos: any) => pos.symbol === symbol) as BinancePosition;
+      const position = data.find((pos: any) => pos.symbol === symbol);
       return position;
   }
-  return null;
 }
 
 

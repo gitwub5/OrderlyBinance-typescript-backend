@@ -1,5 +1,6 @@
 import { ORDERLY_API_URL, orderlyAccountInfo } from '../utils/utils';
 import { signAndSendRequest } from './signer'
+import { getOrderlyPositions } from './account';
 
 export class placeOrderlyOrder {
   private static async placeOrder(symbol: string, orderType: string, side: string, price: number | null, amount: number) {
@@ -40,6 +41,34 @@ export class placeOrderlyOrder {
   public static async marketOrder(symbol: string, side: string, amount: number) {
     return await this.placeOrder(symbol, 'MARKET', side, null, amount);
   }
+}
+
+export async function editOrderlyOrder(orderId: string, symbol: string, orderType: string, side: string, price: number | null, amount: number) {
+  const body: Record<string, any> = {
+    order_id: orderId,
+    symbol: symbol,
+    order_type: orderType,
+    order_price: price,
+    order_quantity: amount,
+    side: side
+  };
+
+  try {
+      const response = await signAndSendRequest(
+        orderlyAccountInfo.accountId, 
+        orderlyAccountInfo.privateKey, 
+        `${ORDERLY_API_URL}/v1/order`, 
+        {
+          method: 'PUT',
+          body: JSON.stringify(body)
+        }
+        );
+        const json = await response.json();
+        console.log('editOrder:', JSON.stringify(json, undefined, 2));
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
 }
 
 export async function cancelOrderlyOrder(symbol: string, orderId: number) {
@@ -118,8 +147,13 @@ export async function getOrderlyOrderById(order_id: string) {
 
 // async function main() {
 //     try {
-//       const response = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'BUY', 2)
+//       // const response = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'BUY', 2)
 //       // const orderId = response.order_id;
+//       const orderlyPosition = await getOrderlyPositions('PERP_TON_USDC');
+//       const orderlyAmt = parseFloat(orderlyPosition.position_qty.toString());
+//       console.log(orderlyAmt);
+//       const res = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'SELL', orderlyAmt);
+//       console.log(res);
 //       // const response2 = await getOrderlyOrderById(orderId);
 //       // const orderlyPrice = response2.average_executed_price;
 //       //console.log(price);
