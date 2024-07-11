@@ -7,8 +7,8 @@ import { tokensArray } from './trading/stratgy';
 
 //토큰 선택
 const selectedTokens = [
-    tokensArray[0],
-    tokensArray[1],
+    // tokensArray[0],
+    // tokensArray[1],
     tokensArray[2],
     tokensArray[3],
     // tokensArray[4],

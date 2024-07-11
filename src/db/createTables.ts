@@ -10,8 +10,8 @@ export async function createTables() {
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 initial_price_difference DECIMAL(10, 4),
                 close_price_difference DECIMAL(10, 4),
-                orderly_enter_price DECIMAL(10, 4),
-                orderly_close_price DECIMAL(10, 4),
+                binance_enter_price DECIMAL(10, 4),
+                binance_close_price DECIMAL(10, 4),
                 PRIMARY KEY (token_name, timestamp),
                 UNIQUE KEY (timestamp)
             )

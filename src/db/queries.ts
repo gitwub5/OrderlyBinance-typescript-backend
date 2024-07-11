@@ -8,7 +8,7 @@ export const recordTrade = async (
   closePrice: number
 ) => {
   const [result] = await connection.query(
-    'INSERT INTO trades (token_name, initial_price_difference, close_price_difference, orderly_enter_price, orderly_close_price) VALUES (?, ?, ?, ?, ?)',
+    'INSERT INTO trades (token_name, initial_price_difference, close_price_difference, binance_enter_price, binance_close_price) VALUES (?, ?, ?, ?, ?)',
     [tokenName, initialPriceDifference, closePriceDifference, enterPrice, closePrice]
   );
   return result;

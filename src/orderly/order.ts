@@ -1,6 +1,5 @@
 import { ORDERLY_API_URL, orderlyAccountInfo } from '../utils/utils';
 import { signAndSendRequest } from './signer'
-import { getOrderlyPositions } from './account';
 
 export class placeOrderlyOrder {
   private static async placeOrder(symbol: string, orderType: string, side: string, price: number | null, amount: number) {

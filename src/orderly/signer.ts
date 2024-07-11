@@ -114,7 +114,7 @@ const OFF_CHAIN_DOMAIN = {
 };
 
 const ON_CHAIN_DOMAIN = {
-  name: 'Arbitrum One',
+  name: 'Arbitrum',
   version: '1',
   chainId: 42161,
   verifyingContract: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'
@@ -133,7 +133,7 @@ export async function signPnLMessage(
   const privateKeyHex = uint8ArrayToHexString(privateKey);
   const wallet = new ethers.Wallet(privateKeyHex);
 
-  const signature = await wallet.signTypedData(OFF_CHAIN_DOMAIN, { SettlePnl: MESSAGE_TYPES.SettlePnl }, messageObject);
+  const signature = await wallet.signTypedData(ON_CHAIN_DOMAIN, { SettlePnl: MESSAGE_TYPES.SettlePnl }, messageObject);
 
   console.log('Wallet Address:', wallet.address);
   console.log('Signature:', signature);

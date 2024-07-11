@@ -47,9 +47,9 @@ export async function handleOrder(
   previousLongPositionPrice: number, 
   previousShortPositionPrice: number
 ) {
-  const shortPositionPrice = fixPrecision(orderlyPrice * (1 + token.arbitrageThreshold / 100), token.precision);
   const longPositionPrice = fixPrecision(orderlyPrice * (1 - token.arbitrageThreshold / 100), token.precision);
-
+  const shortPositionPrice = fixPrecision(orderlyPrice * (1 + token.arbitrageThreshold / 100), token.precision);
+ 
   // 수정할 필요가 없는 가격인지 확인
   const modifications = [];
   if (longPositionPrice !== previousLongPositionPrice) {
@@ -72,19 +72,34 @@ export async function handleOrder(
   }
 }
 
+//10 request per second라 1초에 10번이 최대임 
+const MAX_RETRIES = 10; // 최대 재시도 횟수
+const RETRY_INTERVAL = 100; // 재시도 간격 (0.1초)
+
 // 오덜리 숏 포지션 진입 (바이낸스가 롱 포지션일 때)
 export async function enterShortPosition(token: token, shortPositionId: number) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', token.orderSize);
       const orderId = response.order_id;
-      const order = await getOrderlyOrderById(orderId);
-      const sellPrice = order.average_executed_price;
-      token.state.setEnterPrice(sellPrice);
+      let retries = 0;
+      let order = await getOrderlyOrderById(orderId);
 
-      console.log(`<<<< Executing [${token.binanceSymbol}] arbitrage: BUY on Binance, SELL on Orderly >>>>`);
+      // 반복적으로 주문 상태 확인
+      while (!order || order.status !== 'FILLED') {
+        if (retries >= MAX_RETRIES) {
+          throw new Error('Order did not fill in time');
+        }
+        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
+        order = await getOrderlyOrderById(orderId);
+        retries++;
+      }
+
+      const sellPrice = order.average_executed_price;
+
+      console.log(`<<<< [${token.binanceSymbol}] Executing arbitrage: BUY on Binance, SELL on Orderly >>>>`);
 
       await cancelBinanceOrder(token.binanceSymbol, shortPositionId);
-      console.log('<<<< [${token.binanceSymbol}][B] Short position order canceled >>>>');
+      console.log(`<<<< [${token.binanceSymbol}][B] Short position order canceled >>>>`);
 
       return sellPrice;
   } catch (error) {
@@ -98,14 +113,25 @@ export async function enterLongPosition(token: token, longPositionId: number) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', token.orderSize);
       const orderId = response.order_id;
-      const order = await getOrderlyOrderById(orderId);
+      let retries = 0;
+      let order = await getOrderlyOrderById(orderId);
+  
+      // 반복적으로 주문 상태 확인
+      while (!order || order.status !== 'FILLED') {
+        if (retries >= MAX_RETRIES) {
+          throw new Error('Order did not fill in time');
+        }
+        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL)); // 1초 대기
+        order = await getOrderlyOrderById(orderId);
+        retries++;
+      }
+  
       const buyPrice = order.average_executed_price;
-      token.state.setEnterPrice(buyPrice);
 
-      console.log(`<<<< Executing [${token.binanceSymbol}] arbitrage: SELL on Binance, BUY on Orderly >>>>`);
+      console.log(`<<<< [${token.binanceSymbol}] Executing arbitrage: SELL on Binance, BUY on Orderly >>>>`);
 
       await cancelBinanceOrder(token.binanceSymbol, longPositionId);
-      console.log('<<<< [${token.binanceSymbol}][B] Long position order canceled >>>>');
+      console.log(`<<<< [${token.binanceSymbol}][B] Long position order canceled >>>>`);
 
       return buyPrice;
   } catch (error) {

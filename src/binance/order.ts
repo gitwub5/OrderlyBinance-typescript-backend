@@ -1,13 +1,19 @@
 import { createSignAndRequest } from './signer';
-import { BatchOrder } from './types';
+import { BatchOrder, BinanceOrderStatus } from './types';
 
 //Send in a new order.
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/New-Order
 export class placeBinanceOrder {
   private static async placeOrder(queryParams: Record<string, string>) {
-    const endpoint = '/fapi/v1/order';
-    const response = await createSignAndRequest(endpoint, queryParams, 'POST');
-    return response;
+    try {
+      const endpoint = '/fapi/v1/order';
+      const response = await createSignAndRequest(endpoint, queryParams, 'POST');
+      return response;
+    } catch (error) {
+      console.error('Error placing Binance order:', error);
+      throw error;
+    }
+    
   }
 
   public static async limitOrder(symbol: string, side: string, price: number, amount: number) {
@@ -35,6 +41,40 @@ export class placeBinanceOrder {
     const response = await this.placeOrder(queryParams);
     return response;
   }
+}
+
+//Order modify function, currently only LIMIT order modification is supported, modified orders will be reordered in the match queue
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Order
+export async function modifyBinanceOrders(symbol: string, orderId: number, side: string, price: number, amount: number) {
+  const endpoint = '/fapi/v1/order';
+  const queryParams: Record<string, string> = {
+    symbol: symbol,
+    orderId: orderId.toString(),
+    side: side,
+    quantity: amount.toString(),
+    price: price.toString(),
+  };
+
+  try {
+    const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
+    return response.data;
+  } catch (error) {
+    console.error('Error modifying Binance order:', error);
+    throw error;
+  }
+}
+
+//Modify Multiple Orders (TRADE)
+//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Multiple-Orders
+export async function modifyBinanceBatchOrders(batchOrders: BatchOrder[]) {
+  const endpoint = '/fapi/v1/batchOrders';
+  const queryParams: Record<string, string> = {
+    batchOrders: JSON.stringify(batchOrders),
+    recvWindow: '5000',
+  };
+
+  const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
+  return response;
 }
 
 //Cancel an active order.
@@ -72,41 +112,6 @@ export async function cancelAllBinanceOrders(symbol: string) {
   return await createSignAndRequest(endpoint, queryParams, 'DELETE');
 }
 
-//Order modify function, currently only LIMIT order modification is supported, modified orders will be reordered in the match queue
-//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Order
-export async function modifyBinanceOrders(symbol: string, orderId: number, side: string, price: number, amount: number) {
-  const endpoint = '/fapi/v1/order';
-  const queryParams: Record<string, string> = {
-    symbol: symbol,
-    orderId: orderId.toString(),
-    side: side,
-    quantity: amount.toString(),
-    price: price.toString(),
-  };
-
-  try {
-    const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
-    return response.data;
-  } catch (error) {
-    console.error('Error modifying Binance order:', error);
-    throw error;
-  }
-}
-
-//Modify Multiple Orders (TRADE)
-//https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Modify-Multiple-Orders
-export async function modifyBinanceBatchOrders(batchOrders: BatchOrder[]) {
-  const endpoint = '/fapi/v1/batchOrders';
-  const queryParams: Record<string, string> = {
-    batchOrders: JSON.stringify(batchOrders),
-    recvWindow: '5000',
-  };
-
-  const response = await createSignAndRequest(endpoint, queryParams, 'PUT');
-  return response;
-}
-
-
 // 심볼의 모든 미체결 주문 조회 (Get all open orders on a symbol.)
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/Current-All-Open-Orders
 export async function getBinanceOpenOrders(symbol:string) {
@@ -135,10 +140,7 @@ export async function getBinanceOrderStatus(symbol: string, orderId: number) {
   };
 
   const data = await createSignAndRequest(endpoint, queryParams, 'GET');
-  if (data) {
-    return data.status;
-  }
-  return null;
+  return data as BinanceOrderStatus;
 }
 
 //TODO: 주문 기록 가져오는 함수 (start_time ~ end_time)
@@ -165,16 +167,13 @@ export async function getBinanceAllOrders(symbol:string, startTime?: number, end
 }
 
 
-// async function main() {
-//   const ton = "TONUSDT";
-//   const position = await getBinanceOpenOrders(ton);
-//   console.log(position);
-//   // const res = await getOrderStatus(1517124565);
-//   // console.log(res);
-//   const longPositionStatus = await getBinanceOrderStatus(ton, 1529189098);
-//   console.log(longPositionStatus)
-// }
+async function main() {
+  const response = await placeBinanceOrder.limitOrder("TONUSDT", 'BUY', 6.6, 2)
+  console.log(response);
+  // const response = await getBinanceOrderAvgPrice(tokensArray[0].binanceSymbol,1571012034);
+  // console.log(response);
+}
 
-// main().catch(error => {
-//   console.error('Error in main function:', error);
-// });
+main().catch(error => {
+  console.error('Error in main function:', error);
+});

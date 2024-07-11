@@ -28,7 +28,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('LINK'),
         orderlySymbol : reconstructOrderlySymbol('LINK'),
         orderSize : 2,
-        arbitrageThreshold : 0.50,
+        arbitrageThreshold : 0.40,
         closeThreshold : 0.12,
         precision: 3,
         state: new TokenState()
@@ -37,7 +37,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('ZRO'),
         orderlySymbol : reconstructOrderlySymbol('ZRO'),
         orderSize : 3,
-        arbitrageThreshold : 0.35,
+        arbitrageThreshold : 0.50,
         closeThreshold : 0.12,
         precision: 3,
         state: new TokenState()

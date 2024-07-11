@@ -154,7 +154,7 @@ export async function reqPnLSettlement(){
     try {
         const settle_nonce = await getSettlePnLNonce();
         const messageObject = {
-            brokerId: 'orderly',
+            brokerId: 'woofi_pro',
             chainId: 42161, // Orderly Network의 체인 ID
             settleNonce: settle_nonce,
             timestamp: Date.now(),
@@ -187,15 +187,15 @@ export async function reqPnLSettlement(){
     }
 }
 
-// async function main() {
-//     try {
-//     //   console.log(await getSettlePnLNonce());
-//     //   console.log(await getPnLSettleLHis());
-//       console.log(await reqPnLSettlement());
-//     } catch (error) {
-//         console.error('Error in main function:', error);
-//     }
-// }
-// main().catch(error => {
-//   console.error('Unhandled error in main function:', error);
-// });
+async function main() {
+    try {
+    //   console.log(await getSettlePnLNonce());
+    //   console.log(await getPnLSettleLHis());
+      console.log(await reqPnLSettlement());
+    } catch (error) {
+        console.error('Error in main function:', error);
+    }
+}
+main().catch(error => {
+  console.error('Unhandled error in main function:', error);
+});

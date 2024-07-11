@@ -1,48 +1,108 @@
+import { getOrderlyPrice } from '../../orderly/market';
+import { shouldStop, forceStop } from '../../globals';
+import { placeNewOrder, handleOrder, enterShortPosition, enterLongPosition } from '../manageOrders';
+import { monitorClosePositions } from '../monitorPositions'
+import { interval } from '../stratgy';
+import { getBinanceOrderStatus } from '../../binance/order';
+import { recordTrade } from '../../db/queries';
+import { token } from '../../types/tokenTypes';
 
-// <<웹소켓 ver>>
-// export async function executeArbitrage() {
-//   // TODO: Balance가 없으면 루프문 중지, 또는 에러 발생 시 중지
-//   try {
-//     // 오덜리에서 api로 가격 가져온 다음에 시장가에 맞춰 아비트리지 임계값 차이만큼 매수, 매도 포지션 걸어놓기
-//     // const orderlyPrice = await getOrderlyPrice();
-//     // const { longPositionId, shortPositionId } = await placeOrder(orderlyPrice);
+export async function executeArbitrage(token: token) {
+  try {
+    // 초기 시장가 가져오기
+    const orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
+    console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
+    // 새로운 주문 배치
+    const { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice } = await placeNewOrder(token, orderlyPrice);
+    
+    let positionFilled = false;
+    let previousOrderlyPrice = orderlyPrice;
+    let binanceBuyPrice = longPositionPrice;
+    let binanceSellPrice = shortPositionPrice;
 
-//     // 오덜리에서 웹소켓으로 가격 가져오기
-//     const orderlyClient = new markPriceWSClient();
-//     let positionFilled = false;
+    // 1초 대기
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-//     orderlyClient.setMessageCallback(async (data: any) => {
-//         // if (positionFilled) {
-//         //     return; // 포지션이 체결되었으면 추가 처리를 중지
-//         // }
-//         const orderlyPrice = data.price;
-//         console.log('Received Orderly Mark Price:', orderlyPrice);
+    while (!positionFilled) {
+      const [longPositionStatus, shortPositionStatus] = await Promise.all([
+        getBinanceOrderStatus(token.binanceSymbol, longPositionId),
+        getBinanceOrderStatus(token.binanceSymbol, shortPositionId)
+      ]);
 
-//         // const binancePosition = await getBinancePositions();
-//         // if (binancePosition !== null && binancePosition.positionAmt !== 0) {
-//         //     console.log('Position filled on Binance:', binancePosition);
-//         //     positionFilled = true;
+      // 롱 포지션이 채워졌을 때
+      if (longPositionStatus.status === 'FILLED') {
+        console.log(`<<<< [${token.binanceSymbol}] Long Position filled on Binance >>>>`);
+        const orderlySellPrice = await enterShortPosition(token, shortPositionId);
 
-//         //     // 남아있는 주문 취소 및 오덜리 시장가 진입
-//         //     await enterPosition(binancePosition.positionAmt,longPositionId, shortPositionId);
+        await monitorClosePositions(token);
 
-//         //     // WebSocket 클라이언트 중지
-//             //orderlyClient.stop();
+        token.state.setEnterPrice(binanceBuyPrice);
+        const priceDifference = ((binanceBuyPrice - orderlySellPrice) / orderlySellPrice) * 100;
+        token.state.setInitialPriceDifference(priceDifference);
+        positionFilled = true;
+        break;
+      } 
+      // 숏 포지션이 채워졌을 때
+      else if (shortPositionStatus.status === 'FILLED') {
+        console.log(`<<<< [${token.binanceSymbol}] Short Position filled on Binance >>>>`);
+        const orderlyBuyPrice = await enterLongPosition(token, longPositionId);
 
-//         //     // 포지션을 종료하는 로직 시작
-//         //     await monitorClosePositions();
-//         //     return;
-//         // }
-//       return;
+        await monitorClosePositions(token);
 
-//         // // 오덜리 시장가에 맞춰 아비트리지 임계값 차이만큼 매수, 매도 포지션 걸어놓기
-//         // await handleOrder(orderlyPrice, longPositionId, shortPositionId);
-//     });
+        token.state.setEnterPrice(binanceSellPrice);
+        const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
+        token.state.setInitialPriceDifference(priceDifference);
+        positionFilled = true;
+        break;
+      } 
+      // 포지션이 채워지지 않았을 때
+      else {
+        const orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
+        console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
 
-//     // 새로운 주문을 실행하기 전에 약간의 시간 대기
-//     await new Promise(resolve => setTimeout(resolve, interval));
-// } catch (error) {
-//     console.error('Error in executeArbitrage loop:', error);
-//     // 필요한 경우 루프를 중지하거나 에러 핸들링 로직 추가
-// }
-// }
+        if (orderlyPrice !== previousOrderlyPrice) {
+          const { longPositionPrice, shortPositionPrice } = await handleOrder(token, orderlyPrice, longPositionId, shortPositionId, binanceBuyPrice, binanceSellPrice);
+          binanceBuyPrice = longPositionPrice;
+          binanceSellPrice = shortPositionPrice;
+          previousOrderlyPrice = orderlyPrice;
+        }
+        await new Promise(resolve => setTimeout(resolve, interval));
+      }
+    }
+  } catch (error) {
+    console.error('Error in executeArbitrage:', error);
+    throw error;
+  } finally {
+    if (!forceStop) {
+      try {
+        await recordTrade(
+          token.binanceSymbol,
+          token.state.getInitialPriceDifference(),
+          token.state.getClosePriceDifference(),
+          token.state.getEnterPrice(),
+          token.state.getClosePrice()
+        );
+        console.log(`[${token.binanceSymbol}] Recorded at table`);
+      } catch (err) {
+        console.log('Error during recording at table', err);
+      }
+    }
+    token.state.reset();
+  }
+}
+
+export async function manageArbitrage(token: token) {
+  try {
+    //TODO: shouldStop의 조건은 balance가 없을 때가 되어야함
+    while (!shouldStop) {
+      await executeArbitrage(token);
+      console.log(`<<<< [${token.binanceSymbol}] Arbitrage iteration completed >>>>`);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+  } catch (error) {
+    console.error('Error in manageArbitrage:', error);
+    throw error;
+  } finally {
+    console.log('Exiting manageOrders...');
+  }
+}
