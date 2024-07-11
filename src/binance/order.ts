@@ -167,13 +167,13 @@ export async function getBinanceAllOrders(symbol:string, startTime?: number, end
 }
 
 
-async function main() {
-  const response = await placeBinanceOrder.limitOrder("TONUSDT", 'BUY', 6.6, 2)
-  console.log(response);
-  // const response = await getBinanceOrderAvgPrice(tokensArray[0].binanceSymbol,1571012034);
-  // console.log(response);
-}
+// async function main() {
+//   const response = await placeBinanceOrder.limitOrder("TONUSDT", 'BUY', 6.6, 2)
+//   console.log(response);
+//   // const response = await getBinanceOrderAvgPrice(tokensArray[0].binanceSymbol,1571012034);
+//   // console.log(response);
+// }
 
-main().catch(error => {
-  console.error('Error in main function:', error);
-});
+// main().catch(error => {
+//   console.error('Error in main function:', error);
+// });

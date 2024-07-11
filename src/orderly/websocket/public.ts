@@ -18,7 +18,7 @@ export class WebSocketManager {
     this.messageCallback = null;
   }
 
-  connect() {
+  async connect() {
     this.websocket = new WebSocket(this.url);
 
     this.websocket.onopen = () => {
@@ -32,7 +32,7 @@ export class WebSocketManager {
 
     this.websocket.onmessage = (event: WebSocket.MessageEvent) => {
       const message = JSON.parse(event.data.toString());
-      console.log('Received message:', message);
+      //console.log('Received message:', message);
       if (this.messageCallback) {
           this.messageCallback(message);
       }
@@ -48,7 +48,7 @@ export class WebSocketManager {
     };
   }
 
-  disconnect() {
+  async disconnect() {
     if (this.websocket) {
         this.websocket.close();
         this.websocket = null;
@@ -57,7 +57,7 @@ export class WebSocketManager {
     }
   }
 
-  sendSubscription(subscription: any) {
+  async sendSubscription(subscription: any) {
       if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
           this.websocket.send(JSON.stringify(subscription));
           console.log('Sent subscription:', subscription);
@@ -69,16 +69,16 @@ export class WebSocketManager {
   }
 
 
-  unsubscribe(subscription: any) {
+  async unsubscribe(subscription: any) {
     this.subscriptions.delete(subscription);
     // Unsubscribe from the server if needed
   }
 
-  setMessageCallback(callback: (message: any) => void) {
+  async setMessageCallback(callback: (message: any) => void) {
     this.messageCallback = callback;
   }
 
-  startPing() {
+  async startPing() {
     this.pingTimer = setInterval(() => {
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
             this.websocket.send(JSON.stringify({ event: 'pong' }));
@@ -89,38 +89,51 @@ export class WebSocketManager {
     }, this.pingInterval);
   }
   
-  stopPing() {
+  async stopPing() {
     if (this.pingTimer) {
         clearInterval(this.pingTimer);
         this.pingTimer = null;
         console.log('Stopped ping requests.');
     }
   }
+
+  //시장 가격 불러오기 (1s)
+  async markPrice(symbol : string){
+    const submessage = {
+      id: `id-${Math.random().toString(36).substring(7)}`,
+      topic: `${symbol}@markprice`,
+      event: "subscribe",
+    };
+    this.sendSubscription(submessage);
+  }
 }
 
+// // TEST
+// async function main() {
+//   const wsClient = new WebSocketManager();
 
-//TEST
-function initPublicWs() {
-  const wsPublic = new WebSocketManager()
-  return wsPublic;
-}
+//   await wsClient.connect();
 
-async function main() {
-  const wsClient = initPublicWs();
-  
-  wsClient.connect();
-  
-  const submessage = {
-    id: `id-${Math.random().toString(36).substring(7)}`,
-    topic: `PERP_TON_USDC@markprice`,
-    event: "subscribe",
-  };
-  wsClient.sendSubscription(submessage);
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  wsClient.disconnect();
-  
-}
+//   const symbol = 'PERP_TON_USDC';
 
-main().catch(error => {
-  console.error('Error in main function:', error);
-});
+//   await wsClient.markPrice(symbol);
+
+//   wsClient.setMessageCallback((message) => {
+//     if (message.topic === `${symbol}@markprice`){
+//     const data = message.data;
+//     const price = data.price;
+//     console.log('Received price:', price);
+//     }
+//   });
+
+  
+
+//   // Wait some time to ensure the subscription is processed before disconnecting
+//   setTimeout(() => {
+//     wsClient.disconnect();
+//   }, 30000); // Keep the connection open for 30 seconds
+// }
+
+// main().catch(error => {
+//   console.error('Error in main function:', error);
+// });

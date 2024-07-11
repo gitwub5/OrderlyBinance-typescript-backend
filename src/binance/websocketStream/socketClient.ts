@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { getListenKey } from './listenKey';
 
 interface IMessage {
-  //stream?: string;
+  stream?: string;
   e?: string;
   [key: string]: any;
 }
@@ -26,24 +26,24 @@ export class SocketClient {
     this._ws = new WebSocket(`${this.baseUrl}${this._path}`);
 
     this._ws.onopen = () => {
-         console.log('WebSocket connection established.');
+         console.log('Binance WebSocket connection established.');
     };
 
     this._ws.on('pong', () => {
-        console.log('received pong from server');
+        console.log('Binance received pong from server');
     });
 
     this._ws.on('ping', () => {
-        console.log('received ping from server');
+        console.log('Binance received ping from server');
         this._ws!.pong();
     });
 
     this._ws.onclose = () => {
-        console.log('WebSocket connection closed.');
+        console.log('Binance WebSocket connection closed.');
     };
 
     this._ws.onerror = (err: WebSocket.ErrorEvent) => {
-        console.error('WebSocket connection error:', err.message);
+        console.error('Binance WebSocket connection error:', err.message);
     };
 
     this._ws.onmessage = (msg: WebSocket.MessageEvent) => {
@@ -56,10 +56,10 @@ export class SocketClient {
             cb(message);
           });
         } else {
-          console.log('Unknown method', message);
+          console.log('Binance Unknown method', message);
         }
       } catch (e) {
-        console.log('Parse message failed', e);
+        console.log('Binance Parse message failed', e);
       }
     };
 
@@ -74,9 +74,9 @@ export class SocketClient {
     setInterval(() => {
       if (this._ws && this._ws.readyState === WebSocket.OPEN) {
         this._ws.ping();
-        console.log("ping server");
+        console.log("Binance ping server");
       }
-    }, 10000);
+    }, 60000);
   }
 
   public setHandler(method: string, callback: (message: IMessage) => void) {
@@ -85,37 +85,59 @@ export class SocketClient {
     }
     this._handlers.get(method)!.push(callback);
   }
+
+  public disconnect() {
+    if (this._ws) {
+      this._ws.close();
+      this._ws = null;
+      console.log('Binance WebSocket connection disconnected.');
+    }
+  }
 }
 
-// async function main() {
-//     try {
-//       const listenKey = await getListenKey();
-//       console.log('ListenKey received:', listenKey);
-  
-//       const socketApi = new SocketClient(`ws/${listenKey}`);
-//       socketApi.setHandler('ORDER_TRADE_UPDATE', (params) => {
-//         console.log('Order update:', JSON.stringify(params));
-//       });
-//     } catch (error) {
-//       console.error('Error in createApp:', error);
-//     }
-//   }
-  
-//   main();
-
-  async function main() {
+async function main() {
     try {
-        const symbol = "TONUSDT"
-        const interval = '1s'
-        const endpoint =  `@markPrice@${interval}`
-        const socketApi = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
-        socketApi.setHandler('markPriceUpdate', (params) => {
-            console.log('Mark Price Update:', JSON.stringify(params, null, 2));
-          });
+      const listenKey = await getListenKey();
+      console.log('ListenKey received:', listenKey);
+  
+      const socketClient = new SocketClient(`ws/${listenKey}`);
+      socketClient.setHandler('ORDER_TRADE_UPDATE', (params) => {
+        const orderUpdate = params.o
+        console.log('Order update:', orderUpdate);
+        console.log('Side:', orderUpdate.S);
+        console.log('Order Id:', orderUpdate.i);
+        console.log('Order Status:', orderUpdate.X);
+
+      });
+
+      const symbol = "TONUSDT"
+      const interval = '1s'
+      const endpoint =  `@markPrice@${interval}`
+      const socketClient2 = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
+      socketClient2.setHandler('markPriceUpdate', (params) => {
+        const priceUpdate = params.p;
+        console.log('Mark Price Update:', parseFloat(priceUpdate));
+      });
     } catch (error) {
       console.error('Error in createApp:', error);
     }
   }
   
   main();
+
+  // async function main() {
+  //   try {
+  //       const symbol = "TONUSDT"
+  //       const interval = '1s'
+  //       const endpoint =  `@markPrice@${interval}`
+  //       const socketApi = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
+  //       socketApi.setHandler('markPriceUpdate', (params) => {
+  //           console.log('Mark Price Update:', JSON.stringify(params, null, 2));
+  //         });
+  //   } catch (error) {
+  //     console.error('Error in createApp:', error);
+  //   }
+  // }
+  
+  // main();
   
