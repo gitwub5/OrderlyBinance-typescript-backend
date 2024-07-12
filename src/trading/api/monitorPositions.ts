@@ -1,10 +1,10 @@
-import { getOrderlyPositions } from "../orderly/api/account";
-import { getBinancePositions } from "../binance/api/account";
-import { getBinancePrice } from "../binance/api/market";
-import { getOrderlyPrice } from "../orderly/api/market";
-import { shortInterval } from "./stratgy";
+import { getOrderlyPositions } from "../../orderly/api/account";
+import { getBinancePositions } from "../../binance/api/account";
+import { getBinancePrice } from "../../binance/api/market";
+import { getOrderlyPrice } from "../../orderly/api/market";
+import { shortInterval } from "../stratgy";
 import { cancelAllOrders, closeAllPositions } from "./closePositions";
-import { token } from "../types/tokenTypes";
+import { token } from "../../types/tokenTypes";
 
 //현재 보유한 포지션 갯수
 export async function getPositionAmounts(token: token) {

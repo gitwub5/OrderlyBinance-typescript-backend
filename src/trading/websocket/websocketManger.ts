@@ -6,7 +6,7 @@ import { token } from '../../types/tokenTypes';
 
 export const clients: Record<string, { orderlyClient: OrderlyWs; binanceClient: BinanceWs; binanceClient2: BinanceWs }> = {};
 
-//한 토큰 당 세 개의 웹소켓이 연결된다. 
+//한 토큰 당 세 개의 웹소켓이 연결됨
 export async function initClients(token: token) {
   // Initialize Orderly WebSocket
   const orderlyClient = new OrderlyWs();

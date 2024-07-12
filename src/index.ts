@@ -1,5 +1,5 @@
 import { executeArbitrage } from './trading/websocket/executeArbitrage';
-import { cancelAllOrders, closeAllPositions } from './trading/closePositions';
+import { cancelAllOrders, closeAllPositions } from './trading/api/closePositions';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 import { token } from './types/tokenTypes';

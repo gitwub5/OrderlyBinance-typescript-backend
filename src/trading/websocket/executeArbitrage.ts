@@ -1,8 +1,8 @@
 import { getOrderlyPrice } from '../../orderly/api/market';
 import { shouldStop, forceStop } from '../../globals';
-import { placeNewOrder, handleOrder, enterShortPosition, enterLongPosition } from '../manageOrders';
+import { placeNewOrder, handleOrder, enterShortPosition, enterLongPosition } from '../api/manageOrders';
 import { token } from '../../types/tokenTypes';
-import { closeAllPositions, cancelAllOrders } from '../../trading/closePositions';
+import { closeAllPositions, cancelAllOrders } from '../api/closePositions';
 import { initClients, clients } from './websocketManger';
 
 

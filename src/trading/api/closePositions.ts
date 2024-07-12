@@ -1,7 +1,7 @@
-import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../orderly/api/order';
-import { cancelAllBinanceOrders, getBinanceOrderStatus, placeBinanceOrder } from '../binance/api/order';
+import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../../orderly/api/order';
+import { cancelAllBinanceOrders, getBinanceOrderStatus, placeBinanceOrder } from '../../binance/api/order';
 import { getPositionAmounts } from './monitorPositions'
-import { token } from '../types/tokenTypes';
+import { token } from '../../types/tokenTypes';
 
 async function closeOrderlyPositions(token: token, orderlyAmt: number) {
   if (orderlyAmt > 0) {
