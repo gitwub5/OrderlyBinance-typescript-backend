@@ -2,8 +2,7 @@ import WebSocket from 'ws';
 import { WsPrivateUrl, orderlyAccountInfo } from '../../utils/utils';
 import { Buffer } from 'buffer';
 import { KeyPair } from 'near-api-js';
-import { ConfigurationOptionsClient } from './utils';
-// import { AuthClient } from './auth-client';
+import { ed25519 } from '@noble/curves/ed25519';
 
 //https://github.com/OrderlyNetwork/orderly-sdk-js/blob/2d450b4f33a84d86b62d4d9e584e688f94c7d7a4/README.md?plain=1#L129
 //`wsPrivate` - Private WebSocket. Wallet connection required.
@@ -19,6 +18,19 @@ export const signPostRequestByOrderlyKey = (keyPair : KeyPair , messageString: U
   return Buffer.from(signStr.signature).toString('base64');
 };
 
+export async function signer(
+  privateKey: Uint8Array | string,
+): Promise<{ sign: string, message: string }> {
+  const timestamp = Date.now();
+  const encoder = new TextEncoder();
+
+  let message = `${String(timestamp)}`;
+
+  const orderlySignature = await ed25519.sign(encoder.encode(message), privateKey);
+  const sign = Buffer.from(orderlySignature).toString('base64url');
+  return { sign, message };
+}
+
 export class WebSocketManager {
     private privateUrl: string;
     private privateWebsocket: any;
@@ -27,7 +39,6 @@ export class WebSocketManager {
     private pingInterval: number;
     private pingTimerPrivate: NodeJS.Timeout | null;
 
-    //constructor(private sdkOptions: ConfigurationOptionsClient) {
     constructor() {
       this.privateUrl = `${WsPrivateUrl.mainnet}${orderlyAccountInfo.accountId}`;
       this.privateWebsocket = null;
@@ -42,10 +53,6 @@ export class WebSocketManager {
 
       this.privateWebsocket.onopen = async () => {
         console.log('WebSocket connection established.');
-        // Subscribe to existing subscriptions
-        this.privateSubscriptions.forEach((subscription: any) => {
-          this.sendPrivateSubscription(subscription);
-        });
 
         const timestamp = new Date().getTime().toString();
         const messageStr = [
@@ -55,7 +62,9 @@ export class WebSocketManager {
         const messageBytes = new TextEncoder().encode(messageStr);
         const keyPair = await getOrderlyKeyPair(orderlyAccountInfo.privateKeyBase58);
         const orderlySign = signPostRequestByOrderlyKey(keyPair, messageBytes);
-        //console.log('orderlySign:', orderlySign);
+        console.log('orderlySign:', orderlySign);
+        // const { sign: orderlySign, message: timestamp } = await signer(orderlyAccountInfo.privateKey);
+        console.log()
         const payload = {
           "id":"123r",
           "event":"auth",
@@ -67,6 +76,11 @@ export class WebSocketManager {
         };
 
         this.privateWebsocket.send(JSON.stringify(payload));
+
+        // Subscribe to existing subscriptions
+        this.privateSubscriptions.forEach((subscription: any) => { 
+          this.sendPrivateSubscription(subscription); 
+        });
         
         this.startPingPrivate();
 
@@ -99,14 +113,14 @@ export class WebSocketManager {
     }
 
     sendPrivateSubscription(subscription: any) {
-        if (this.privateWebsocket && this.privateWebsocket.readyState === WebSocket.OPEN) {
+      if (this.privateWebsocket && this.privateWebsocket.readyState === WebSocket.OPEN) {
         this.privateWebsocket.send(JSON.stringify(subscription));
         console.log('Sent subscription private:', subscription);
         this.privateSubscriptions.add(subscription);
-        } else {
+      } else {
         console.warn('Private WebSocket connection not open. Subscription not sent.');
         this.privateSubscriptions.add(subscription);
-        }
+      }
     }
 
     unsubscribePrivate(subscription: any) {
@@ -160,35 +174,6 @@ export class WebSocketManager {
       });
     }
 
-    // const [wsClientPrivate, setWsClientPrivate] = useState(null);
-
-    // const initPrivateWs = async () => {
-    //   const authClient = new AuthClient({
-    //     networkId: 'testnet',
-    //     contractId: 'asset-manager.orderly.testnet',
-    //     debug: true
-    //   });
-
-    //   const wsPrivate = await authClient.wsClientPrivate();
-    //   await wsPrivate.connectPrivate();
-    //   setWsClientPrivate(wsPrivate);
-    // }
-
-    // const subscribePrivate = () => {
-    //   const subscription = {
-    //     "id": "123r",
-    //     "topic": "balance",
-    //     "event": "subscribe"
-    //   }
-    //   wsClientPrivate.sendPrivateSubscription(subscription);
-    // }
-
-    // const setPublicWsCallback = () => {
-    //   wsClientPrivate.setPrivateMessageCallback((message : any) => {
-    //     // Process the received message
-    //     console.log('Received data:', message);
-    //   });
-    // }
   }
   
   main().catch(error => {
