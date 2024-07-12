@@ -95,35 +95,35 @@ export class SocketClient {
   }
 }
 
-async function main() {
-    try {
-      const listenKey = await getListenKey();
-      console.log('ListenKey received:', listenKey);
+// async function main() {
+//     try {
+//       const listenKey = await getListenKey();
+//       console.log('ListenKey received:', listenKey);
   
-      const socketClient = new SocketClient(`ws/${listenKey}`);
-      socketClient.setHandler('ORDER_TRADE_UPDATE', (params) => {
-        const orderUpdate = params.o
-        console.log('Order update:', orderUpdate);
-        console.log('Side:', orderUpdate.S);
-        console.log('Order Id:', orderUpdate.i);
-        console.log('Order Status:', orderUpdate.X);
+//       const socketClient = new SocketClient(`ws/${listenKey}`);
+//       socketClient.setHandler('ORDER_TRADE_UPDATE', (params) => {
+//         const orderUpdate = params.o
+//         console.log('Order update:', orderUpdate);
+//         console.log('Side:', orderUpdate.S);
+//         console.log('Order Id:', orderUpdate.i);
+//         console.log('Order Status:', orderUpdate.X);
 
-      });
+//       });
 
-      const symbol = "TONUSDT"
-      const interval = '1s'
-      const endpoint =  `@markPrice@${interval}`
-      const socketClient2 = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
-      socketClient2.setHandler('markPriceUpdate', (params) => {
-        const priceUpdate = params.p;
-        console.log('Mark Price Update:', parseFloat(priceUpdate));
-      });
-    } catch (error) {
-      console.error('Error in createApp:', error);
-    }
-  }
+//       const symbol = "TONUSDT"
+//       const interval = '1s'
+//       const endpoint =  `@markPrice@${interval}`
+//       const socketClient2 = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
+//       socketClient2.setHandler('markPriceUpdate', (params) => {
+//         const priceUpdate = params.p;
+//         console.log('Mark Price Update:', parseFloat(priceUpdate));
+//       });
+//     } catch (error) {
+//       console.error('Error in createApp:', error);
+//     }
+//   }
   
-  main();
+//   main();
 
   // async function main() {
   //   try {

@@ -1,7 +1,7 @@
-import { getOrderlyPositions } from "../orderly/account";
-import { getBinancePositions } from "../binance/account";
-import { getBinancePrice } from "../binance/market";
-import { getOrderlyPrice } from "../orderly/market";
+import { getOrderlyPositions } from "../orderly/api/account";
+import { getBinancePositions } from "../binance/api/account";
+import { getBinancePrice } from "../binance/api/market";
+import { getOrderlyPrice } from "../orderly/api/market";
 import { shortInterval } from "./stratgy";
 import { cancelAllOrders, closeAllPositions } from "./closePositions";
 import { token } from "../types/tokenTypes";

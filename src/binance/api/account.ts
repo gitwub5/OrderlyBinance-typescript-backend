@@ -1,6 +1,5 @@
 import { createSignAndRequest } from "./signer";
-import { BinanceBalance } from "./types";
-import { BinancePosition } from './types';
+import { BinanceBalance } from "../types/types";
 
 //Query account balance info
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/account/rest-api/Futures-Account-Balance-V2

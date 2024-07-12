@@ -1,5 +1,5 @@
-import { placeOrderlyOrder, getOrderlyOrderById } from '../orderly/order';
-import { placeBinanceOrder, cancelBinanceOrder, modifyBinanceOrders } from '../binance/order';
+import { placeOrderlyOrder, getOrderlyOrderById } from '../orderly/api/order';
+import { placeBinanceOrder, cancelBinanceOrder, modifyBinanceOrders } from '../binance/api/order';
 import { token } from '../types/tokenTypes';
 
 function fixPrecision(value: number, precision: number): number {

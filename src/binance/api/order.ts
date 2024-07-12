@@ -1,5 +1,5 @@
 import { createSignAndRequest } from './signer';
-import { BatchOrder, BinanceOrderStatus } from './types';
+import { BatchOrder, BinanceOrderStatus } from '../types/types';
 
 //Send in a new order.
 //https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api/New-Order

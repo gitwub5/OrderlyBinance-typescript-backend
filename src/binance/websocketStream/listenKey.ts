@@ -1,4 +1,4 @@
-import { createSignAndRequest } from '../signer';
+import { createSignAndRequest } from '../api/signer';
 
 export async function getListenKey(){
     const endpoint = '/fapi/v1/listenKey';

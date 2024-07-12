@@ -1,5 +1,5 @@
-import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../orderly/order';
-import { cancelAllBinanceOrders, getBinanceOrderStatus, placeBinanceOrder } from '../binance/order';
+import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../orderly/api/order';
+import { cancelAllBinanceOrders, getBinanceOrderStatus, placeBinanceOrder } from '../binance/api/order';
 import { getPositionAmounts } from './monitorPositions'
 import { token } from '../types/tokenTypes';
 

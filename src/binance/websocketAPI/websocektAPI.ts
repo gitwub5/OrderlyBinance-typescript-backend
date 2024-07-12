@@ -26,7 +26,6 @@ const callbacks = {
 
 const websocketAPIClient = new WebsocketAPI(API_KEY, API_SECRET, { callbacks, wsURL });
 
-
 setTimeout(() => websocketAPIClient.disconnect(), 60000);
 
 // console.log(placeBinanceOrder.limitOrder("TONUSDT", 'BUY', 6.6, 2));

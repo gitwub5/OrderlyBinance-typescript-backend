@@ -1,9 +1,9 @@
-import { getOrderlyPrice } from '../orderly/market';
+import { getOrderlyPrice } from '../orderly/api/market';
 import { shouldStop, forceStop } from '../globals';
 import { placeNewOrder, handleOrder, enterShortPosition, enterLongPosition } from './manageOrders';
 import { monitorClosePositions } from './monitorPositions'
 import { interval } from './stratgy';
-import { getBinanceOrderStatus } from '../binance/order';
+import { getBinanceOrderStatus } from '../binance/api/order';
 import { recordTrade } from '../db/queries';
 import { token } from '../types/tokenTypes';
 
@@ -50,8 +50,7 @@ export async function executeArbitrage(token: token) {
         await monitorClosePositions(token);
 
         token.state.setEnterPrice(binanceSellPrice);
-        const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
-        token.state.setInitialPriceDifference(priceDifference);
+        
         positionFilled = true;
         break;
       } 

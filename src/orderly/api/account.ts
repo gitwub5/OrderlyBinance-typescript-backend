@@ -1,7 +1,7 @@
 import { signPnLMessage, signAndSendRequest } from "./signer";
-import { orderlyAccountInfo, ORDERLY_API_URL } from "../utils/utils";
-import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "./types";
-import { formatDate } from "./utils/formatDate";
+import { orderlyAccountInfo, ORDERLY_API_URL } from "../../utils/utils";
+import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "../types/types";
+import { formatDate } from "../utils/formatDate";
 
 //문제: PnL settlement를 해야지 됨
 export async function getOrderlyBalance(): Promise<number | null>{
@@ -187,15 +187,15 @@ export async function reqPnLSettlement(){
     }
 }
 
-async function main() {
-    try {
-    //   console.log(await getSettlePnLNonce());
-    //   console.log(await getPnLSettleLHis());
-      console.log(await reqPnLSettlement());
-    } catch (error) {
-        console.error('Error in main function:', error);
-    }
-}
-main().catch(error => {
-  console.error('Unhandled error in main function:', error);
-});
+// async function main() {
+//     try {
+//     //   console.log(await getSettlePnLNonce());
+//     //   console.log(await getPnLSettleLHis());
+//       console.log(await reqPnLSettlement());
+//     } catch (error) {
+//         console.error('Error in main function:', error);
+//     }
+// }
+// main().catch(error => {
+//   console.error('Unhandled error in main function:', error);
+// });
