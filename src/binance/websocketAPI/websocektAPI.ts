@@ -5,12 +5,14 @@ import { createSignature } from '../../binance/api/signer';
 export class WebSocketAPIClient {
   private baseUrl: string;
   private ws: WebSocket | null;
+  public messageCallback: ((message: any) => void) | null;
   private handlers: Map<string, Array<(message: any) => void>>;
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || BINANCE_WS_URL;
     this.ws = null;
     this.handlers = new Map();
+    this.messageCallback = null;
   }
 
   async connect() {
@@ -39,7 +41,10 @@ export class WebSocketAPIClient {
 
     this.ws.on('message', (message: any) => {
       const data = JSON.parse(message.toString());
-      //console.log('Received message:', data);
+      // console.log('Received message:', data);
+      if (this.messageCallback) {
+        this.messageCallback(data);
+      }
     });
 
     this.heartBeat();
@@ -52,6 +57,10 @@ export class WebSocketAPIClient {
         console.log('Binance ping server');
       }
     }, 300000);
+  }
+
+  async setMessageCallback(callback: (message: any) => void) {
+    this.messageCallback = callback;
   }
 
   send(data: any) {

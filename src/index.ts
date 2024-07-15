@@ -25,7 +25,7 @@ async function manageMultipleTokens(tokens: token[]) {
     }));
 }
 
-async function shutdown() {
+export async function shutdown() {
     setForceStop(true);
     setShouldStop(true);
     console.log('Shutting down arbitrage...');

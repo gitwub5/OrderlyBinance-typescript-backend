@@ -1,6 +1,5 @@
-import { WebsocketAPI } from "@binance/connector-typescript";
 import { token } from "../../types/tokenTypes";
-import { WebSocketAPIClient } from "binance/websocketAPI/websocektAPI";
+import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
 
 function fixPrecision(value: number, precision: number): number {
     const factor = Math.pow(10, precision);

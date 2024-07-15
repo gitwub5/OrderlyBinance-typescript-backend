@@ -6,8 +6,11 @@ import { initClients, clients, disconnectClients } from './websocketManger';
 import { shouldStop, forceStop } from '../../globals';
 import { recordTrade } from '../../db/queries';
 import { handleOrder } from './manageOrder';
+import { shutdown } from '../../index';
 
 export async function executeArbitrage(token: token) {
+  let errorCounter = 0;
+
   try {
     let orderlyPrice: number | null = null;
     let orderlyTimestamp: number | null = null;
@@ -118,6 +121,25 @@ export async function executeArbitrage(token: token) {
         checkAndComparePrices();
       }
     });
+
+    binanceAPIws.setMessageCallback(async (message) => {
+      //주문가 변경시 에러 3번 연속으로 발생 시 종료 (재시작)
+      if (message.error) {
+        console.log(message.error);
+        if (message.error.code === -2013) {
+          errorCounter++;
+          if (errorCounter >= 3) {
+            console.error('Error code -2013 encountered 3 times. Throwing error and shutting down.');
+            await shutdown();
+            throw new Error('Order does not exist error occurred 3 times consecutively.');
+          }
+        } else {
+          errorCounter = 0; // Reset the counter for other errors
+        }
+      }
+      // console.log('Received message:', data);
+    });
+
 
     async function comparePrices() {
       try {
