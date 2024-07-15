@@ -1,7 +1,3 @@
-import { getOrderlyPrice } from '../../orderly/api/market';
-import { getBinancePrice } from '../../binance/api/market';
-import { shouldStop, forceStop } from '../../globals';
-import { recordTrade } from '../../db/queries';
 import { token } from '../../types/tokenTypes';
 import { WebSocketManager as OrderlyWs } from '../../orderly/websocket/public';
 import { SocketClient as BinanceWs } from '../../binance/websocketStream/socketClient';

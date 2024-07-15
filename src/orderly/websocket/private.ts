@@ -152,34 +152,35 @@ export class WebSocketManager {
     }
   }
 
-  //TEST
-  async function main() {
-    const privateClient = new WebSocketManager();
+//   //TEST
+//   async function main() {
+//     const privateClient = new WebSocketManager();
     
-    privateClient.connectPrivate();
+//     privateClient.connectPrivate();
     
-    const submessage = {
-      id: `id-${Math.random().toString(36).substring(7)}`,
-      topic: "executionreport",
-      event: "subscribe",
-    };
+//     const submessage = {
+//       id: `id-${Math.random().toString(36).substring(7)}`,
+//       topic: "executionreport",
+//       event: "subscribe",
+//     };
 
-    privateClient.sendPrivateSubscription(submessage);
 
-    const setPublicWsCallback = () => {
-      privateClient.setPrivateMessageCallback((message : any) => {
-        // Process the received message
-        console.log('Received data:', message);
-      });
-    }
+//     privateClient.sendPrivateSubscription(submessage);
 
-  }
+//     const setPublicWsCallback = () => {
+//       privateClient.setPrivateMessageCallback((message : any) => {
+//         // Process the received message
+//         console.log('Received data:', message);
+//       });
+//     }
+
+//   }
   
-  main().catch(error => {
-    console.error('Error in main function:', error);
-  });
+//   main().catch(error => {
+//     console.error('Error in main function:', error);
+//   });
 
-function useState(arg0: null): [any, any] {
-  throw new Error('Function not implemented.');
-}
+// function useState(arg0: null): [any, any] {
+//   throw new Error('Function not implemented.');
+// }
   
