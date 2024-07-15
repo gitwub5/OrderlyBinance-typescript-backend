@@ -47,6 +47,7 @@ export async function handleOrder(
   previousLongPositionPrice: number, 
   previousShortPositionPrice: number
 ) {
+  try {
   const longPositionPrice = fixPrecision(orderlyPrice * (1 - token.arbitrageThreshold / 100), token.precision);
   const shortPositionPrice = fixPrecision(orderlyPrice * (1 + token.arbitrageThreshold / 100), token.precision);
  
@@ -62,7 +63,7 @@ export async function handleOrder(
     return { longPositionPrice, shortPositionPrice };
   }
 
-  try {
+  
     await Promise.all(modifications);
     console.log(`[${token.binanceSymbol}][B] Modified orders -> BUY: ${longPositionPrice} | SELL: ${shortPositionPrice}`);
     return { longPositionPrice, shortPositionPrice };

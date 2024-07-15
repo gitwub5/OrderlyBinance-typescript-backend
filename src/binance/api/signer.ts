@@ -3,7 +3,7 @@ import axios from "axios";
 import { binanceAccountInfo, BINANCE_API_URL } from '../../utils/utils';
 
 
-async function createBinanceSignature(
+export async function createSignature(
     query_string : string,
     apiSecret : Uint8Array | string,
 ){
@@ -19,7 +19,7 @@ export async function createSignAndRequest(endpoint: string, queryParams: Record
     queryParams.timestamp = timestamp;
     
     const queryString = new URLSearchParams(queryParams).toString();
-    const signature = await createBinanceSignature(queryString, binanceAccountInfo.secret);
+    const signature = await createSignature(queryString, binanceAccountInfo.secret);
     const finalQueryString = `${queryString}&signature=${signature}`;
 
     const url = `${baseUrl}${endpoint}?${finalQueryString}`;

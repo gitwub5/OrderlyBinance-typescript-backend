@@ -7,6 +7,7 @@ dotenv.config();
 export const ORDERLY_API_URL = 'https://api-evm.orderly.org';
 // export const ORDERLY_API_URL = 'https://testnet-api-evm.orderly.org';
 export const BINANCE_API_URL = 'https://fapi.binance.com';
+export const BINANCE_WS_URL = 'wss://ws-fapi.binance.com/ws-fapi/v1';
 
 export enum NearNetworkId {
   testnet = 'testnet',

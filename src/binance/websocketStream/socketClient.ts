@@ -76,7 +76,7 @@ export class SocketClient {
         this._ws.ping();
         console.log("Binance ping server");
       }
-    }, 60000);
+    }, 300000);
   }
 
   public setHandler(method: string, callback: (message: IMessage) => void) {
@@ -94,50 +94,3 @@ export class SocketClient {
     }
   }
 }
-
-// async function main() {
-//     try {
-//       const listenKey = await getListenKey();
-//       console.log('ListenKey received:', listenKey);
-  
-//       const socketClient = new SocketClient(`ws/${listenKey}`);
-//       socketClient.setHandler('ORDER_TRADE_UPDATE', (params) => {
-//         const orderUpdate = params.o
-//         console.log('Order update:', orderUpdate);
-//         console.log('Side:', orderUpdate.S);
-//         console.log('Order Id:', orderUpdate.i);
-//         console.log('Order Status:', orderUpdate.X);
-
-//       });
-
-//       const symbol = "TONUSDT"
-//       const interval = '1s'
-//       const endpoint =  `@markPrice@${interval}`
-//       const socketClient2 = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
-//       socketClient2.setHandler('markPriceUpdate', (params) => {
-//         const priceUpdate = params.p;
-//         console.log('Mark Price Update:', parseFloat(priceUpdate));
-//       });
-//     } catch (error) {
-//       console.error('Error in createApp:', error);
-//     }
-//   }
-  
-//   main();
-
-  // async function main() {
-  //   try {
-  //       const symbol = "TONUSDT"
-  //       const interval = '1s'
-  //       const endpoint =  `@markPrice@${interval}`
-  //       const socketApi = new SocketClient(`ws/${symbol.toLowerCase()}${endpoint}`);
-  //       socketApi.setHandler('markPriceUpdate', (params) => {
-  //           console.log('Mark Price Update:', JSON.stringify(params, null, 2));
-  //         });
-  //   } catch (error) {
-  //     console.error('Error in createApp:', error);
-  //   }
-  // }
-  
-  // main();
-  

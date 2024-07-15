@@ -22,7 +22,7 @@ export class WebSocketManager {
     this.websocket = new WebSocket(this.url);
 
     this.websocket.onopen = () => {
-        console.log('WebSocket connection established.');
+        console.log('Orderly WebSocket connection established.');
         // Subscribe to existing subscriptions
         this.subscriptions.forEach((subscription) => {
             this.sendSubscription(subscription);
@@ -39,12 +39,12 @@ export class WebSocketManager {
     };
 
     this.websocket.onclose = (event: WebSocket.CloseEvent) => {
-      console.log('WebSocket connection closed:', event.reason);
+      console.log('Orderly WebSocket connection closed:', event.reason);
       this.stopPing();
     };
 
     this.websocket.onerror = (error: WebSocket.ErrorEvent) => {
-        console.error('WebSocket connection error:', error.message);
+        console.error('Orderly WebSocket connection error:', error.message);
     };
   }
 
@@ -52,7 +52,7 @@ export class WebSocketManager {
     if (this.websocket) {
         this.websocket.close();
         this.websocket = null;
-        console.log('WebSocket connection disconnected.');
+        console.log('Orderly WebSocket connection disconnected.');
         this.stopPing();
     }
   }
@@ -63,14 +63,25 @@ export class WebSocketManager {
           console.log('Sent subscription:', subscription);
           this.subscriptions.add(subscription);
       } else {
-          console.warn('WebSocket connection not open. Subscription not sent.');
+          console.warn('Orderly WebSocket connection not open. Subscription not sent.');
           this.subscriptions.add(subscription);
       }
   }
 
 
   async unsubscribe(subscription: any) {
-    this.subscriptions.delete(subscription);
+    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+      this.websocket.send(JSON.stringify(subscription));
+      console.log('Sent unsubscription:', subscription);
+      this.subscriptions.delete(subscription);
+  } else {
+      console.warn('Orderly WebSocket connection not open. Subscription not sent.');
+      this.subscriptions.delete(subscription);
+  }
+
+
+    // console.log('Sent subscription:', subscription);
+    // this.subscriptions.delete(subscription);
     // Unsubscribe from the server if needed
   }
 
@@ -82,9 +93,9 @@ export class WebSocketManager {
     this.pingTimer = setInterval(() => {
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
             this.websocket.send(JSON.stringify({ event: 'pong' }));
-            console.log('Sent ping request.');
+            console.log('Orderly Sent ping request.');
         } else {
-            console.warn('WebSocket connection not open. Ping request not sent.');
+            console.warn('Orderly WebSocket connection not open. Ping request not sent.');
         }
     }, this.pingInterval);
   }
@@ -93,18 +104,26 @@ export class WebSocketManager {
     if (this.pingTimer) {
         clearInterval(this.pingTimer);
         this.pingTimer = null;
-        console.log('Stopped ping requests.');
+        console.log('Orderly Stopped ping requests.');
     }
   }
 
   //시장 가격 불러오기 (1s)
   async markPrice(symbol : string){
     const submessage = {
-      id: `id-${Math.random().toString(36).substring(7)}`,
+      id: `id-markPrice`,
       topic: `${symbol}@markprice`,
       event: "subscribe",
     };
     this.sendSubscription(submessage);
+  }
+  async unsubMarkPrice(symbol : string){
+    const submessage = {
+      id: `id-markPrice`,
+      topic: `${symbol}@markprice`,
+      event: "unsubscribe",
+    };
+    this.unsubscribe(submessage);
   }
 }
 

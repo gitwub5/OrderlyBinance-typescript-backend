@@ -50,7 +50,8 @@ export async function executeArbitrage(token: token) {
         await monitorClosePositions(token);
 
         token.state.setEnterPrice(binanceSellPrice);
-        
+        const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
+        token.state.setInitialPriceDifference(priceDifference);
         positionFilled = true;
         break;
       } 

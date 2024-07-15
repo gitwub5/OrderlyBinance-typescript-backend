@@ -1,10 +1,19 @@
 import { WebSocketManager as OrderlyWs } from '../../orderly/websocket/public';
 import { SocketClient as BinanceWs } from '../../binance/websocketStream/socketClient';
+import { WebSocketAPIClient as BinanceAPI} from '../../binance/websocketAPI/websocektAPI';
 import { deleteListenKey, getListenKey, keepListenKey } from '../../binance/websocketStream/listenKey';
 import { forceStop, shouldStop } from '../../globals';
 import { token } from '../../types/tokenTypes';
 
-export const clients: Record<string, { orderlyClient: OrderlyWs; binanceClient: BinanceWs; binanceClient2: BinanceWs }> = {};
+export const clients: Record<
+  string,
+  {
+    orderlyClient: OrderlyWs;
+    binanceUserDataStream: BinanceWs;
+    binanceMarketStream: BinanceWs;
+    binanceAPIws: BinanceAPI;
+  }
+> = {};
 
 //한 토큰 당 세 개의 웹소켓이 연결됨
 export async function initClients(token: token) {
@@ -14,13 +23,17 @@ export async function initClients(token: token) {
 
   // Initialize Binance User Data Stream WebSocket
   const listenKey = await getListenKey();
-  const binanceClient = new BinanceWs(`ws/${listenKey}`);
+  const binanceUserDataStream = new BinanceWs(`ws/${listenKey}`);
 
   // Initialize Binance Market Price Stream WebSocket
-  const binanceClient2 = new BinanceWs(`ws/${token.binanceSymbol.toLowerCase()}@markPrice@1s`);
+  const binanceMarketStream = new BinanceWs(`ws/${token.binanceSymbol.toLowerCase()}@markPrice@1s`);
 
+   // Initialize Binance Websocket API
+   const binanceAPIws = new BinanceAPI();
+   await binanceAPIws.connect();
+ 
   // Store the clients in the dictionary
-  clients[token.binanceSymbol] = { orderlyClient, binanceClient, binanceClient2 };
+  clients[token.binanceSymbol] = { orderlyClient, binanceUserDataStream, binanceMarketStream, binanceAPIws };
 
   // Keep listenKey active every hour
   setInterval(async () => {
@@ -31,8 +44,8 @@ export async function initClients(token: token) {
   const checkStop = async () => {
     if (forceStop || shouldStop) {
       orderlyClient.disconnect();
-      binanceClient.disconnect();
-      binanceClient2.disconnect();
+      binanceUserDataStream.disconnect();
+      binanceMarketStream.disconnect();
       await deleteListenKey();
     }
   };
@@ -41,9 +54,10 @@ export async function initClients(token: token) {
 }
 
 export async function disconnectClients(token : token) {
-    const { orderlyClient, binanceClient, binanceClient2 } = clients[token.binanceSymbol];
+    const { orderlyClient, binanceUserDataStream, binanceMarketStream, binanceAPIws } = clients[token.binanceSymbol];
     orderlyClient.disconnect();
-    binanceClient.disconnect();
-    binanceClient2.disconnect();
+    binanceUserDataStream.disconnect();
+    binanceMarketStream.disconnect();
+    binanceAPIws.disconnect();
     delete clients[token.binanceSymbol];
 }

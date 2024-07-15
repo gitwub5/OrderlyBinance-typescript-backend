@@ -164,7 +164,6 @@ export class WebSocketManager {
       event: "subscribe",
     };
 
-    //구독이 제대로 안됨.
     privateClient.sendPrivateSubscription(submessage);
 
     const setPublicWsCallback = () => {

@@ -46,8 +46,11 @@ async function monitorClosePositions(token : token) {
             orderlyTimestamp = message.ts; 
             console.log('orderlyPrice ws:', orderlyPrice);
             console.log('orderlyTIME ws :', orderlyTimestamp);
+            
+            if(true){
             orderlyPriceUpdated = true;
             checkAndComparePrices();
+            }
         }
     });
 
@@ -60,8 +63,11 @@ async function monitorClosePositions(token : token) {
         binanceTimestamp = params.E;  // assuming the params object contains an event time (E)
         console.log('binancePrice ws:', binancePrice);
         console.log('binanceTIME ws:', binanceTimestamp);
+        
+        if(true){
         binancePriceUpdated = true;
         checkAndComparePrices();
+        }
     });
 
 }
