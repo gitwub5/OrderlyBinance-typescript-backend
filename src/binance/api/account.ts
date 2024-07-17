@@ -59,8 +59,8 @@ if (endTime) {
 }
 
 // async function main() {
-//   const position = await getBinancePositions();
-//   console.log(position?.positionAmt);
+//   const position = await getBinancePositions("TONUSDT");
+//   console.log(position);
 // }
 
 // main().catch(error => {

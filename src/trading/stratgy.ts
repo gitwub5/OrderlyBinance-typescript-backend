@@ -10,7 +10,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('TON'), //바이낸스 버전 심볼 -> TONUSDT
         orderlySymbol : reconstructOrderlySymbol('TON'), //오덜리 버전 심볼 -> PERP_TON_USDC
         orderSize : 2, //주문수량
-        arbitrageThreshold : 0.28, // 아비트리지 허용 임계값 (%)
+        arbitrageThreshold : 0.35, // 아비트리지 허용 임계값 (%)
         closeThreshold : 0.10, //청산 포지션 임계값(%)
         precision: 4,
         state: new TokenState()
@@ -19,7 +19,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('ARB'),
         orderlySymbol : reconstructOrderlySymbol('ARB'),
         orderSize : 25,
-        arbitrageThreshold : 0.3,
+        arbitrageThreshold : 0.38,
         closeThreshold : 0.10,
         precision: 4,
         state: new TokenState()
@@ -37,7 +37,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('ZRO'),
         orderlySymbol : reconstructOrderlySymbol('ZRO'),
         orderSize : 3,
-        arbitrageThreshold : 0.45,
+        arbitrageThreshold : 0.50,
         closeThreshold : 0.12,
         precision: 3,
         state: new TokenState()
@@ -46,7 +46,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('ONDO'),
         orderlySymbol : reconstructOrderlySymbol('ONDO'),
         orderSize : 12,
-        arbitrageThreshold : 0.3,
+        arbitrageThreshold : 0.47,
         closeThreshold : 0.12,
         precision: 4,
         state: new TokenState()

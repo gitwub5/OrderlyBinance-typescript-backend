@@ -13,8 +13,8 @@ export async function getPositionAmounts(token: token) {
         getBinancePositions(token.binanceSymbol)
     ]);
 
-    const orderlyAmt = parseFloat(orderlyPosition.position_qty.toString());
-    const binanceAmt = parseFloat(binancePosition.positionAmt.toString());
+    const orderlyAmt = Number(orderlyPosition.position_qty);
+    const binanceAmt = Number(binancePosition.positionAmt);
 
     return { orderlyAmt, binanceAmt };
 }
