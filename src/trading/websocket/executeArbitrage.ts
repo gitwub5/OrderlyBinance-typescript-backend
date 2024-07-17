@@ -7,6 +7,7 @@ import { shouldStop, forceStop } from '../../globals';
 import { recordTrade } from '../../db/queries';
 import { handleOrder } from './manageOrder';
 import { shutdown } from '../../index';
+import { sendTelegramMessage } from '../../utils/telegram/telegramBot';
 
 export async function executeArbitrage(token: token) {
   let errorCounter = 0;
@@ -156,11 +157,18 @@ export async function executeArbitrage(token: token) {
                 await cancelAllOrders(token);
                 console.log(`<<<< [${token.binanceSymbol}] Closing positions due to close threshold >>>>`);
 
-                token.state.setClosePriceDifference(priceDifference);
-                await recoredAndReset(token);
-                
                 await orderlyClient.unsubMarkPrice(token.orderlySymbol);
                 positionFilled = false;
+
+                token.state.setClosePriceDifference(priceDifference);
+                await sendTelegramMessage(
+                  token.binanceSymbol,
+                  token.orderSize,
+                  token.state.getEnterPrice(),
+                  token.state.getClosePrice(),
+                  token.state.getInitialPriceDifference()
+                );
+                await recoredAndReset(token);
 
                 //주문 다시 실행 
                 orderlyPrice = await getOrderlyPrice(token.orderlySymbol);

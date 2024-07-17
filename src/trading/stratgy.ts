@@ -1,5 +1,5 @@
 import { token } from "../types/tokenTypes";
-import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/getSymbols";
+import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/symbols/getSymbols";
 import { TokenState } from "../types/tokenState";
 
 export const interval = 2000; // 2초 (단위시간)
@@ -37,7 +37,7 @@ export const tokensArray: token[] = [
         binanceSymbol : reconstructBinanceSymbol('ZRO'),
         orderlySymbol : reconstructOrderlySymbol('ZRO'),
         orderSize : 3,
-        arbitrageThreshold : 0.50,
+        arbitrageThreshold : 0.30,
         closeThreshold : 0.12,
         precision: 3,
         state: new TokenState()

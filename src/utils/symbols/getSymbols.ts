@@ -1,6 +1,6 @@
 import axios from 'axios';
 import fs from 'fs';
-import { ORDERLY_API_URL, BINANCE_API_URL } from './utils';
+import { ORDERLY_API_URL, BINANCE_API_URL } from '../utils';
 
 async function getOrderlySymbols(): Promise<string[]> {
   try {
