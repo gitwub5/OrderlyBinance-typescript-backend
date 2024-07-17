@@ -38,22 +38,22 @@ export async function sendTelegramMessage(tokenName: string, amount: number, ent
     }
     
     const message = `
-        📊 Arbitrage Event 📊
-        ------------------------------------------
-        Token: ${tokenName}
-        Transaction Amount: ${transactionAmount} USD
-        Time: ${arbitrageEndTime}
-        Arbitrage Gap: ${initDifference.toFixed(8)}%
-        Binance PnL: ${binancePnl.toFixed(8)}
-        ------------------------------------------
-        <Details>
-        Enter price: ${enterPrice}
-        Close prcie: ${closePrice}
+    📊 <b>Arbitrage Event</b> 📊
+    ------------------------------------------
+    <b>Token:</b> ${tokenName}
+    <b>Transaction Amount:</b> ${transactionAmount.toFixed(2)} USD
+    <b>Time:</b> ${arbitrageEndTime.toLocaleString('en-GB')}
+    <b>Arbitrage Gap:</b> ${initDifference.toFixed(8)}%
+    <b>Binance PnL:</b> ${binancePnl.toFixed(8)}
+    ------------------------------------------
+    <b>Details:</b>
+    - <b>Enter Price:</b> ${enterPrice.toFixed(4)}
+    - <b>Close Price:</b> ${closePrice.toFixed(4)}
     `;
 
-bot.sendMessage(chatId, message)
-    .then(() => console.log('Message sent successfully'))
-    .catch((error) => console.error('Error sending message:', error));
+    bot.sendMessage(chatId, message, { parse_mode: 'HTML' })
+        .then(() => console.log('Message sent successfully'))
+        .catch((error) => console.error('Error sending message:', error));
 }
 
 // Log all received messages to the console
