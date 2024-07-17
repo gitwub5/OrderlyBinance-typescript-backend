@@ -7,7 +7,7 @@ import { tokensArray } from './trading/stratgy';
 import { initClients, disconnectClients } from './trading/websocket/websocketManger';
 
 //토큰 선택
-const selectedTokens = [
+export const selectedTokens = [
     tokensArray[0],
     tokensArray[1],
     tokensArray[2],

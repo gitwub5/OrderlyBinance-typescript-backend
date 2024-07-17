@@ -86,22 +86,24 @@ export async function executeArbitrage(token: token) {
         console.log('Binance order filled:', typeof(orderUpdate.S));
 
         if(orderUpdate.S === 'SELL'){
+          positionFilled = true;
+
           const orderlyBuyPrice = await enterLongPosition(token, binanceBuyId);
           await orderlyClient.markPrice(token.orderlySymbol);
           
           token.state.setEnterPrice(binanceSellPrice);
           const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
-          positionFilled = true;
         }
         else{
+          positionFilled = true;
+
           const orderlySellPrice = await enterShortPosition(token, binanceSellId);
           await orderlyClient.markPrice(token.orderlySymbol);
         
           token.state.setEnterPrice(binanceBuyPrice);
           const priceDifference = ((binanceBuyPrice - orderlySellPrice) / orderlySellPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
-          positionFilled = true;
         }
       }
     });
