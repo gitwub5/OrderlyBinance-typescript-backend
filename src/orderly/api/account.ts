@@ -1,7 +1,8 @@
-import { signPnLMessage, signAndSendRequest } from "./signer";
+import { signEIP712Message, signAndSendRequest } from "./signer";
 import { orderlyAccountInfo, ORDERLY_API_URL } from "../../utils/utils";
 import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "../types/types";
 import { formatDate } from "../utils/formatDate";
+import { userWalletAddress } from "../../utils/utils";
 
 //문제: PnL settlement를 해야지 됨
 export async function getOrderlyBalance(): Promise<number | null>{
@@ -153,20 +154,20 @@ export async function getSettlePnLNonce(){
 export async function reqPnLSettlement(){
     try {
         const settle_nonce = await getSettlePnLNonce();
-        const messageObject = {
-            brokerId: 'woofi_pro',
-            chainId: 42161, // Orderly Network의 체인 ID
+        const message = {
+            brokerId: "orderly",
+            chainId: 42161,
             settleNonce: settle_nonce,
             timestamp: Date.now(),
         };
 
-        const [walletAddress, signature] = await signPnLMessage(orderlyAccountInfo.privateKey, messageObject);
+        const [walletAddress, signature] = await signEIP712Message(orderlyAccountInfo.privateKey, message);
         
         const body: Record<string, any> = {
             signature: signature,
             userAddress: walletAddress,
             verifyingContract: '0x6F7a338F2aA472838dEFD3283eB360d4Dff5D203',
-            message: messageObject
+            message: message
         };
 
         const res = await signAndSendRequest(
@@ -189,9 +190,10 @@ export async function reqPnLSettlement(){
 
 // async function main() {
 //     try {
-//     //   console.log(await getSettlePnLNonce());
+//       console.log(await getSettlePnLNonce());
 //     //   console.log(await getPnLSettleLHis());
-//      console.log(await getOrderlyPositions('PERP_TON_USDC'))
+//         console.log(await reqPnLSettlement());
+//     //  console.log(await getOrderlyPositions('PERP_TON_USDC'))
 //     } catch (error) {
 //         console.error('Error in main function:', error);
 //     }
@@ -199,3 +201,4 @@ export async function reqPnLSettlement(){
 // main().catch(error => {
 //   console.error('Unhandled error in main function:', error);
 // });
+

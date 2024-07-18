@@ -1,6 +1,7 @@
 import { ed25519 } from '@noble/curves/ed25519';
 import bs58 from 'bs58';
 import { ethers } from 'ethers';
+import { getMessage, encodeType } from 'eip-712';
 
 export async function signAndSendRequest(
   orderlyAccountId: string,
@@ -35,81 +36,81 @@ export async function signAndSendRequest(
 }
 
 const MESSAGE_TYPES = {
-  "EIP712Domain": [
-      { "name": "name", "type": "string" },
-      { "name": "version", "type": "string" },
-      { "name": "chainId", "type": "uint256" },
-      { "name": "verifyingContract", "type": "address" },
+  EIP712Domain: [
+    { name: "name", type: "string" },
+    { name: "version", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "verifyingContract", type: "address" },
   ],
-  "Registration": [
-      { "name": "brokerId", "type": "string" },
-      { "name": "chainId", "type": "uint256" },
-      { "name": "timestamp", "type": "uint64" },
-      { "name": "registrationNonce", "type": "uint256" },
+  Registration: [
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "timestamp", type: "uint64" },
+    { name: "registrationNonce", type: "uint256" },
   ],
-  "AddOrderlyKey": [
-      { "name": "brokerId", "type": "string" },
-      { "name": "chainId", "type": "uint256" },
-      { "name": "orderlyKey", "type": "string" },
-      { "name": "scope", "type": "string" },
-      { "name": "timestamp", "type": "uint64" },
-      { "name": "expiration", "type": "uint64" },
+  AddOrderlyKey: [
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "orderlyKey", type: "string" },
+    { name: "scope", type: "string" },
+    { name: "timestamp", type: "uint64" },
+    { name: "expiration", type: "uint64" },
   ],
-  "Withdraw": [
-      { "name": "brokerId", "type": "string" },
-      { "name": "chainId", "type": "uint256" },
-      { "name": "receiver", "type": "address" },
-      { "name": "token", "type": "string" },
-      { "name": "amount", "type": "uint256" },
-      { "name": "withdrawNonce", "type": "uint64" },
-      { "name": "timestamp", "type": "uint64" },
+  Withdraw: [
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "receiver", type: "address" },
+    { name: "token", type: "string" },
+    { name: "amount", type: "uint256" },
+    { name: "withdrawNonce", type: "uint64" },
+    { name: "timestamp", type: "uint64" },
   ],
-  "SettlePnl": [
-      { "name": "brokerId", "type": "string" },
-      { "name": "chainId", "type": "uint256" },
-      { "name": "settleNonce", "type": "uint64" },
-      { "name": "timestamp", "type": "uint64" },
+  SettlePnl: [
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "settleNonce", type: "uint64" },
+    { name: "timestamp", type: "uint64" },
   ],
-  "DelegateSigner": [
-      { "name": "delegateContract", type: "address" },
-      { "name": "brokerId", type: "string" },
-      { "name": "chainId", type: "uint256" },
-      { "name": "timestamp", type: "uint64" },
-      { "name": "registrationNonce", type: "uint256" },
-      { "name": "txHash", type: "bytes32" },
+  DelegateSigner: [
+    { name: "delegateContract", type: "address" },
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "timestamp", type: "uint64" },
+    { name: "registrationNonce", type: "uint256" },
+    { name: "txHash", type: "bytes32" },
   ],
-  "DelegateAddOrderlyKey": [
-      { "name": "delegateContract", type: "address" },
-      { "name": "brokerId", type: "string" },
-      { "name": "chainId", type: "uint256" },
-      { "name": "orderlyKey", type: "string" },
-      { "name": "scope", type: "string" },
-      { "name": "timestamp", type: "uint64" },
-      { "name": "expiration", type: "uint64" },
+  DelegateAddOrderlyKey: [
+    { name: "delegateContract", type: "address" },
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "orderlyKey", type: "string" },
+    { name: "scope", type: "string" },
+    { name: "timestamp", type: "uint64" },
+    { name: "expiration", type: "uint64" },
   ],
-  "DelegateWithdraw": [
-      { "name": "delegateContract", type: "address" },
-      { "name": "brokerId", type: "string" },
-      { "name": "chainId", type: "uint256" },
-      { "name": "receiver", type: "address"},     
-      { "name": "token", type: "string" },
-      { "name": "amount", type: "uint256" },
-      { "name": "withdrawNonce", type: "uint64" },
-      { "name": "timestamp", type: "uint64" },
+  DelegateWithdraw: [
+    { name: "delegateContract", type: "address" },
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "receiver", type: "address" },
+    { name: "token", type: "string" },
+    { name: "amount", type: "uint256" },
+    { name: "withdrawNonce", type: "uint64" },
+    { name: "timestamp", type: "uint64" },
   ],
-  "DelegateSettlePnl": [
-      { "name": "delegateContract", type: "address" },
-      { "name": "brokerId", type: "string" },
-      { "name": "chainId", type: "uint256" },
-      { "name": "settleNonce", type: "uint64" },
-      { "name": "timestamp", type: "uint64" },
+  DelegateSettlePnl: [
+    { name: "delegateContract", type: "address" },
+    { name: "brokerId", type: "string" },
+    { name: "chainId", type: "uint256" },
+    { name: "settleNonce", type: "uint64" },
+    { name: "timestamp", type: "uint64" },
   ],
 };
 
 const OFF_CHAIN_DOMAIN = {
   name: 'Orderly',
   version: '1',
-  chainId: 42161,
+  chainId: 421614,
   verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
 };
 
@@ -126,15 +127,14 @@ function uint8ArrayToHexString(uint8Array: Uint8Array): string {
       .join('');
 }
 
-export async function signPnLMessage(
-  privateKey : Uint8Array, 
-  messageObject: { brokerId: string; chainId: number; settleNonce: number; timestamp: number }
-) {
+export async function signEIP712Message(
+  privateKey: Uint8Array,
+  message: Record<string, any>
+): Promise<[string, string]> {
   const privateKeyHex = uint8ArrayToHexString(privateKey);
   const wallet = new ethers.Wallet(privateKeyHex);
 
-  const signature = await wallet.signTypedData(ON_CHAIN_DOMAIN, { SettlePnl: MESSAGE_TYPES.SettlePnl }, messageObject);
-
+  const signature = await wallet.signTypedData(ON_CHAIN_DOMAIN, { SettlePnl: MESSAGE_TYPES.SettlePnl }, message);
   console.log('Wallet Address:', wallet.address);
   console.log('Signature:', signature);
 

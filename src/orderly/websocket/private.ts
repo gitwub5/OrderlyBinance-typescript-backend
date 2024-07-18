@@ -64,7 +64,6 @@ export class WebSocketManager {
         const orderlySign = signPostRequestByOrderlyKey(keyPair, messageBytes);
         console.log('orderlySign:', orderlySign);
         // const { sign: orderlySign, message: timestamp } = await signer(orderlyAccountInfo.privateKey);
-        console.log()
         const payload = {
           "id":"123r",
           "event":"auth",

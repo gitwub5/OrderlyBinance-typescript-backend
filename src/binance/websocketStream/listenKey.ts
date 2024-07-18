@@ -26,3 +26,8 @@ export async function deleteListenKey(){
     const res = await createSignAndRequest(endpoint, queryParams, 'DELETE');
     console.log(res);
 }
+
+async function main(){
+console.log(await keepListenKey());
+}
+main();

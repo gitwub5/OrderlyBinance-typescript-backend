@@ -13,8 +13,8 @@ export const selectedTokens = [
     tokensArray[2],
     tokensArray[3],
     tokensArray[4],
-    // tokensArray[5],
-    // tokensArray[6]
+    tokensArray[5],
+    tokensArray[6]
 ];
 
 //여러 토큰 한 번에 병렬 처리

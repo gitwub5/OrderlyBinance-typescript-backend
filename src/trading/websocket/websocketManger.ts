@@ -38,7 +38,7 @@ export async function initClients(token: token) {
   // Keep listenKey active every hour
   setInterval(async () => {
     await keepListenKey();
-  }, 60 * 60 * 1000); // 1 hour
+  }, 30 * 60 * 1000); // 30 min
 
   // Check stop condition periodically
   const checkStop = async () => {
