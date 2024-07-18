@@ -39,13 +39,13 @@ export async function sendTelegramMessage(tokenName: string, amount: number, ent
     
     const message = `
     📊 <b>Arbitrage Event</b> 📊
-    ------------------------------------------
+    ---------------------------------------
     <b>Token:</b> ${tokenName}
     <b>Transaction Amount:</b> ${transactionAmount.toFixed(2)} USD
     <b>Time:</b> ${arbitrageEndTime.toLocaleString('en-GB')}
     <b>Arbitrage Gap:</b> ${initDifference.toFixed(8)}%
     <b>Binance PnL:</b> ${binancePnl.toFixed(8)}
-    ------------------------------------------
+    ---------------------------------------
     <b>Details:</b>
     - <b>Enter Price:</b> ${enterPrice.toFixed(4)}
     - <b>Close Price:</b> ${closePrice.toFixed(4)}
