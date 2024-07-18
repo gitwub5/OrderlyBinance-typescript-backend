@@ -40,6 +40,24 @@ export class placeOrderlyOrder {
   public static async marketOrder(symbol: string, side: string, amount: number) {
     return await this.placeOrder(symbol, 'MARKET', side, null, amount);
   }
+
+  public static async bidOrder(symbol: string, side: string, amount: number) {
+    return await this.placeOrder(symbol, 'BID', side, null, amount);
+  }
+
+  public static async askOrder(symbol: string, side: string, amount: number) {
+    return await this.placeOrder(symbol, 'ASK', side , null, amount);
+  }
+
+  // Buy at the lowest price
+  public static async buyAtLowestPrice(symbol: string, amount: number) {
+    return await this.bidOrder(symbol, 'BUY' ,amount);
+  }
+
+  // Sell at the highest price
+  public static async sellAtHighestPrice(symbol: string, amount: number) {
+    return await this.askOrder(symbol, 'SELL', amount);
+  }
 }
 
 export async function editOrderlyOrder(orderId: string, symbol: string, orderType: string, side: string, price: number | null, amount: number) {
@@ -146,13 +164,13 @@ export async function getOrderlyOrderById(order_id: string) {
 
 // async function main() {
 //     try {
-//       // const response = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'BUY', 2)
+//       console.log(await placeOrderlyOrder.buyAtLowestPrice('PERP_TON_USDC', 2));
 //       // const orderId = response.order_id;
-//       const orderlyPosition = await getOrderlyPositions('PERP_TON_USDC');
-//       const orderlyAmt = parseFloat(orderlyPosition.position_qty.toString());
-//       console.log(orderlyAmt);
-//       const res = await placeOrderlyOrder.marketOrder('PERP_TON_USDC', 'SELL', orderlyAmt);
-//       console.log(res);
+//       // const orderlyPosition = await getOrderlyPositions('PERP_TON_USDC');
+//       // const orderlyAmt = parseFloat(orderlyPosition.position_qty.toString());
+//       // console.log(orderlyAmt);
+//       console.log(await placeOrderlyOrder.sellAtHighestPrice('PERP_TON_USDC', 2));
+//       // console.log(res);
 //       // const response2 = await getOrderlyOrderById(orderId);
 //       // const orderlyPrice = response2.average_executed_price;
 //       //console.log(price);

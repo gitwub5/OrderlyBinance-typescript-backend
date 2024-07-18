@@ -128,7 +128,7 @@ export async function executeArbitrage(token: token) {
     binanceAPIws.setMessageCallback(async (message) => {
       //주문가 변경시 에러 3번 연속으로 발생 시 종료 (재시작)
       if (message.error) {
-        console.log(message.error);
+        console.log(`${token.binanceSymbol}:`, message.error);
         if (message.error.code === -2013) {
           errorCounter++;
           if (errorCounter >= 3) {

@@ -39,7 +39,7 @@ export const tokensArray: token[] = [
         orderlySymbol : reconstructOrderlySymbol('ZRO'),
         orderSize : 3,
         arbitrageThreshold : 0.50,
-        closeThreshold : 0.08,
+        closeThreshold : 0.11,
         precision: 3,
         state: new TokenState()
     },
