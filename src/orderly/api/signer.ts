@@ -115,7 +115,7 @@ const OFF_CHAIN_DOMAIN = {
 };
 
 const ON_CHAIN_DOMAIN = {
-  name: 'Arbitrum',
+  name: 'Arbitrum One',
   version: '1',
   chainId: 42161,
   verifyingContract: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831'

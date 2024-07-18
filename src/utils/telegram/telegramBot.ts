@@ -88,6 +88,7 @@ bot.onText(/\/reset/, async (msg) => {
         await Promise.all(tokensArray.map(token => cancelAllOrders(token)));
         tokensArray.forEach(token => disconnectClients(token));
         bot.sendMessage(msg.chat.id, "All orders cancelled and positions closed.");
+        process.exit(1);
     } catch (error) {
         bot.sendMessage(msg.chat.id, "Error resetting orders and positions.");
         console.error('Error resetting orders and positions:', error);
