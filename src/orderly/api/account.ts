@@ -188,17 +188,17 @@ export async function reqPnLSettlement(){
     }
 }
 
-async function main() {
-    try {
-      console.log(await getSettlePnLNonce());
-    //   console.log(await getPnLSettleLHis());
-        console.log(await reqPnLSettlement());
-    //  console.log(await getOrderlyPositions('PERP_TON_USDC'))
-    } catch (error) {
-        console.error('Error in main function:', error);
-    }
-}
-main().catch(error => {
-  console.error('Unhandled error in main function:', error);
-});
+// async function main() {
+//     try {
+//       console.log(await getSettlePnLNonce());
+//     //   console.log(await getPnLSettleLHis());
+//         console.log(await reqPnLSettlement());
+//     //  console.log(await getOrderlyPositions('PERP_TON_USDC'))
+//     } catch (error) {
+//         console.error('Error in main function:', error);
+//     }
+// }
+// main().catch(error => {
+//   console.error('Unhandled error in main function:', error);
+// });
 

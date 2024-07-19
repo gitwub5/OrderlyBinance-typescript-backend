@@ -169,7 +169,7 @@ export async function getOrderlyOrderById(order_id: string) {
 //       // const orderlyPosition = await getOrderlyPositions('PERP_TON_USDC');
 //       // const orderlyAmt = parseFloat(orderlyPosition.position_qty.toString());
 //       // console.log(orderlyAmt);
-//       console.log(await placeOrderlyOrder.sellAtHighestPrice('PERP_TON_USDC', 2));
+//       // console.log(await placeOrderlyOrder.sellAtHighestPrice('PERP_TON_USDC', 2));
 //       // console.log(res);
 //       // const response2 = await getOrderlyOrderById(orderId);
 //       // const orderlyPrice = response2.average_executed_price;

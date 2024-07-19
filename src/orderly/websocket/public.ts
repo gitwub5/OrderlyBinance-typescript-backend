@@ -127,7 +127,7 @@ export class WebSocketManager {
   }
 }
 
-// // TEST
+// // // TEST
 // async function main() {
 //   const wsClient = new WebSocketManager();
 
@@ -145,7 +145,9 @@ export class WebSocketManager {
 //     }
 //   });
 
-  
+//   setTimeout(() => {
+//     wsClient.unsubMarkPrice(symbol);
+//   }, 5000); // Keep the connection open for 30 seconds
 
 //   // Wait some time to ensure the subscription is processed before disconnecting
 //   setTimeout(() => {

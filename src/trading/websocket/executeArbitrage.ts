@@ -56,8 +56,7 @@ export async function executeArbitrage(token: token) {
           
           //시장가에 따라 바이낸스 주문 수정
           if (orderlyPrice !== previousOrderlyPrice && !positionFilled) {
-            const { longPositionPrice, shortPositionPrice } 
-            = await handleOrder(binanceAPIws, token, orderlyPrice, binanceBuyId, binanceSellId, binanceBuyPrice, binanceSellPrice);
+            const { longPositionPrice, shortPositionPrice } = await handleOrder(binanceAPIws, token, orderlyPrice, binanceBuyId, binanceSellId, binanceBuyPrice, binanceSellPrice);
             binanceBuyPrice = longPositionPrice;
             binanceSellPrice = shortPositionPrice;
             previousOrderlyPrice = orderlyPrice;
@@ -79,27 +78,18 @@ export async function executeArbitrage(token: token) {
       const orderUpdate = message.o;
       //포지션 체결되었을 시
       if (orderUpdate.X === 'FILLED' && (orderUpdate.i === binanceBuyId || orderUpdate.i === binanceSellId)) {
-        await orderlyClient.unsubMarkPrice(token.orderlySymbol);
-
+        positionFilled = true;
         console.log('Binance order filled:', JSON.stringify(orderUpdate));
-        console.log('Binance order filled:', orderUpdate.S);
-        console.log('Binance order filled:', typeof(orderUpdate.S));
 
         if(orderUpdate.S === 'SELL'){
-          positionFilled = true;
-
           const orderlyBuyPrice = await enterLongPosition(token, binanceBuyId);
-          await orderlyClient.markPrice(token.orderlySymbol);
           
           token.state.setEnterPrice(binanceSellPrice);
           const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
         }
         else{
-          positionFilled = true;
-
           const orderlySellPrice = await enterShortPosition(token, binanceSellId);
-          await orderlyClient.markPrice(token.orderlySymbol);
         
           token.state.setEnterPrice(binanceBuyPrice);
           const priceDifference = ((binanceBuyPrice - orderlySellPrice) / orderlySellPrice) * 100;
