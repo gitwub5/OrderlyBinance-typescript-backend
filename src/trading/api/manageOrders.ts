@@ -122,7 +122,7 @@ export async function enterLongPosition(token: token, longPositionId: number) {
         if (retries >= MAX_RETRIES) {
           throw new Error('Order did not fill in time');
         }
-        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL)); // 1초 대기
+        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
         order = await getOrderlyOrderById(orderId);
         retries++;
       }

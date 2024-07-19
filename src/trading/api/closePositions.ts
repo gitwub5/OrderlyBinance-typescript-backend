@@ -11,7 +11,13 @@ async function closeOrderlyPositions(token: token, orderlyAmt: number) {
     await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', -orderlyAmt);
     console.log(`<<<< [${token.binanceSymbol}] Closing Orderly short position: BUY ${-orderlyAmt} >>>>`);
   } else {
-    console.log(`<<<< [${token.binanceSymbol}] No Orderly position to close. >>>>`);
+    // Re-check position amounts
+    const { orderlyAmt: newOrderlyAmt } = await getPositionAmounts(token);
+    if (newOrderlyAmt !== 0) {
+      await closeOrderlyPositions(token, newOrderlyAmt);
+    } else {
+      console.log(`<<<< [${token.binanceSymbol}] No Orderly position to close. >>>>`);
+    }
   }
 }
 
@@ -33,7 +39,13 @@ async function closeBinancePositions(token: token, binanceAmt: number) {
     token.state.setClosePrice(parseFloat(status.avgPrice));
 
   } else {
-    console.log(`<<<< [${token.binanceSymbol}] No Binance position to close. >>>>`);
+     // Re-check position amounts
+     const { binanceAmt: newBinanceAmt } = await getPositionAmounts(token);
+     if (newBinanceAmt !== 0) {
+       await closeBinancePositions(token, newBinanceAmt);
+     } else {
+       console.log(`<<<< [${token.binanceSymbol}] No Binance position to close. >>>>`);
+     }
   }
 }
 
@@ -44,13 +56,13 @@ export async function closeAllPositions(token: token) {
     const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
 
     //임시 로그
-    console.log(`orderltAmt = ${orderlyAmt} / binanceAmt = ${binanceAmt}`);
+    console.log(`orderlyAmt = ${orderlyAmt} / binanceAmt = ${binanceAmt}`);
 
     await Promise.all([
       closeOrderlyPositions(token, orderlyAmt),
       closeBinancePositions(token, binanceAmt)
     ]);
-    
+
   } catch (error) {
     console.error('Error during position close:', error);
   }

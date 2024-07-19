@@ -9,15 +9,15 @@ import { token } from "../../types/tokenTypes";
 //현재 보유한 포지션 갯수
 export async function getPositionAmounts(token: token) {
     const [orderlyPosition, binancePosition] = await Promise.all([
-        getOrderlyPositions(token.orderlySymbol),
-        getBinancePositions(token.binanceSymbol)
+      getOrderlyPositions(token.orderlySymbol),
+      getBinancePositions(token.binanceSymbol)
     ]);
-
+  
     const orderlyAmt = Number(orderlyPosition.position_qty);
     const binanceAmt = Number(binancePosition.positionAmt);
-
+  
     return { orderlyAmt, binanceAmt };
-}
+  }  
 
 export async function monitorClosePositions(token: token) {
     try {

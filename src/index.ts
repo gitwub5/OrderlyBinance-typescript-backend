@@ -37,7 +37,7 @@ export async function shutdown() {
         console.error('Error during closing positions:', err);
     } finally {
         console.log('Exiting manageOrders...');
-        process.exit(0);
+        process.exit(1);
     }
 }
 
