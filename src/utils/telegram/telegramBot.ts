@@ -19,24 +19,25 @@ const bot = new TelegramBot(botToken, { polling: true });
 
 bot.on('polling_error', (error) => console.log(`Polling error: ${error.message}`));
 
-export async function sendTelegramMessage(tokenName: string, amount: number, enterPrice: number, closePrice: number , initDifference : number) {
+export async function sendTelegramMessage(tokenName: string, amount: number, enterPrice: number, closePrice: number, initDifference: number) {
     const arbitrageEndTime = new Date();
-    const transactionAmount =  enterPrice * amount;
+    const transactionAmount = enterPrice * amount;
 
     const MakerFee = enterPrice * 0.0002;
     const TakerFee = closePrice * 0.0005;
 
-    let binancePnl : number = 0;
-    if(initDifference > 0){ //양수인 경우 바이낸스 > 오덜리 -> 바이낸스 숏, 오덜리 롱
+    let binancePnl: string | number = 0;
+
+    if (enterPrice === 0 || closePrice === 0) {
+        binancePnl = "Record Error: Price cannot be 0";
+    } else if (initDifference > 0) { //양수인 경우 바이낸스 > 오덜리 -> 바이낸스 숏, 오덜리 롱
         binancePnl = ((enterPrice - closePrice) - (MakerFee + TakerFee)) * amount;
-    }
-    else if(initDifference < 0){ //음수인 경우 오덜리 > 바이낸스 -> 바이낸스 롱, 오덜리 숏
+    } else if (initDifference < 0) { //음수인 경우 오덜리 > 바이낸스 -> 바이낸스 롱, 오덜리 숏
         binancePnl = ((closePrice - enterPrice) - (MakerFee + TakerFee)) * amount;
-    }
-    else{
+    } else {
         return;
     }
-    
+
     const message = `
     📊 <b>Arbitrage Event</b> 📊
     ---------------------------------------
@@ -44,7 +45,7 @@ export async function sendTelegramMessage(tokenName: string, amount: number, ent
     <b>Transaction Amount:</b> ${transactionAmount.toFixed(2)} USD
     <b>Time:</b> ${arbitrageEndTime.toLocaleString('en-GB')}
     <b>Arbitrage Gap:</b> ${initDifference.toFixed(8)}%
-    <b>Binance PnL:</b> ${binancePnl.toFixed(8)}
+    <b>Binance PnL:</b> ${typeof binancePnl === 'number' ? binancePnl.toFixed(8) : binancePnl}
     ---------------------------------------
     <b>Details:</b>
     - <b>Enter Price:</b> ${enterPrice.toFixed(4)}
