@@ -142,7 +142,8 @@ export async function executeArbitrage(token: token) {
               const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
               console.log(`<<<< INIT PRICE DIFFERENCE: ${token.state.getInitialPriceDifference()} >>>>`)
               console.log(`<<<< Current Price Difference: ${priceDifference}% >>>>`);
-
+              
+              // if(Math.abs(priceDifference) < Math.abs(token.state.getInitialPriceDifference()))
               // 청산 조건 확인
               if (Math.abs(priceDifference) <= token.closeThreshold) {
                 await closeAllPositions(token);
