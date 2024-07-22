@@ -3,7 +3,7 @@ import { SocketClient as BinanceWs } from '../../binance/websocketStream/socketC
 import { WebSocketAPIClient as BinanceAPI} from '../../binance/websocketAPI/websocektAPI';
 import { deleteListenKey, getListenKey, keepListenKey } from '../../binance/websocketStream/listenKey';
 import { forceStop, shouldStop } from '../../globals';
-import { token } from '../../types/tokenTypes';
+import { Token } from '../../types/tokenTypes';
 
 export const clients: Record<
   string,
@@ -16,7 +16,7 @@ export const clients: Record<
 > = {};
 
 //한 토큰 당 세 개의 웹소켓이 연결됨
-export async function initClients(token: token) {
+export async function initClients(token: Token) {
   // Initialize Orderly WebSocket
   const orderlyClient = new OrderlyWs();
   orderlyClient.connect();
@@ -53,7 +53,7 @@ export async function initClients(token: token) {
   setInterval(checkStop, 5000); // Check every 5 seconds
 }
 
-export async function disconnectClients(token : token) {
+export async function disconnectClients(token : Token) {
     const { orderlyClient, binanceUserDataStream, binanceMarketStream, binanceAPIws } = clients[token.binanceSymbol];
     orderlyClient.disconnect();
     binanceUserDataStream.disconnect();

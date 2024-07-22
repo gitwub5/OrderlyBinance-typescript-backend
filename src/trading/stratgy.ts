@@ -1,4 +1,4 @@
-import { token } from "../types/tokenTypes";
+import { Token } from "../types/tokenTypes";
 import { reconstructBinanceSymbol, reconstructOrderlySymbol } from "../utils/symbols/getSymbols";
 import { TokenState } from "../types/tokenState";
 
@@ -6,7 +6,7 @@ export const interval = 2000; // 2초 (단위시간)
 export const shortInterval = 500; // 0.5초
 
 //TODO: 토큰 동적으로 전략 수정 가능하게!
-export const tokensArray: token[] = [
+export const tokensArray: Token[] = [
     {
         binanceSymbol : reconstructBinanceSymbol('TON'), //바이낸스 버전 심볼 -> TONUSDT
         orderlySymbol : reconstructOrderlySymbol('TON'), //오덜리 버전 심볼 -> PERP_TON_USDC

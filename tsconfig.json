@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ES6",
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./src",
-    "paths": {
-      "*": ["*"]
-    }
+    "rootDir": "./src"
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

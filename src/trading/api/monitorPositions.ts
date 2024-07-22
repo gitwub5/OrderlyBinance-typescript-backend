@@ -4,10 +4,10 @@ import { getBinancePrice } from "../../binance/api/market";
 import { getOrderlyPrice } from "../../orderly/api/market";
 import { shortInterval } from "../stratgy";
 import { cancelAllOrders, closeAllPositions } from "./closePositions";
-import { token } from "../../types/tokenTypes";
+import { Token } from "../../types/tokenTypes";
 
 //현재 보유한 포지션 갯수
-export async function getPositionAmounts(token: token) {
+export async function getPositionAmounts(token: Token) {
     const [orderlyPosition, binancePosition] = await Promise.all([
       getOrderlyPositions(token.orderlySymbol),
       getBinancePositions(token.binanceSymbol)
@@ -19,7 +19,7 @@ export async function getPositionAmounts(token: token) {
     return { orderlyAmt, binanceAmt };
   }  
 
-export async function monitorClosePositions(token: token) {
+export async function monitorClosePositions(token: Token) {
     try {
         let isClosePosition = false;
 

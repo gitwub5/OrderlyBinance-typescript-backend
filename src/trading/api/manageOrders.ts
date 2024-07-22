@@ -1,6 +1,6 @@
 import { placeOrderlyOrder, getOrderlyOrderById } from '../../orderly/api/order';
 import { placeBinanceOrder, cancelBinanceOrder, modifyBinanceOrders } from '../../binance/api/order';
-import { token } from '../../types/tokenTypes';
+import { Token } from '../../types/tokenTypes';
 
 function fixPrecision(value: number, precision: number): number {
   const factor = Math.pow(10, precision);
@@ -10,7 +10,7 @@ function fixPrecision(value: number, precision: number): number {
 // TODO: db에 주문이 들어갔을 때 가격 밖에 없어서 아비트리지가 일어나야할 시점의 가격을 추가해서 확인 원하는 가격이랑 주문 가격이 비슷한지 확인!
 // 오덜리 시장가에 따라 바이낸스에 아비트리지 임계값 차이만큼 매수, 매도 포지션 주문
 // 롱 포지션, 숏 포지션 주문 Id 리턴
-export async function placeNewOrder(token: token, orderlyPrice: number) {
+export async function placeNewOrder(token: Token, orderlyPrice: number) {
   try {
     // 매도가 (Short Position) - orderlyPrice + arbitrageThreshold%
     const shortPositionPrice = fixPrecision(orderlyPrice * (1 + token.arbitrageThreshold / 100), token.precision);
@@ -40,7 +40,7 @@ export async function placeNewOrder(token: token, orderlyPrice: number) {
 // 현재 오덜리의 시장가에 따라 바이낸스 롱 포지션, 숏 포지션 수정
 // 롱 포지션, 숏 포지션 가격 반환
 export async function handleOrder(
-  token: token, 
+  token: Token, 
   orderlyPrice: number, 
   longPositionId: number, 
   shortPositionId: number, 
@@ -78,7 +78,7 @@ const MAX_RETRIES = 10; // 최대 재시도 횟수
 const RETRY_INTERVAL = 100; // 재시도 간격 (0.1초)
 
 // 오덜리 숏 포지션 진입 (바이낸스가 롱 포지션일 때)
-export async function enterShortPosition(token: token, shortPositionId: number) {
+export async function enterShortPosition(token: Token, shortPositionId: number) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', token.orderSize);
       const orderId = response.order_id;
@@ -110,7 +110,7 @@ export async function enterShortPosition(token: token, shortPositionId: number) 
 }
 
 // 오덜리 롱 포지션 진입 (바이낸스가 숏 포지션일 때)
-export async function enterLongPosition(token: token, longPositionId: number) {
+export async function enterLongPosition(token: Token, longPositionId: number) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', token.orderSize);
       const orderId = response.order_id;

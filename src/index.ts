@@ -2,7 +2,7 @@ import { executeArbitrage } from './trading/websocket/executeArbitrage';
 import { cancelAllOrders, closeAllPositions } from './trading/api/closePositions';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
-import { token } from './types/tokenTypes';
+import { Token } from './types/tokenTypes';
 import { tokensArray } from './trading/stratgy';
 import { initClients, disconnectClients } from './trading/websocket/websocketManger';
 
@@ -18,7 +18,7 @@ export const selectedTokens = [
 ];
 
 //여러 토큰 한 번에 병렬 처리
-async function manageMultipleTokens(tokens: token[]) {
+async function manageMultipleTokens(tokens: Token[]) {
     await Promise.all(tokens.map(async (token) => {
         await initClients(token);
         await executeArbitrage(token);

@@ -5,9 +5,9 @@ import { monitorClosePositions } from './monitorPositions'
 import { interval } from '../stratgy';
 import { getBinanceOrderStatus } from '../../binance/api/order';
 import { recordTrade } from '../../db/queries';
-import { token } from '../../types/tokenTypes';
+import { Token } from '../../types/tokenTypes';
 
-export async function executeArbitrage(token: token) {
+export async function executeArbitrage(token: Token) {
   try {
     // 초기 시장가 가져오기
     const orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
@@ -80,7 +80,8 @@ export async function executeArbitrage(token: token) {
           token.state.getInitialPriceDifference(),
           token.state.getClosePriceDifference(),
           token.state.getEnterPrice(),
-          token.state.getClosePrice()
+          token.state.getClosePrice(),
+          token.orderSize
         );
         console.log(`[${token.binanceSymbol}] Recorded at table`);
       } catch (err) {
@@ -91,7 +92,7 @@ export async function executeArbitrage(token: token) {
   }
 }
 
-export async function manageArbitrage(token: token) {
+export async function manageArbitrage(token: Token) {
   try {
     //TODO: shouldStop의 조건은 balance가 없을 때가 되어야함
     while (!shouldStop) {

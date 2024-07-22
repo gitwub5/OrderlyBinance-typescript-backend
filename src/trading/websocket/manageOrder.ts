@@ -1,4 +1,4 @@
-import { token } from "../../types/tokenTypes";
+import { Token } from "../../types/tokenTypes";
 import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
 
 function fixPrecision(value: number, precision: number): number {
@@ -10,7 +10,7 @@ function fixPrecision(value: number, precision: number): number {
 // 롱 포지션, 숏 포지션 가격 반환
 export async function handleOrder(
     client : WebSocketAPIClient,
-    token: token,
+    token: Token,
     orderlyPrice: number, 
     longPositionId: number, 
     shortPositionId: number, 

@@ -1,9 +1,9 @@
 import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../../orderly/api/order';
 import { cancelAllBinanceOrders, getBinanceOrderStatus, placeBinanceOrder } from '../../binance/api/order';
 import { getPositionAmounts } from './monitorPositions'
-import { token } from '../../types/tokenTypes';
+import { Token } from '../../types/tokenTypes';
 
-async function closeOrderlyPositions(token: token, orderlyAmt: number) {
+async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
   if (orderlyAmt > 0) {
     await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', orderlyAmt);
     console.log(`<<<< [${token.binanceSymbol}] Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
@@ -21,7 +21,7 @@ async function closeOrderlyPositions(token: token, orderlyAmt: number) {
   }
 }
 
-async function closeBinancePositions(token: token, binanceAmt: number) {
+async function closeBinancePositions(token: Token, binanceAmt: number) {
   if (binanceAmt > 0) {
     const response = await placeBinanceOrder.marketOrder(token.binanceSymbol, 'SELL', binanceAmt);
     console.log(`<<<< [${token.binanceSymbol}] Closing Binance long position: SELL ${binanceAmt} >>>>`);
@@ -50,7 +50,7 @@ async function closeBinancePositions(token: token, binanceAmt: number) {
 }
 
 // 모든 포지션 청산(Market Order)
-export async function closeAllPositions(token: token) {
+export async function closeAllPositions(token: Token) {
   try {
     console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
     const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
@@ -69,7 +69,7 @@ export async function closeAllPositions(token: token) {
 }
 
 // 오덜리 & 바이낸스 모든 주문 취소
-export async function cancelAllOrders(token : token){
+export async function cancelAllOrders(token : Token){
   const cancelOrderPromises = [
     cancelAllBinanceOrders(token.binanceSymbol),
     cancelAllOrderlyOrders(token.orderlySymbol)

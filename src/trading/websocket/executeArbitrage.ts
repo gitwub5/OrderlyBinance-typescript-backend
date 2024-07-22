@@ -1,6 +1,6 @@
 import { getOrderlyPrice } from '../../orderly/api/market';
 import { placeNewOrder, enterShortPosition, enterLongPosition } from '../api/manageOrders';
-import { token } from '../../types/tokenTypes';
+import { Token } from '../../types/tokenTypes';
 import { closeAllPositions, cancelAllOrders } from '../api/closePositions';
 import { initClients, clients, disconnectClients } from './websocketManger';
 import { shouldStop, forceStop } from '../../globals';
@@ -9,7 +9,7 @@ import { handleOrder } from './manageOrder';
 import { shutdown } from '../../index';
 import { sendTelegramMessage } from '../../utils/telegram/telegramBot';
 
-export async function executeArbitrage(token: token) {
+export async function executeArbitrage(token: Token) {
   let errorCounter = 0;
 
   try {
@@ -161,7 +161,7 @@ export async function executeArbitrage(token: token) {
                   token.state.getClosePrice(),
                   token.state.getInitialPriceDifference()
                 );
-                await recoredAndReset(token);
+                await recordAndReset(token);
 
                 //주문 다시 실행 
                 orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
@@ -203,7 +203,7 @@ export async function executeArbitrage(token: token) {
   } 
 }
 
-export async function recoredAndReset(token: token) {
+export async function recordAndReset(token: Token) {
   try {
     await recordTrade(
       token.binanceSymbol,
@@ -213,9 +213,10 @@ export async function recoredAndReset(token: token) {
       token.state.getClosePrice(),
       token.orderSize
     );
+
     console.log(`[${token.binanceSymbol}] Recorded at table`);
   } catch (err) {
-    console.log('Error during recording at table', err);
+    console.log("Error during recording at table", err);
   } finally {
     token.state.reset();
   }
