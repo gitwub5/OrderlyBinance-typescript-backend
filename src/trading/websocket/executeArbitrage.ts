@@ -204,13 +204,13 @@ export async function executeArbitrage(token: Token) {
                 console.log(token.state.getInitialPriceDifference());
                 console.log(token.state.getClosePriceDifference());
 
-                // await sendTelegramMessage(
-                //   token.binanceSymbol,
-                //   token.orderSize,
-                //   token.state.getEnterPrice(),
-                //   token.state.getClosePrice(),
-                //   token.state.getInitialPriceDifference()
-                // );
+                await sendTelegramMessage(
+                  token.binanceSymbol,
+                  token.orderSize,
+                  token.state.getEnterPrice(),
+                  token.state.getClosePrice(),
+                  token.state.getInitialPriceDifference()
+                );
                 await recordAndReset(token);
 
                 //주문 다시 실행 
