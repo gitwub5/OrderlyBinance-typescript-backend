@@ -159,7 +159,7 @@ export async function executeArbitrage(token: Token) {
        //아비트리징 아닌데 열려있는 포지션이 있다면 닫고 다시 시작
       if(!positionFilled){
         if (message.id === "id-positionInformation") {
-          console.log(`[${token.binanceSymbol}][B]Position Information: ${parseFloat(message.result[0].positionAmt)}`);
+          //console.log(`[${token.binanceSymbol}][B]Position Information: ${parseFloat(message.result[0].positionAmt)}`);
           if(parseFloat(message.result[0].positionAmt) !== 0.0){
             await closeAllPositions(binanceAPIws, token);
             await cancelAllOrders(token);
