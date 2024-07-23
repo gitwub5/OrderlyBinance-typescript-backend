@@ -12,6 +12,7 @@ import { sendTelegramMessage } from '../../utils/telegram/telegramBot';
 
 export async function executeArbitrage(token: Token) {
   let errorCounter = 0;
+  let lastPositionCheck = 0;
 
   try {
     let orderlyPrice: number | null = null;
@@ -129,9 +130,12 @@ export async function executeArbitrage(token: Token) {
         binancePriceUpdated = true;
         checkAndComparePrices();
       }
-      else{
-        //포지션이 있는지 확인
-        binanceAPIws.positionInfo(token.binanceSymbol);
+      else { //10초마다 한번씩 열린 포지션 있는지 확인 (요청 너무 많아져서 줄임)
+        const currentTime = Date.now();
+        if (currentTime - lastPositionCheck >= 10000) {
+          lastPositionCheck = currentTime;
+          binanceAPIws.positionInfo(token.binanceSymbol);
+        }
       }
     });
 
@@ -159,7 +163,7 @@ export async function executeArbitrage(token: Token) {
        //아비트리징 아닌데 열려있는 포지션이 있다면 닫고 다시 시작
       if(!positionFilled){
         if (message.id === "id-positionInformation") {
-          //console.log(`[${token.binanceSymbol}][B]Position Information: ${parseFloat(message.result[0].positionAmt)}`);
+          console.log(`[${token.binanceSymbol}][B]Position Information: ${parseFloat(message.result[0].positionAmt)}`);
           if(parseFloat(message.result[0].positionAmt) !== 0.0){
             await closeAllPositions(binanceAPIws, token);
             await cancelAllOrders(token);
