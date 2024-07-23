@@ -180,9 +180,9 @@ export async function executeArbitrage(token: Token) {
       try {
         if (orderlyPrice !== null && binancePrice !== null && orderlyTimestamp !== null && binanceTimestamp !== null) {
           const timestampDifference = Math.abs(orderlyTimestamp - binanceTimestamp);
-          if (timestampDifference <= 500) {  // 0.5초 이내의 차이인 경우
+          if (timestampDifference <= 100) {  // 0.1초 이내의 차이인 경우
               const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
-              console.log(`<<<< INIT PRICE DIFFERENCE: ${token.state.getInitialPriceDifference()} >>>>`)
+              console.log(`<<<< INITIAL Price Difference: ${token.state.getInitialPriceDifference()} >>>>`)
               console.log(`<<<< Current Price Difference: ${priceDifference}% >>>>`);
 
               // 손절 조건 확인
@@ -241,7 +241,7 @@ export async function executeArbitrage(token: Token) {
 
     async function checkAndComparePrices() {
         if (orderlyPriceUpdated && binancePriceUpdated) {
-            comparePrices();
+            await comparePrices();
             orderlyPriceUpdated = false;
             binancePriceUpdated = false;
         }
