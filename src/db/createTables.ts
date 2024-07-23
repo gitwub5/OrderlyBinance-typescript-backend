@@ -13,7 +13,8 @@ export async function createTables() {
                 binance_enter_price DECIMAL(10, 4),
                 binance_close_price DECIMAL(10, 4),
                 transaction_amount DECIMAL(20, 2),
-                win_loss_status VARCHAR(10),
+                win_loss_status VARCHAR(10) NULL,
+                binance_pnl DECIMAL(10, 4) NULL,
                 PRIMARY KEY (token_name, timestamp),
                 UNIQUE KEY (timestamp)
             )

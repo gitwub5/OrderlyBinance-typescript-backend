@@ -72,28 +72,29 @@ export class WebSocketAPIClient {
     }
   }
 
-  async placeOrder(symbol: string, price: number, quantity: number, side: 'BUY' | 'SELL', type: 'LIMIT' | 'MARKET') {
-    const params = {
-        apiKey: binanceAccountInfo.apiKey,
-        positionSide: "BOTH",
-        price: price,
-        quantity: quantity,
-        side: side,
-        symbol: symbol,
-        timeInForce: 'GTC',
-        timestamp: Date.now().toString(),
-        type: type,
-        recvWindow: 5000,
+  async placeOrder(symbol: string,  price: number | null , quantity: number, side: 'BUY' | 'SELL', type: 'LIMIT' | 'MARKET') {
+    const params: any = {
+      apiKey: binanceAccountInfo.apiKey,
+      positionSide: "BOTH",
+      quantity: quantity,
+      side: side,
+      symbol: symbol,
+      timestamp: Date.now().toString(),
+      type: type,
+      recvWindow: 5000,
     };
-
-    // Generate the signature
+  
+    if (type === 'LIMIT' && price !== null) {
+      params.price = price;
+      params.timeInForce = 'GTC';
+    }  
+  
     const sortedParams = Object.keys(params)
       .sort()
-      .map(key => `${key}=${(params as any)[key]}`)
+      .map(key => `${key}=${params[key]}`)
       .join('&');
     const signature = await createSignature(sortedParams, binanceAccountInfo.secret);
-
-    // Add the signature to the params
+  
     const request = {
       id: 'id-placeOrder',
       method: 'order.place',
@@ -102,7 +103,9 @@ export class WebSocketAPIClient {
         signature: signature
       },
     };
-
+  
+    //console.log('Placing order with request:', request); 
+  
     this.send(request);
   }
 
@@ -198,6 +201,33 @@ export class WebSocketAPIClient {
     this.send(request);
   }
 
+  async positionInfo(symbol: string){
+    const params = {
+        apiKey: binanceAccountInfo.apiKey,
+        symbol: symbol,
+        timestamp: Date.now().toString()
+    };
+
+    // Generate the signature
+    const sortedParams = Object.keys(params)
+      .sort()
+      .map(key => `${key}=${(params as any)[key]}`)
+      .join('&');
+    const signature = await createSignature(sortedParams, binanceAccountInfo.secret);
+
+    // Add the signature to the params
+    const request = {
+      id: 'id-positionInformation',
+      method: "account.position",
+      params: {
+        ...params,
+        signature: signature
+      },
+    };
+
+    this.send(request);
+  }
+
   public disconnect() {
     if (this.ws) {
       this.ws.close();
@@ -208,14 +238,33 @@ export class WebSocketAPIClient {
 }
 
 
-
-// // Main function to test the WebSocketAPIClient
 // async function main() {
 //   const newClient = new WebSocketAPIClient();
+
 //   await newClient.connect();
-//   setTimeout(async () => {
-//     await newClient.placeOrder("TONUSDT", 6.6, 2, 'BUY', "LIMIT");
-//   }, 1000); // Adjust the timeout as necessary
+
+//   // Define the callback function to process incoming messages
+//   const handleMessage = (message: any) => {
+//     if (message.id === 'id-positionInformation') {
+//       console.log('Position Information:', parseFloat(message.result[0].positionAmt));
+//     } else {
+//       console.log('Other Message:', message);
+//     }
+//   };
+ 
+
+//   newClient.setMessageCallback(handleMessage);
+
+//   // // Assign the callback function to the messageCallback property
+  
+//   setTimeout(async() => {
+//     newClient.placeOrder('TONUSDT', null , 2, 'BUY', 'MARKET');
+//   }, 1000);
+
+//   // // Use setInterval to send a request every second
+//   // setInterval(async () => {
+//   //   await newClient.positionInfo("TONUSDT");
+//   // }, 1000); // Sends the request every 1000 milliseconds (1 second)
 // }
 
 // main();

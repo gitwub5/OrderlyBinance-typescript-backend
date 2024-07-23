@@ -1,7 +1,8 @@
 import { getOrderlyPrice } from '../../orderly/api/market';
 import { placeNewOrder, enterShortPosition, enterLongPosition } from '../api/manageOrders';
 import { Token } from '../../types/tokenTypes';
-import { closeAllPositions, cancelAllOrders } from '../api/closePositions';
+import { cancelAllOrders, closeAllPositions as closeAllPositionsAPI } from '../api/closePositions';
+import { closeAllPositions } from './closePositions';
 import { initClients, clients, disconnectClients } from './websocketManger';
 import { shouldStop, forceStop } from '../../globals';
 import { recordTrade } from '../../db/queries';
@@ -73,37 +74,52 @@ export async function executeArbitrage(token: Token) {
       }
     });
 
-    //바이낸스 유저 데이터 스트림
+    //바이낸스 유저 데이터 스트림 핸들러
     binanceUserDataStream.setHandler('ORDER_TRADE_UPDATE', async (message) => {
       const orderUpdate = message.o;
       //포지션 체결되었을 시
-      if (orderUpdate.X === 'FILLED' && (orderUpdate.i === binanceBuyId || orderUpdate.i === binanceSellId)) {
+      if (
+        orderUpdate.s === token.binanceSymbol &&
+        orderUpdate.X === "FILLED" &&
+        orderUpdate.o === "LIMIT" &&
+        (orderUpdate.i === binanceBuyId || orderUpdate.i === binanceSellId)
+      ) {
         positionFilled = true;
-        console.log('Binance order filled:', JSON.stringify(orderUpdate));
+        console.log("Binance order filled:", JSON.stringify(orderUpdate));
 
-        if(orderUpdate.S === 'SELL'){
+        if (orderUpdate.S === "SELL") {
           const orderlyBuyPrice = await enterLongPosition(token, binanceBuyId);
-          
-          token.state.setEnterPrice(binanceSellPrice);
-          const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
+
+          const binanceEnterPrice = parseFloat(orderUpdate.ap);
+          token.state.setEnterPrice(binanceEnterPrice);
+          const priceDifference = ((binanceEnterPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
-        }
-        else{
+        } else {
           const orderlySellPrice = await enterShortPosition(token, binanceSellId);
-        
-          token.state.setEnterPrice(binanceBuyPrice);
-          const priceDifference = ((binanceBuyPrice - orderlySellPrice) / orderlySellPrice) * 100;
+
+          const binanceEnterPrice = parseFloat(orderUpdate.ap);
+          token.state.setEnterPrice(binanceEnterPrice);
+          const priceDifference = ((binanceEnterPrice - orderlySellPrice) / orderlySellPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
         }
       }
+
+      //포지션 정리되었을 때
+      if (
+        orderUpdate.s === token.binanceSymbol &&
+        orderUpdate.X === "FILLED" &&
+        orderUpdate.o === "MARKET"
+      ) {
+        token.state.setClosePrice(parseFloat(orderUpdate.ap));
+      }
     });
 
-    // ACCOUNT_UPDATE
+    // ACCOUNT_UPDATE 핸들러
     binanceUserDataStream.setHandler('ACCOUNT_UPDATE', (message) => {
       //console.log('Binance ACCOUNT_UPDATE:', JSON.stringify(message));
     });
 
-    //바이낸스 시장가 스트림
+    //바이낸스 시장가 스트림 핸들러
     binanceMarketStream.setHandler('markPriceUpdate', (params) => {
       binancePrice = parseFloat(params.p);
       binanceTimestamp = params.E;  
@@ -113,8 +129,13 @@ export async function executeArbitrage(token: Token) {
         binancePriceUpdated = true;
         checkAndComparePrices();
       }
+      else{
+        //포지션이 있는지 확인
+        binanceAPIws.positionInfo(token.binanceSymbol);
+      }
     });
 
+    //바이낸스 API 웹소켓 핸들러
     binanceAPIws.setMessageCallback(async (message) => {
       //주문가 변경시 에러 3번 연속으로 발생 시 종료 (재시작)
       if (message.error) {
@@ -122,17 +143,34 @@ export async function executeArbitrage(token: Token) {
         if (message.error.code === -2013) {
           errorCounter++;
           if (errorCounter >= 3) {
-            console.error('Error code -2013 encountered 3 times. Throwing error and shutting down.');
+            console.error(
+              "Error code -2013 encountered 3 times. Throwing error and shutting down."
+            );
             await shutdown();
-            throw new Error('Order does not exist error occurred 3 times consecutively.');
+            throw new Error(
+              "Order does not exist error occurred 3 times consecutively."
+            );
           }
         } else {
           errorCounter = 0; // Reset the counter for other errors
         }
       }
-      // console.log('Received message:', data);
-    });
 
+       //아비트리징 아닌데 열려있는 포지션이 있다면 닫고 다시 시작
+      if(!positionFilled){
+        if (message.id === "id-positionInformation") {
+          console.log(`[${token.binanceSymbol}][B]Position Information: ${parseFloat(message.result[0].positionAmt)}`);
+          if(parseFloat(message.result[0].positionAmt) !== 0.0){
+            await closeAllPositions(binanceAPIws, token);
+            await cancelAllOrders(token);
+            token.state.reset();
+            await executeArbitrage(token);
+          }
+        } else {
+          //console.log("Other Message:", message);
+        }
+      }
+    });
 
     async function comparePrices() {
       try {
@@ -143,10 +181,12 @@ export async function executeArbitrage(token: Token) {
               console.log(`<<<< INIT PRICE DIFFERENCE: ${token.state.getInitialPriceDifference()} >>>>`)
               console.log(`<<<< Current Price Difference: ${priceDifference}% >>>>`);
 
-              // if(Math.abs(priceDifference) < Math.abs(token.state.getInitialPriceDifference()))
-              // 청산 조건 확인
-              if (Math.abs(priceDifference) <= token.closeThreshold) {
-                await closeAllPositions(token);
+              // 손절 조건 확인
+              // 버전#2: 초기 갭차이의 절반 이하로 떨어지면 손절
+              if (Math.abs(priceDifference) < Math.abs(token.state.getInitialPriceDifference() / 2)) {
+              // //버전#1: 손절 갭 임의로 설정
+              // if (Math.abs(priceDifference) <= token.closeThreshold) {
+                await closeAllPositions(binanceAPIws, token);
                 await cancelAllOrders(token);
                 console.log(`<<<< [${token.binanceSymbol}] Closing positions due to close threshold >>>>`);
 
@@ -154,28 +194,36 @@ export async function executeArbitrage(token: Token) {
                 positionFilled = false;
 
                 token.state.setClosePriceDifference(priceDifference);
-                await sendTelegramMessage(
-                  token.binanceSymbol,
-                  token.orderSize,
-                  token.state.getEnterPrice(),
-                  token.state.getClosePrice(),
-                  token.state.getInitialPriceDifference()
-                );
+
+                console.log(token.state.getEnterPrice());
+                console.log(token.state.getClosePrice());
+                console.log(token.state.getInitialPriceDifference());
+                console.log(token.state.getClosePriceDifference());
+
+                // await sendTelegramMessage(
+                //   token.binanceSymbol,
+                //   token.orderSize,
+                //   token.state.getEnterPrice(),
+                //   token.state.getClosePrice(),
+                //   token.state.getInitialPriceDifference()
+                // );
                 await recordAndReset(token);
 
                 //주문 다시 실행 
-                orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
-                console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
-                const { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice } 
-                = await placeNewOrder(token, orderlyPrice);
-                
-                previousOrderlyPrice = orderlyPrice;
-                binanceBuyId = longPositionId;
-                binanceSellId = shortPositionId;
-                binanceBuyPrice = longPositionPrice;
-                binanceSellPrice = shortPositionPrice;
+                await executeArbitrage(token);
 
-                await orderlyClient.markPrice(token.orderlySymbol);
+                // orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
+                // console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
+                // const { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice } 
+                // = await placeNewOrder(token, orderlyPrice);
+                
+                // previousOrderlyPrice = orderlyPrice;
+                // binanceBuyId = longPositionId;
+                // binanceSellId = shortPositionId;
+                // binanceBuyPrice = longPositionPrice;
+                // binanceSellPrice = shortPositionPrice;
+
+                // await orderlyClient.markPrice(token.orderlySymbol);
 
                 //return;
               }
@@ -196,7 +244,7 @@ export async function executeArbitrage(token: Token) {
     }
   } catch (error) {
     console.error('Error in executeArbitrage:', error);
-    await closeAllPositions(token);
+    await closeAllPositionsAPI(token);
     await cancelAllOrders(token);
     await disconnectClients(token);
     throw error;

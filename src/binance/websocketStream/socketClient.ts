@@ -94,3 +94,28 @@ export class SocketClient {
     }
   }
 }
+
+// // 사용자 데이터 스트림에 연결하는 함수
+// async function connectUserDataStream() {
+//   try {
+//     const listenKey = await getListenKey();
+//     const binanceUserDataStream = new SocketClient(`ws/${listenKey}`);
+
+//     binanceUserDataStream.setHandler('ACCOUNT_UPDATE', (message: any) => {
+//       console.log('Account Update:', message);
+//     });
+
+//     binanceUserDataStream.setHandler('ORDER_TRADE_UPDATE', (message: any) => {
+//       console.log('Order Trade Update:', message);
+//     });
+
+//     binanceUserDataStream.setHandler('POSITION_UPDATE', (message: any) => {
+//       console.log('Position Update:', message);
+//     });
+//   } catch (error) {
+//     console.error('Error connecting to user data stream:', error);
+//   }
+// }
+
+// // 사용자 데이터 스트림 연결 시도
+// connectUserDataStream();

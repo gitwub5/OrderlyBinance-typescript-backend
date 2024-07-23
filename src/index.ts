@@ -1,5 +1,5 @@
 import { executeArbitrage } from './trading/websocket/executeArbitrage';
-import { cancelAllOrders, closeAllPositions } from './trading/api/closePositions';
+import { cancelAllOrders, closeAllPositions as closeAllPositionsAPI} from './trading/api/closePositions';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 import { Token } from './types/tokenTypes';
@@ -30,7 +30,7 @@ export async function shutdown() {
     setShouldStop(true);
     console.log('Shutting down arbitrage...');
     try {
-        await Promise.all(selectedTokens.map(token => closeAllPositions(token)));
+        await Promise.all(selectedTokens.map(token => closeAllPositionsAPI(token)));
         await Promise.all(selectedTokens.map(token => cancelAllOrders(token)));
         selectedTokens.forEach(token => disconnectClients(token));
     } catch (err) {
@@ -64,7 +64,7 @@ async function init() {
 init().catch(async err => {
     setForceStop(true);
     console.error('Failed to initialize application:', err);
-    await Promise.all(selectedTokens.map(token => closeAllPositions(token)));
+    await Promise.all(selectedTokens.map(token => closeAllPositionsAPI(token)));
     await Promise.all(selectedTokens.map(token => cancelAllOrders(token)));
     selectedTokens.forEach(token => disconnectClients(token));
     process.exit(1);

@@ -127,7 +127,7 @@ export async function enterLongPosition(token: Token, longPositionId: number) {
         retries++;
       }
   
-      const buyPrice = order.average_executed_price;
+      const buyPrice = parseFloat(order.average_executed_price);
 
       console.log(`<<<< [${token.binanceSymbol}] Executing arbitrage: SELL on Binance, BUY on Orderly >>>>`);
 

@@ -1,6 +1,7 @@
 import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../../orderly/api/order';
-import { cancelAllBinanceOrders, getBinanceOrderStatus, placeBinanceOrder } from '../../binance/api/order';
-import { getPositionAmounts } from './monitorPositions'
+import { cancelAllBinanceOrders} from '../../binance/api/order';
+import { getPositionAmounts } from '../api/monitorPositions'
+import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
 import { Token } from '../../types/tokenTypes';
 
 async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
@@ -21,28 +22,19 @@ async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
   }
 }
 
-async function closeBinancePositions(token: Token, binanceAmt: number) {
+//웹소켓 ver
+async function closeBinancePositions(client: WebSocketAPIClient, token: Token, binanceAmt: number) {
   if (binanceAmt > 0) {
-    const response = await placeBinanceOrder.marketOrder(token.binanceSymbol, 'SELL', binanceAmt);
+    client.placeOrder(token.binanceSymbol, null , binanceAmt , 'SELL', 'MARKET');
     console.log(`<<<< [${token.binanceSymbol}] Closing Binance long position: SELL ${binanceAmt} >>>>`);
-
-    const orderId = response.orderId;
-    const status = await getBinanceOrderStatus(token.binanceSymbol, orderId);
-    token.state.setClosePrice(parseFloat(status.avgPrice));
-
   } else if (binanceAmt < 0) {
-    const response = await placeBinanceOrder.marketOrder(token.binanceSymbol, 'BUY', -binanceAmt);
+    client.placeOrder(token.binanceSymbol, null , -binanceAmt , 'BUY', 'MARKET');
     console.log(`<<<< [${token.binanceSymbol}] Closing Binance short position: BUY ${-binanceAmt} >>>>`);
-
-    const orderId = response.orderId;
-    const status = await getBinanceOrderStatus(token.binanceSymbol, orderId);
-    token.state.setClosePrice(parseFloat(status.avgPrice));
-
   } else {
      // Re-check position amounts
      const { binanceAmt: newBinanceAmt } = await getPositionAmounts(token);
      if (newBinanceAmt !== 0) {
-       await closeBinancePositions(token, newBinanceAmt);
+       await closeBinancePositions(client, token, newBinanceAmt);
      } else {
        console.log(`<<<< [${token.binanceSymbol}] No Binance position to close. >>>>`);
      }
@@ -50,7 +42,7 @@ async function closeBinancePositions(token: Token, binanceAmt: number) {
 }
 
 // 모든 포지션 청산(Market Order)
-export async function closeAllPositions(token: Token) {
+export async function closeAllPositions(client: WebSocketAPIClient, token: Token) {
   try {
     console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
     const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
@@ -60,7 +52,7 @@ export async function closeAllPositions(token: Token) {
 
     await Promise.all([
       closeOrderlyPositions(token, orderlyAmt),
-      closeBinancePositions(token, binanceAmt)
+      closeBinancePositions(client, token, binanceAmt)
     ]);
 
   } catch (error) {
