@@ -32,154 +32,177 @@ export async function signer(
 }
 
 export class WebSocketManager {
-    private privateUrl: string;
-    private privateWebsocket: any;
-    private privateSubscriptions: Set<any>;
-    private messageCallbackPrivate: ((message: any) => void) | null;
-    private pingInterval: number;
-    private pingTimerPrivate: NodeJS.Timeout | null;
+  private privateUrl: string;
+  private privateWebsocket: any;
+  private privateSubscriptions: Set<any>;
+  private messageCallbackPrivate: ((message: any) => void) | null;
+  private pingInterval: number;
+  private pingTimerPrivate: NodeJS.Timeout | null;
 
-    constructor() {
-      this.privateUrl = `${WsPrivateUrl.mainnet}${orderlyAccountInfo.accountId}`;
-      this.privateWebsocket = null;
-      this.privateSubscriptions = new Set();
-      this.pingInterval = 10000; // Ping interval in milliseconds (10 seconds)
-      this.pingTimerPrivate = null;
-      this.messageCallbackPrivate = null;
-    }
+  constructor() {
+    this.privateUrl = `${WsPrivateUrl.mainnet}${orderlyAccountInfo.accountId}`;
+    this.privateWebsocket = null;
+    this.privateSubscriptions = new Set();
+    this.pingInterval = 10000; // Ping interval in milliseconds (10 seconds)
+    this.pingTimerPrivate = null;
+    this.messageCallbackPrivate = null;
+  }
 
-    connectPrivate() {
-      this.privateWebsocket = new WebSocket(this.privateUrl);
+  async connectPrivate() {
+    this.privateWebsocket = new WebSocket(this.privateUrl);
 
-      this.privateWebsocket.onopen = async () => {
-        console.log('WebSocket connection established.');
+    this.privateWebsocket.onopen = async () => {
+      console.log("WebSocket connection established.");
 
-        const timestamp = new Date().getTime().toString();
-        const messageStr = [
-            timestamp,
-          ].join('');
+      const timestamp = new Date().getTime().toString();
+      const messageStr = [timestamp].join("");
 
-        const messageBytes = new TextEncoder().encode(messageStr);
-        const keyPair = await getOrderlyKeyPair(orderlyAccountInfo.privateKeyBase58);
-        const orderlySign = signPostRequestByOrderlyKey(keyPair, messageBytes);
-        console.log('orderlySign:', orderlySign);
-        // const { sign: orderlySign, message: timestamp } = await signer(orderlyAccountInfo.privateKey);
-        const payload = {
-          "id":"123r",
-          "event":"auth",
-          "params":{
-              "orderly_key": orderlyAccountInfo.orderlyKey,
-              "sign": orderlySign,
-              "timestamp": timestamp
-          }
-        };
-
-        this.privateWebsocket.send(JSON.stringify(payload));
-
-        // Subscribe to existing subscriptions
-        this.privateSubscriptions.forEach((subscription: any) => { 
-          this.sendPrivateSubscription(subscription); 
-        });
-        
-        this.startPingPrivate();
-
-        this.privateWebsocket.onmessage = (event: WebSocket.MessageEvent) => {
-            const message = JSON.parse(event.data.toString());
-            console.log('Received message:', message);
-            if (this.messageCallbackPrivate) {
-              this.messageCallbackPrivate(message);
-            }
-        };
-    
-        this.privateWebsocket.onclose = (event: WebSocket.CloseEvent) => {
-            console.log('WebSocket private connection closed: ',  event.reason);
-            this.stopPingPrivate();
-        };
-    
-        this.privateWebsocket.onerror = (error: WebSocket.ErrorEvent) => {
-            console.error('WebSocket private connection error:', error.message);
-        };
+      const messageBytes = new TextEncoder().encode(messageStr);
+      const keyPair = await getOrderlyKeyPair(
+        orderlyAccountInfo.privateKeyBase58
+      );
+      const orderlySign = signPostRequestByOrderlyKey(keyPair, messageBytes);
+      console.log("orderlySign:", orderlySign);
+      // const { sign: orderlySign, message: timestamp } = await signer(orderlyAccountInfo.privateKey);
+      const payload = {
+        id: "123r",
+        event: "auth",
+        params: {
+          orderly_key: orderlyAccountInfo.orderlyKey,
+          sign: orderlySign,
+          timestamp: timestamp,
+        },
       };
-    }
 
-    disconnectPrivate() {
-      if (this.privateWebsocket) {
-        this.privateWebsocket.close();
-        this.privateWebsocket = null;
-        console.log('WebSocket private connection disconnected.');
-        this.stopPingPrivate();
-      }
-    }
+      this.privateWebsocket.send(JSON.stringify(payload));
 
-    sendPrivateSubscription(subscription: any) {
-      if (this.privateWebsocket && this.privateWebsocket.readyState === WebSocket.OPEN) {
-        this.privateWebsocket.send(JSON.stringify(subscription));
-        console.log('Sent subscription private:', subscription);
-        this.privateSubscriptions.add(subscription);
-      } else {
-        console.warn('Private WebSocket connection not open. Subscription not sent.');
-        this.privateSubscriptions.add(subscription);
-      }
-    }
+      // Subscribe to existing subscriptions
+      this.privateSubscriptions.forEach((subscription: any) => {
+        this.sendPrivateSubscription(subscription);
+      });
 
-    unsubscribePrivate(subscription: any) {
-      this.privateSubscriptions.delete(subscription);
-      // Unsubscribe from the server if needed
-    }
-  
-    setPrivateMessageCallback(callback: any) {
-      this.messageCallbackPrivate = callback;
-    }
+      this.startPingPrivate();
 
-    startPingPrivate() {
-        this.pingTimerPrivate = setInterval(() => {
-          if (this.privateWebsocket && this.privateWebsocket.readyState === WebSocket.OPEN) {
-            this.privateWebsocket.send(JSON.stringify({ event: 'pong' }));
-            console.log('Sent private ping request.');
-          } else {
-            console.warn('Private WebSocket connection not open. Ping request not sent.');
-          }
-        }, this.pingInterval);
-    }
-    
-    stopPingPrivate() {
-        if (this.pingTimerPrivate) {
-          clearInterval(this.pingTimerPrivate);
-          this.pingTimerPrivate = null;
-          console.log('Stopped private ping requests.');
+      this.privateWebsocket.onmessage = (event: WebSocket.MessageEvent) => {
+        const message = JSON.parse(event.data.toString());
+        //console.log("Received message:", message);
+        if (this.messageCallbackPrivate) {
+          this.messageCallbackPrivate(message);
         }
+      };
+
+      this.privateWebsocket.onclose = (event: WebSocket.CloseEvent) => {
+        console.log("WebSocket private connection closed: ", event.reason);
+        this.stopPingPrivate();
+      };
+
+      this.privateWebsocket.onerror = (error: WebSocket.ErrorEvent) => {
+        console.error("WebSocket private connection error:", error.message);
+      };
+    };
+  }
+
+  async disconnectPrivate() {
+    if (this.privateWebsocket) {
+      this.privateWebsocket.close();
+      this.privateWebsocket = null;
+      console.log("WebSocket private connection disconnected.");
+      this.stopPingPrivate();
     }
   }
 
-//   //TEST
-//   async function main() {
-//     const privateClient = new WebSocketManager();
+  async sendPrivateSubscription(subscription: any) {
+    if (
+      this.privateWebsocket &&
+      this.privateWebsocket.readyState === WebSocket.OPEN
+    ) {
+      this.privateWebsocket.send(JSON.stringify(subscription));
+      console.log("Sent subscription private:", subscription);
+      this.privateSubscriptions.add(subscription);
+    } else {
+      console.warn(
+        "Private WebSocket connection not open. Subscription not sent."
+      );
+      this.privateSubscriptions.add(subscription);
+    }
+  }
+
+  async unsubscribePrivate(subscription: any) {
+    this.privateSubscriptions.delete(subscription);
+    console.log("Sent unsubscription private:", subscription);
+    // Unsubscribe from the server if needed
+  }
+
+  async setPrivateMessageCallback(callback: (message: any) => void) {
+    this.messageCallbackPrivate = callback;
+  }
+
+  async startPingPrivate() {
+    this.pingTimerPrivate = setInterval(() => {
+      if (
+        this.privateWebsocket &&
+        this.privateWebsocket.readyState === WebSocket.OPEN
+      ) {
+        this.privateWebsocket.send(JSON.stringify({ event: "pong" }));
+        console.log("Sent private ping request.");
+      } else {
+        console.warn(
+          "Private WebSocket connection not open. Ping request not sent."
+        );
+      }
+    }, this.pingInterval);
+  }
+
+  async stopPingPrivate() {
+    if (this.pingTimerPrivate) {
+      clearInterval(this.pingTimerPrivate);
+      this.pingTimerPrivate = null;
+      console.log("Stopped private ping requests.");
+    }
+  }
+
+  async executionReport() {
+    const submessage = {
+      id: `id-execution-report`,
+      topic: "executionreport",
+      event: "subscribe",
+    };
+
+    this.sendPrivateSubscription(submessage);
+  }
+
+  async unsubExecutionReport() {
+    const submessage = {
+      id: `id-execution-report`,
+      topic: "executionreport",
+      event: "unsubscribe",
+    };
+
+    this.unsubscribePrivate(submessage);
+  }
+}
+
+  //TEST
+  // async function main() {
+  //   const privateClient = new WebSocketManager();
     
-//     privateClient.connectPrivate();
+  //   privateClient.connectPrivate();
     
-//     const submessage = {
-//       id: `id-${Math.random().toString(36).substring(7)}`,
-//       topic: "executionreport",
-//       event: "subscribe",
-//     };
-
-
-//     privateClient.sendPrivateSubscription(submessage);
-
-//     const setPublicWsCallback = () => {
-//       privateClient.setPrivateMessageCallback((message : any) => {
-//         // Process the received message
-//         console.log('Received data:', message);
-//       });
-//     }
-
-//   }
+  //   await privateClient.executionReport();
+  //   privateClient.setPrivateMessageCallback((message) => {
+  //       if(message.topic === 'executionreport' && message.data.symbol === 'PERP_TON_USDC'){
+  //         const data = message.data;
+  //         console.log(data);
+  //         if(data.status === 'FILLED'){
+  //           console.log(data.executedPrice);
+  //         }
+  //       }
+  //   });
+    
+  // }
   
-//   main().catch(error => {
-//     console.error('Error in main function:', error);
-//   });
+  // main().catch(error => {
+  //   console.error('Error in main function:', error);
+  // });
 
-// function useState(arg0: null): [any, any] {
-//   throw new Error('Function not implemented.');
-// }
   

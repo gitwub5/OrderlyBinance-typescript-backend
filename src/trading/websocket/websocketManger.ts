@@ -1,4 +1,5 @@
-import { WebSocketManager as OrderlyWs } from '../../orderly/websocket/public';
+import { WebSocketManager as OrderlyPublicWs } from '../../orderly/websocket/public';
+import { WebSocketManager as OrderlyPrivateWs } from '../../orderly/websocket/private';
 import { SocketClient as BinanceWs } from '../../binance/websocketStream/socketClient';
 import { WebSocketAPIClient as BinanceAPI} from '../../binance/websocketAPI/websocektAPI';
 import { deleteListenKey, getListenKey, keepListenKey } from '../../binance/websocketStream/listenKey';
@@ -8,18 +9,23 @@ import { Token } from '../../types/tokenTypes';
 export const clients: Record<
   string,
   {
-    orderlyClient: OrderlyWs;
+    orderlyPublic: OrderlyPublicWs;
+    orderlyPrivate: OrderlyPrivateWs;
     binanceUserDataStream: BinanceWs;
     binanceMarketStream: BinanceWs;
     binanceAPIws: BinanceAPI;
   }
 > = {};
 
-//한 토큰 당 세 개의 웹소켓이 연결됨
+//한 토큰 당 5개의 웹소켓이 연결됨
 export async function initClients(token: Token) {
-  // Initialize Orderly WebSocket
-  const orderlyClient = new OrderlyWs();
-  orderlyClient.connect();
+  // Initialize Orderly Public WebSocket
+  const orderlyPublic = new OrderlyPublicWs();
+  orderlyPublic.connect();
+
+  // Initialize Orderly Private WebSocket
+  const orderlyPrivate = new OrderlyPrivateWs();
+  orderlyPrivate.connectPrivate();
 
   // Initialize Binance User Data Stream WebSocket
   const listenKey = await getListenKey();
@@ -33,7 +39,7 @@ export async function initClients(token: Token) {
    await binanceAPIws.connect();
  
   // Store the clients in the dictionary
-  clients[token.binanceSymbol] = { orderlyClient, binanceUserDataStream, binanceMarketStream, binanceAPIws };
+  clients[token.binanceSymbol] = { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws };
 
   // Keep listenKey active every hour
   setInterval(async () => {
@@ -43,7 +49,8 @@ export async function initClients(token: Token) {
   // Check stop condition periodically
   const checkStop = async () => {
     if (forceStop || shouldStop) {
-      orderlyClient.disconnect();
+      orderlyPublic.disconnect();
+      orderlyPrivate.disconnectPrivate();
       binanceUserDataStream.disconnect();
       binanceMarketStream.disconnect();
       await deleteListenKey();
@@ -54,8 +61,9 @@ export async function initClients(token: Token) {
 }
 
 export async function disconnectClients(token : Token) {
-    const { orderlyClient, binanceUserDataStream, binanceMarketStream, binanceAPIws } = clients[token.binanceSymbol];
-    orderlyClient.disconnect();
+    const { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws } = clients[token.binanceSymbol];
+    orderlyPublic.disconnect();
+    orderlyPrivate.disconnectPrivate();
     binanceUserDataStream.disconnect();
     binanceMarketStream.disconnect();
     binanceAPIws.disconnect();

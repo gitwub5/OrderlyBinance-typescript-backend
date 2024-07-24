@@ -36,7 +36,7 @@ export async function executeArbitrage(token: Token) {
 
         await monitorClosePositions(token);
 
-        token.state.setEnterPrice(binanceBuyPrice);
+        token.state.setBinanceEnterPrice(binanceBuyPrice);
         const priceDifference = ((binanceBuyPrice - orderlySellPrice) / orderlySellPrice) * 100;
         token.state.setInitialPriceDifference(priceDifference);
         positionFilled = true;
@@ -49,7 +49,7 @@ export async function executeArbitrage(token: Token) {
 
         await monitorClosePositions(token);
 
-        token.state.setEnterPrice(binanceSellPrice);
+        token.state.setBinanceEnterPrice(binanceSellPrice);
         const priceDifference = ((binanceSellPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
         token.state.setInitialPriceDifference(priceDifference);
         positionFilled = true;
@@ -79,8 +79,12 @@ export async function executeArbitrage(token: Token) {
           token.binanceSymbol,
           token.state.getInitialPriceDifference(),
           token.state.getClosePriceDifference(),
-          token.state.getEnterPrice(),
-          token.state.getClosePrice(),
+          token.state.getBinanceSide(),
+          token.state.getBinanceEnterPrice(),
+          token.state.getBinanceClosePrice(),
+          token.state.getOrderlySide(),
+          token.state.getBinanceEnterPrice(),
+          token.state.getOrderlyClosePrice(),
           token.orderSize
         );
         console.log(`[${token.binanceSymbol}] Recorded at table`);

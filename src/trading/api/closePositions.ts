@@ -28,7 +28,7 @@ async function closeBinancePositions(token: Token, binanceAmt: number) {
 
     const orderId = response.orderId;
     const status = await getBinanceOrderStatus(token.binanceSymbol, orderId);
-    token.state.setClosePrice(parseFloat(status.avgPrice));
+    token.state.setBinanceClosePrice(parseFloat(status.avgPrice));
 
   } else if (binanceAmt < 0) {
     const response = await placeBinanceOrder.marketOrder(token.binanceSymbol, 'BUY', -binanceAmt);
@@ -36,7 +36,7 @@ async function closeBinancePositions(token: Token, binanceAmt: number) {
 
     const orderId = response.orderId;
     const status = await getBinanceOrderStatus(token.binanceSymbol, orderId);
-    token.state.setClosePrice(parseFloat(status.avgPrice));
+    token.state.setBinanceClosePrice(parseFloat(status.avgPrice));
 
   } else {
      // Re-check position amounts

@@ -25,7 +25,8 @@ export async function executeArbitrage(token: Token) {
     }
 
     const {
-      orderlyClient,
+      orderlyPublic,
+      orderlyPrivate,
       binanceUserDataStream,
       binanceMarketStream,
       binanceAPIws,
@@ -46,9 +47,9 @@ export async function executeArbitrage(token: Token) {
     let binancePriceUpdated = false;
     let positionFilled = false;
    
-    //오덜리 시장가 가져오기
-    await orderlyClient.markPrice(token.orderlySymbol);
-    orderlyClient.setMessageCallback(async (message) => {
+    //오덜리 시장가 가져오기 (public)
+    await orderlyPublic.markPrice(token.orderlySymbol);
+    orderlyPublic.setMessageCallback(async (message) => {
       try {
         if (message.topic === `${token.orderlySymbol}@markprice`){
           const data = message.data;
@@ -75,6 +76,29 @@ export async function executeArbitrage(token: Token) {
       }
     });
 
+    //오덜리 Execution Report 가져오기 (private)
+    await orderlyPrivate.executionReport();
+    orderlyPrivate.setPrivateMessageCallback((message) => {
+      if (
+        message.topic === "executionreport" &&
+        message.data.symbol === token.orderlySymbol
+      ) {
+        const data = message.data;
+        // 거래 FILLED 경우에 저장
+        // && data.type === market 추가 고려 (limit 거래로 바꾸면 필요x)
+        if (data.status === "FILLED") {
+          if (token.state.getOrderlySide() === '') {
+            // enter 
+            token.state.setOrderlyEnterPrice(data.executedPrice);
+            token.state.setOrderlySide(data.side);
+          } else if (data.side !== token.state.getOrderlySide()) {
+            // close (반대 side)
+            token.state.setOrderlyClosePrice(data.executedPrice);
+          }
+        }
+      }
+    });
+
     //바이낸스 유저 데이터 스트림 핸들러
     binanceUserDataStream.setHandler('ORDER_TRADE_UPDATE', async (message) => {
       const orderUpdate = message.o;
@@ -92,14 +116,16 @@ export async function executeArbitrage(token: Token) {
           const orderlyBuyPrice = await enterLongPosition(token, binanceBuyId);
 
           const binanceEnterPrice = parseFloat(orderUpdate.ap);
-          token.state.setEnterPrice(binanceEnterPrice);
+          token.state.setBinanceEnterPrice(binanceEnterPrice);
+          token.state.setBinanceSide(orderUpdate.S);
           const priceDifference = ((binanceEnterPrice - orderlyBuyPrice) / orderlyBuyPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
         } else {
           const orderlySellPrice = await enterShortPosition(token, binanceSellId);
 
           const binanceEnterPrice = parseFloat(orderUpdate.ap);
-          token.state.setEnterPrice(binanceEnterPrice);
+          token.state.setBinanceEnterPrice(binanceEnterPrice);
+          token.state.setBinanceSide(orderUpdate.S);
           const priceDifference = ((binanceEnterPrice - orderlySellPrice) / orderlySellPrice) * 100;
           token.state.setInitialPriceDifference(priceDifference);
         }
@@ -111,7 +137,7 @@ export async function executeArbitrage(token: Token) {
         orderUpdate.X === "FILLED" &&
         orderUpdate.o === "MARKET"
       ) {
-        token.state.setClosePrice(parseFloat(orderUpdate.ap));
+        token.state.setBinanceClosePrice(parseFloat(orderUpdate.ap));
       }
     });
 
@@ -194,21 +220,20 @@ export async function executeArbitrage(token: Token) {
                 await cancelAllOrders(token);
                 console.log(`<<<< [${token.binanceSymbol}] Closing positions due to close threshold >>>>`);
 
-                await orderlyClient.unsubMarkPrice(token.orderlySymbol);
+                await orderlyPublic.unsubMarkPrice(token.orderlySymbol);
                 positionFilled = false;
 
                 token.state.setClosePriceDifference(priceDifference);
 
-                console.log(token.state.getEnterPrice());
-                console.log(token.state.getClosePrice());
-                console.log(token.state.getInitialPriceDifference());
-                console.log(token.state.getClosePriceDifference());
-
                 await sendTelegramMessage(
                   token.binanceSymbol,
                   token.orderSize,
-                  token.state.getEnterPrice(),
-                  token.state.getClosePrice(),
+                  token.state.getBinanceSide(),
+                  token.state.getBinanceEnterPrice(),
+                  token.state.getBinanceClosePrice(),
+                  token.state.getOrderlySide(),
+                  token.state.getOrderlyEnterPrice(),
+                  token.state.getOrderlyClosePrice(),
                   token.state.getInitialPriceDifference()
                 );
                 await recordAndReset(token);
@@ -261,8 +286,12 @@ export async function recordAndReset(token: Token) {
       token.binanceSymbol,
       token.state.getInitialPriceDifference(),
       token.state.getClosePriceDifference(),
-      token.state.getEnterPrice(),
-      token.state.getClosePrice(),
+      token.state.getBinanceSide(),
+      token.state.getBinanceEnterPrice(),
+      token.state.getBinanceClosePrice(),
+      token.state.getOrderlySide(),
+      token.state.getBinanceEnterPrice(),
+      token.state.getOrderlyClosePrice(),
       token.orderSize
     );
 

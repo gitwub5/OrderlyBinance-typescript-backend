@@ -19,25 +19,55 @@ const bot = new TelegramBot(botToken, { polling: true });
 
 bot.on('polling_error', (error) => console.log(`Polling error: ${error.message}`));
 
-export async function sendTelegramMessage(tokenName: string, amount: number, enterPrice: number, closePrice: number, initDifference: number) {
+export async function sendTelegramMessage(
+    tokenName: string,
+    amount: number,
+    binanceSide: string,
+    binanceEnterPrice: number,
+    binanceClosePrice: number,
+    orderlySide: string,
+    orderlyEnterPrice: number,
+    orderlyClosePrice: number,
+    initDifference: number
+  ) {
     const arbitrageEndTime = new Date();
-    const transactionAmount = enterPrice * amount;
-
-    const MakerFee = enterPrice * 0.0002;
-    const TakerFee = closePrice * 0.0005;
-
+    const transactionAmount = binanceEnterPrice * amount;
+  
+    const binanceMakerFee = binanceEnterPrice * 0.0002;
+    const binanceTakerFee = binanceClosePrice * 0.0005;
+  
+    const orderlyMakerFee = orderlyEnterPrice * 0.0003;
+    const orderlyTakerFee = orderlyClosePrice * 0.0003;
+  
     let binancePnl: string | number = 0;
-
-    if (enterPrice === 0 || closePrice === 0) {
+    let orderlyPnl: string | number = 0;
+    let totalPnl: string | number = 0;
+  
+    if (binanceEnterPrice === 0 || binanceClosePrice === 0 || orderlyEnterPrice === 0 || orderlyClosePrice === 0) {
         binancePnl = "Record Error: Price cannot be 0";
-    } else if (initDifference > 0) { //양수인 경우 바이낸스 > 오덜리 -> 바이낸스 숏, 오덜리 롱
-        binancePnl = ((enterPrice - closePrice) - (MakerFee + TakerFee)) * amount;
-    } else if (initDifference < 0) { //음수인 경우 오덜리 > 바이낸스 -> 바이낸스 롱, 오덜리 숏
-        binancePnl = ((closePrice - enterPrice) - (MakerFee + TakerFee)) * amount;
-    } else {
-        return;
+        orderlyPnl = "Record Error: Price cannot be 0";
+        totalPnl = "Record Error: Price cannot be 0";
+      } else {
+        // Calculate Binance PnL
+        if (binanceSide === 'SELL') {
+          binancePnl = ((binanceEnterPrice - binanceClosePrice) - (binanceMakerFee + binanceTakerFee)) * amount;
+        } else if (binanceSide === 'BUY') {
+          binancePnl = ((binanceClosePrice - binanceEnterPrice) - (binanceMakerFee + binanceTakerFee)) * amount;
+        }
+    
+        // Calculate Orderly PnL
+        if (orderlySide === 'SELL') {
+          orderlyPnl = ((orderlyEnterPrice - orderlyClosePrice) - (orderlyMakerFee + orderlyTakerFee)) * amount;
+        } else if (orderlySide === 'BUY') {
+          orderlyPnl = ((orderlyClosePrice - orderlyEnterPrice) - (orderlyMakerFee + orderlyTakerFee)) * amount;
+        }
+    
+        // Calculate Total PnL
+        if (typeof binancePnl === 'number' && typeof orderlyPnl === 'number') {
+          totalPnl = binancePnl + orderlyPnl;
+        }
     }
-
+  
     const message = `
     📊 <b>Arbitrage Event</b> 📊
     ---------------------------------------
@@ -46,52 +76,70 @@ export async function sendTelegramMessage(tokenName: string, amount: number, ent
     <b>Time:</b> ${arbitrageEndTime.toLocaleString('en-GB')}
     <b>Arbitrage Gap:</b> ${initDifference.toFixed(8)}%
     <b>Binance PnL:</b> ${typeof binancePnl === 'number' ? binancePnl.toFixed(8) : binancePnl}
+    <b>Orderly PnL:</b> ${typeof orderlyPnl === 'number' ? orderlyPnl.toFixed(8) : orderlyPnl}
+    <b>Total PnL:</b> ${typeof totalPnl === 'number' ? totalPnl.toFixed(8) : totalPnl}
     ---------------------------------------
     <b>Details:</b>
-    - <b>Enter Price:</b> ${enterPrice.toFixed(4)}
-    - <b>Close Price:</b> ${closePrice.toFixed(4)}
-    `;
+    - <b>Binance Enter Price:</b> ${binanceEnterPrice.toFixed(4)}
+    - <b>Binance Close Price:</b> ${binanceClosePrice.toFixed(4)}
+    - <b>Orderly Enter Price:</b> ${orderlyEnterPrice.toFixed(4)}
+    - <b>Orderly Close Price:</b> ${orderlyClosePrice.toFixed(4)}
+  `;
 
-    bot.sendMessage(chatId, message, { parse_mode: 'HTML' })
-        .then(() => console.log('Message sent successfully'))
-        .catch((error) => console.error('Error sending message:', error));
+  bot.sendMessage(chatId, message, { parse_mode: 'HTML' })
+    .then(() => console.log('Message sent successfully'))
+    .catch((error) => console.error('Error sending message:', error));
 }
 
 // Log all received messages to the console
 bot.on('message', (msg: TelegramBot.Message) => {
-    console.log(`Received message: ${msg.text}`);
+  console.log(`Received message: ${msg.text}`);
 });
 
 bot.onText(/\/start/, (msg) => {
-    console.log('Received /start command');
-    bot.sendMessage(msg.chat.id, "Welcome! Type 'Bot!' for help.");
+  console.log('Received /start command');
+  bot.sendMessage(msg.chat.id, "Welcome! Type 'Bot!' for help.");
 });
 
 bot.onText(/Bot!/, (msg) => {
-    console.log('Received Bot! command');
-    const helpMessage = `
-        🤖 <b>Arbitrage Bot Help</b> 🤖
-        ---------------------------------
-        <b>Available Commands:</b>
-        /reset - Cancel all orders and close all positions.
-        /settoken [TOKEN] - Change the token type (e.g., /settoken BTCUSDT).
-        /setquantity [QUANTITY] - Change the quantity (e.g., /setquantity 0.5).
-        /setgap [GAP] - Change the arbitrage gap (e.g., /setgap 0.1).
-        ---------------------------------
-    `;
-    bot.sendMessage(msg.chat.id, helpMessage, { parse_mode: 'HTML' });
+  console.log('Received Bot! command');
+  const helpMessage = `
+      🤖 <b>Arbitrage Bot Help</b> 🤖
+      ---------------------------------
+      <b>Available Commands:</b>
+      /stop - Stop the bot and close all positions.
+      /restart - Restart the bot & Cancel all orders and close all positions.
+      ❌/settoken [TOKEN] - Change the token type (e.g., /settoken BTCUSDT). 
+      ❌/setquantity [QUANTITY] - Change the quantity (e.g., /setquantity 0.5).
+      ❌/setgap [GAP] - Change the arbitrage gap (e.g., /setgap 0.1).
+      ---------------------------------
+  `;
+  bot.sendMessage(msg.chat.id, helpMessage, { parse_mode: 'HTML' });
 });
 
-bot.onText(/\/reset/, async (msg) => {
-    try {
-        console.log('Received /reset command');
-        await Promise.all(tokensArray.map(token => closeAllPositions(token)));
-        await Promise.all(tokensArray.map(token => cancelAllOrders(token)));
-        tokensArray.forEach(token => disconnectClients(token));
-        bot.sendMessage(msg.chat.id, "All orders cancelled and positions closed.");
-        process.exit(1);
-    } catch (error) {
-        bot.sendMessage(msg.chat.id, "Error resetting orders and positions.");
-        console.error('Error resetting orders and positions:', error);
-    }
+bot.onText(/\/stop/, async (msg) => {
+try {
+    console.log('Received /stop command');
+    await Promise.all(tokensArray.map(token => closeAllPositions(token)));
+    await Promise.all(tokensArray.map(token => cancelAllOrders(token)));
+    tokensArray.forEach(token => disconnectClients(token));
+    bot.sendMessage(msg.chat.id, "Stop action: All orders cancelled and positions closed.");
+} catch (error) {
+    bot.sendMessage(msg.chat.id, "Error stopping bot and resetting orders and positions.");
+    console.error('Error stopping bot and resetting orders and positions:', error);
+}
+});
+
+bot.onText(/\/restart/, async (msg) => {
+try {
+  console.log('Received /restart command');
+  await Promise.all(tokensArray.map(token => closeAllPositions(token)));
+  await Promise.all(tokensArray.map(token => cancelAllOrders(token)));
+  tokensArray.forEach(token => disconnectClients(token));
+  bot.sendMessage(msg.chat.id, "All orders cancelled and positions closed. Restarting bot...");
+  process.exit(1);
+} catch (error) {
+    bot.sendMessage(msg.chat.id, "Error restarting bot and resetting orders and positions.");
+    console.error('Error restarting bot and resetting orders and positions:', error);
+}
 });
