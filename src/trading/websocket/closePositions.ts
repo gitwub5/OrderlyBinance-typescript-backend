@@ -7,12 +7,12 @@ import { Token } from '../../types/tokenTypes';
 async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
   if (orderlyAmt > 0) {
     await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', orderlyAmt);
-    console.log(`<<<< [${token.binanceSymbol}] Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
+    console.log(`<<<< [${token.symbol}] Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
   } else if (orderlyAmt < 0) {
     await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', -orderlyAmt);
-    console.log(`<<<< [${token.binanceSymbol}] Closing Orderly short position: BUY ${-orderlyAmt} >>>>`);
+    console.log(`<<<< [${token.symbol}] Closing Orderly short position: BUY ${-orderlyAmt} >>>>`);
   } else {
-    console.log(`<<<< [${token.binanceSymbol}] No Orderly position to close. >>>>`);
+    console.log(`<<<< [${token.symbol}] No Orderly position to close. >>>>`);
   }
 }
 
@@ -20,19 +20,19 @@ async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
 async function closeBinancePositions(client: WebSocketAPIClient, token: Token, binanceAmt: number) {
   if (binanceAmt > 0) {
     client.placeOrder(token.binanceSymbol, null, binanceAmt, 'SELL', 'MARKET');
-    console.log(`<<<< [${token.binanceSymbol}] Closing Binance long position: SELL ${binanceAmt} >>>>`);
+    console.log(`<<<< [${token.symbol}] Closing Binance long position: SELL ${binanceAmt} >>>>`);
   } else if (binanceAmt < 0) {
     client.placeOrder(token.binanceSymbol, null, -binanceAmt, 'BUY', 'MARKET');
-    console.log(`<<<< [${token.binanceSymbol}] Closing Binance short position: BUY ${-binanceAmt} >>>>`);
+    console.log(`<<<< [${token.symbol}] Closing Binance short position: BUY ${-binanceAmt} >>>>`);
   } else {
-    console.log(`<<<< [${token.binanceSymbol}] No Binance position to close. >>>>`);
+    console.log(`<<<< [${token.symbol}] No Binance position to close. >>>>`);
   }
 }
 
 // 모든 포지션 청산(Market Order)
 export async function closeAllPositions(client: WebSocketAPIClient, token: Token) {
   try {
-    console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
+    console.log(`<<<< [${token.symbol}] Closing positions >>>>`);
     const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
 
     //임시 로그
@@ -43,7 +43,7 @@ export async function closeAllPositions(client: WebSocketAPIClient, token: Token
       closeBinancePositions(client, token, binanceAmt)
     ]);
 
-    console.log(`<<<< [${token.binanceSymbol}] All positions closed >>>>`);
+    console.log(`<<<< [${token.symbol}] All positions closed >>>>`);
 
   } catch (error) {
     console.error('Error during position close:', error);
@@ -59,7 +59,7 @@ export async function cancelAllOrders(token : Token){
 
   try {
     await Promise.all(cancelOrderPromises);
-    console.log(`[${token.binanceSymbol}] All Open Orders are canceled...`);
+    console.log(`[${token.symbol}] All Open Orders are canceled...`);
   } catch (error) {
     console.error('Error during order cancelation:', error);
   }

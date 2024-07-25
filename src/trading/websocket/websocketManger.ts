@@ -39,7 +39,7 @@ export async function initClients(token: Token) {
    await binanceAPIws.connect();
  
   // Store the clients in the dictionary
-  clients[token.binanceSymbol] = { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws };
+  clients[token.symbol] = { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws };
 
   // Keep listenKey active every hour
   setInterval(async () => {
@@ -61,11 +61,11 @@ export async function initClients(token: Token) {
 }
 
 export async function disconnectClients(token : Token) {
-    const { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws } = clients[token.binanceSymbol];
+    const { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws } = clients[token.symbol];
     orderlyPublic.disconnect();
     orderlyPrivate.disconnectPrivate();
     binanceUserDataStream.disconnect();
     binanceMarketStream.disconnect();
     binanceAPIws.disconnect();
-    delete clients[token.binanceSymbol];
+    delete clients[token.symbol];
 }

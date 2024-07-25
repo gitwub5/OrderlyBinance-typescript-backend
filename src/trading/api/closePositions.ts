@@ -52,7 +52,7 @@ async function closeBinancePositions(token: Token, binanceAmt: number) {
 // 모든 포지션 청산(Market Order)
 export async function closeAllPositions(token: Token) {
   try {
-    console.log(`<<<< [${token.binanceSymbol}] Closing positions >>>>`);
+    console.log(`<<<< [${token.symbol}] Closing positions >>>>`);
     const { orderlyAmt, binanceAmt } = await getPositionAmounts(token);
 
     //임시 로그

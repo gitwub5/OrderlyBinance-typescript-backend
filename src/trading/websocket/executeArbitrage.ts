@@ -19,7 +19,7 @@ export async function executeArbitrage(token: Token) {
     let binancePrice: number | null = null;
     let binanceTimestamp: number | null = null;
 
-    if (!clients[token.binanceSymbol]) {
+    if (!clients[token.symbol]) {
       await initClients(token);
     }
 
@@ -29,11 +29,11 @@ export async function executeArbitrage(token: Token) {
       binanceUserDataStream,
       binanceMarketStream,
       binanceAPIws,
-    } = clients[token.binanceSymbol];
+    } = clients[token.symbol];
 
     // 초기 시장가 가져와서 주문
     orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
-    console.log(`[${token.binanceSymbol}][O] Initial Mark Price: `, orderlyPrice);
+    console.log(`[${token.symbol}][O] Initial Mark Price: `, orderlyPrice);
     const {
       longPositionId,
       longPositionPrice,
@@ -57,7 +57,7 @@ export async function executeArbitrage(token: Token) {
         const data = message.data;
         orderlyPrice = parseFloat(data.price);
         orderlyTimestamp = message.ts;
-        console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
+        console.log(`[${token.symbol}][O] Mark Price: `, orderlyPrice);
 
         //시장가에 따라 바이낸스 주문 수정
         if (orderlyPrice !== previousOrderlyPrice && !positionFilled) {
@@ -123,7 +123,7 @@ export async function executeArbitrage(token: Token) {
           const orderlyBuyPrice = await enterLongPosition(token);
           //바이낸스 매수 주문 취소
           await binanceAPIws.cancelOrder(token.binanceSymbol, binanceBuyId);
-          console.log(`<<<< [${token.binanceSymbol}][B] BUY order canceled >>>>`);
+          console.log(`<<<< [${token.symbol}][B] BUY order canceled >>>>`);
 
           const binanceEnterPrice = parseFloat(orderUpdate.ap);
           token.state.setBinanceEnterPrice(binanceEnterPrice);
@@ -136,7 +136,7 @@ export async function executeArbitrage(token: Token) {
           const orderlySellPrice = await enterShortPosition(token);
           //바이낸스 매도 주문 취소
           await binanceAPIws.cancelOrder(token.binanceSymbol, binanceSellId);
-           console.log(`<<<< [${token.binanceSymbol}][B] SELL order canceled >>>>`);
+           console.log(`<<<< [${token.symbol}][B] SELL order canceled >>>>`);
 
           const binanceEnterPrice = parseFloat(orderUpdate.ap);
           token.state.setBinanceEnterPrice(binanceEnterPrice);
@@ -165,7 +165,7 @@ export async function executeArbitrage(token: Token) {
     binanceMarketStream.setHandler("markPriceUpdate", (params) => {
       binancePrice = parseFloat(params.p);
       binanceTimestamp = params.E;
-      console.log(`[${token.binanceSymbol}][B] Mark Price: `, binancePrice);
+      console.log(`[${token.symbol}][B] Mark Price: `, binancePrice);
 
       if (positionFilled) {
         binancePriceUpdated = true;
@@ -184,7 +184,7 @@ export async function executeArbitrage(token: Token) {
     binanceAPIws.setMessageCallback(async (message) => {
       //주문가 변경시 에러 3번 연속으로 발생 시 종료 (재시작)
       if (message.error) {
-        console.log(`${token.binanceSymbol}:`, message.error);
+        console.log(`${token.symbol}:`, message.error);
         if (message.error.code === -2013) {
           errorCounter++;
           if (errorCounter >= 3) {
@@ -204,11 +204,8 @@ export async function executeArbitrage(token: Token) {
       //아비트리징 아닌데 열려있는 포지션이 있다면 닫고 다시 시작
       if (!positionFilled) {
         if (message.id === "id-positionInformation") {
-          console.log(
-            `[${token.binanceSymbol}][B]Position Information: ${parseFloat(
-              message.result[0].positionAmt
-            )}`
-          );
+          console.log(`[${token.symbol}][B]Position Information: ${parseFloat(message.result[0].positionAmt)}`);
+
           if (parseFloat(message.result[0].positionAmt) !== 0.0) {
             await closeAllPositions(binanceAPIws, token);
             await cancelAllOrders(token);
@@ -253,7 +250,7 @@ export async function executeArbitrage(token: Token) {
               // if (Math.abs(priceDifference) <= token.closeThreshold) {
               await closeAllPositions(binanceAPIws, token);
               await cancelAllOrders(token);
-              console.log(`<<<< [${token.binanceSymbol}] Arbitrage close complete: Positions closed and orders canceled >>>>`);
+              console.log(`<<<< [${token.symbol}] Arbitrage close complete: Positions closed and orders canceled >>>>`);
 
               await orderlyPublic.unsubMarkPrice(token.orderlySymbol);
               positionFilled = false;
@@ -275,7 +272,7 @@ export async function executeArbitrage(token: Token) {
 
               //주문 다시 실행
               orderlyPrice = await getOrderlyPrice(token.orderlySymbol);
-              console.log(`[${token.binanceSymbol}][O] Mark Price: `, orderlyPrice);
+              console.log(`[${token.symbol}][O] Mark Price: `, orderlyPrice);
               const { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice }
               = await placeNewOrder(token, orderlyPrice);
 
@@ -329,7 +326,7 @@ export async function recordAndReset(token: Token) {
       token.orderSize
     );
 
-    console.log(`[${token.binanceSymbol}] Recorded at table`);
+    console.log(`[${token.symbol}] Recorded at table`);
   } catch (err) {
     console.log("Error during recording at table", err);
   } finally {

@@ -20,12 +20,12 @@ function fixPrecision(value: number, precision: number): number {
         placeBinanceOrder.limitOrder(token.binanceSymbol, 'BUY', longPositionPrice, token.orderSize),
         placeBinanceOrder.limitOrder(token.binanceSymbol, 'SELL', shortPositionPrice, token.orderSize)
       ]);
-      console.log(`[${token.binanceSymbol}][B] Place Orders -> Long Pos: ${longPositionPrice} | Short Pos: ${shortPositionPrice}`);
+      console.log(`[${token.symbol}][B] Place Orders -> Long Pos: ${longPositionPrice} | Short Pos: ${shortPositionPrice}`);
   
       // 주문 ID 가져오기
       const longPositionId = longPosition.orderId;
       const shortPositionId = shortPosition.orderId;
-      console.log(`[${token.binanceSymbol}][B] Long Position ID, Short Position ID: `, longPositionId, shortPositionId);
+      console.log(`[${token.symbol}][B] Long Position ID, Short Position ID: `, longPositionId, shortPositionId);
       // 주문 ID 반환
       return { longPositionId, longPositionPrice, shortPositionId, shortPositionPrice };
   
@@ -64,7 +64,7 @@ export async function handleOrder(
   
     
       await Promise.all(modifications);
-      console.log(`[${token.binanceSymbol}][B] Modified orders -> BUY: ${longPositionPrice} | SELL: ${shortPositionPrice}`);
+      console.log(`[${token.symbol}][B] Modified orders -> BUY: ${longPositionPrice} | SELL: ${shortPositionPrice}`);
       return { longPositionPrice, shortPositionPrice };
     } catch (error) {
       console.error('Error in modifying orders:', error);
@@ -82,7 +82,7 @@ export async function enterShortPosition(token: Token) {
 
       const sellPrice = order.average_executed_price;
 
-      console.log(`<<<< [${token.binanceSymbol}] Executing arbitrage: BUY on Binance, SELL on Orderly >>>>`);
+      console.log(`<<<< [${token.symbol}] Executing arbitrage: BUY on Binance, SELL on Orderly >>>>`);
 
       return sellPrice;
   } catch (error) {
@@ -101,7 +101,7 @@ export async function enterLongPosition(token: Token) {
   
       const buyPrice = parseFloat(order.average_executed_price);
 
-      console.log(`<<<< [${token.binanceSymbol}] Executing arbitrage: SELL on Binance, BUY on Orderly >>>>`);
+      console.log(`<<<< [${token.symbol}] Executing arbitrage: SELL on Binance, BUY on Orderly >>>>`);
 
       return buyPrice;
   } catch (error) {

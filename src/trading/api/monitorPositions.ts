@@ -31,11 +31,11 @@ export async function monitorClosePositions(token: Token) {
 
             const priceDifference = ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
 
-            console.log(`<<<< [${token.binanceSymbol}] Price Difference: ${priceDifference}% >>>>`);
+            console.log(`<<<< [${token.symbol}] Price Difference: ${priceDifference}% >>>>`);
 
             // 청산 조건 확인
             if (Math.abs(priceDifference) <= token.closeThreshold) {
-                console.log(`<<<< [${token.binanceSymbol}] Closing positions due to close threshold >>>>`);
+                console.log(`<<<< [${token.symbol}] Closing positions due to close threshold >>>>`);
 
                 await closeAllPositions(token);
                 await cancelAllOrders(token);
