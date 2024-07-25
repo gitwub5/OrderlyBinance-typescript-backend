@@ -16,41 +16,45 @@ export const recordTrade = async (
   // average entry price * amount = transaction amount
   const transactionAmount = ((binanceEnterPrice + orderlyEnterPrice) / 2) * amount;
 
-  // Constants for fee rates
-  const binanceMakerFeeRate = 0.0002;
-  const binanceTakerFeeRate = 0.0005;
-  const orderlyMakerFeeRate = 0.0003;
-  const orderlyTakerFeeRate = 0.0003;
-
-  let binancePnl: string | number = 0;
-  let orderlyPnl: string | number = 0;
-  let totalPnl: string | number = 0;
+  let binancePnl: number | null = null;
+  let orderlyPnl: number | null = null;
+  let totalPnl: number | null = null;
   let winLossStatus: string | null = null;
 
-  if (binanceEnterPrice === 0 || binanceClosePrice === 0 || orderlyEnterPrice === 0 || orderlyClosePrice === 0) {
-    binancePnl = "Record Error: Price cannot be 0";
-    orderlyPnl = "Record Error: Price cannot be 0";
-    totalPnl = "Record Error: Price cannot be 0";
-  } else {
-    // Calculate Binance PnL
+  // Calculate Binance PnL
+  const binanceMakerFeeRate = 0.0002;
+  const binanceTakerFeeRate = 0.0005;
+
+  if (binanceEnterPrice !== 0 && binanceClosePrice !== 0) {
     if (binanceSide === 'SELL') {
       binancePnl = ((binanceEnterPrice - binanceClosePrice) - (binanceEnterPrice * binanceMakerFeeRate + binanceClosePrice * binanceTakerFeeRate)) * amount;
     } else if (binanceSide === 'BUY') {
       binancePnl = ((binanceClosePrice - binanceEnterPrice) - (binanceEnterPrice * binanceMakerFeeRate + binanceClosePrice * binanceTakerFeeRate)) * amount;
     }
+  } else {
+    console.error('Record Error: Binance Price cannot be 0');
+  }
 
-    // Calculate Orderly PnL
+  // Calculate Orderly PnL
+  const orderlyMakerFeeRate = 0.0003;
+  const orderlyTakerFeeRate = 0.0003;
+
+  if (orderlyEnterPrice !== 0 && orderlyClosePrice !== 0) {
     if (orderlySide === 'SELL') {
       orderlyPnl = ((orderlyEnterPrice - orderlyClosePrice) - (orderlyEnterPrice * orderlyMakerFeeRate + orderlyClosePrice * orderlyTakerFeeRate)) * amount;
     } else if (orderlySide === 'BUY') {
       orderlyPnl = ((orderlyClosePrice - orderlyEnterPrice) - (orderlyEnterPrice * orderlyMakerFeeRate + orderlyClosePrice * orderlyTakerFeeRate)) * amount;
     }
+  } else {
+    console.error('Record Error: Orderly Price cannot be 0');
+  }
 
-    // Calculate Total PnL and determine win/loss status
-    if (typeof binancePnl === 'number' && typeof orderlyPnl === 'number') {
-      totalPnl = binancePnl + orderlyPnl;
-      winLossStatus = totalPnl > 0 ? 'WIN' : 'LOSS';
-    }
+  // Calculate Total PnL and determine win/loss status
+  if (typeof binancePnl === 'number' && typeof orderlyPnl === 'number') {
+    totalPnl = binancePnl + orderlyPnl;
+    winLossStatus = totalPnl > 0 ? 'WIN' : 'LOSS';
+  } else {
+    console.error('Record Error: PnL calculation resulted in null values');
   }
 
   // Insert records into respective tables

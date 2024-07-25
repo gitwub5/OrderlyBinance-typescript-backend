@@ -73,10 +73,6 @@ export async function handleOrder(
   }
 }
 
-//10 request per second라 1초에 10번이 최대임 
-const MAX_RETRIES = 10; // 최대 재시도 횟수
-const RETRY_INTERVAL = 100; // 재시도 간격 (0.1초)
-
 // 오덜리 숏 포지션 진입 (바이낸스가 롱 포지션일 때)
 export async function enterShortPosition(token: Token, shortPositionId: number) {
   try {
@@ -84,16 +80,6 @@ export async function enterShortPosition(token: Token, shortPositionId: number) 
       const orderId = response.order_id;
       let retries = 0;
       let order = await getOrderlyOrderById(orderId);
-
-      // 반복적으로 주문 상태 확인
-      while (!order || order.status !== 'FILLED') {
-        if (retries >= MAX_RETRIES) {
-          throw new Error('Order did not fill in time');
-        }
-        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
-        order = await getOrderlyOrderById(orderId);
-        retries++;
-      }
 
       const sellPrice = order.average_executed_price;
 
@@ -116,16 +102,6 @@ export async function enterLongPosition(token: Token, longPositionId: number) {
       const orderId = response.order_id;
       let retries = 0;
       let order = await getOrderlyOrderById(orderId);
-  
-      // 반복적으로 주문 상태 확인
-      while (!order || order.status !== 'FILLED') {
-        if (retries >= MAX_RETRIES) {
-          throw new Error('Order did not fill in time');
-        }
-        await new Promise(resolve => setTimeout(resolve, RETRY_INTERVAL));
-        order = await getOrderlyOrderById(orderId);
-        retries++;
-      }
   
       const buyPrice = parseFloat(order.average_executed_price);
 
