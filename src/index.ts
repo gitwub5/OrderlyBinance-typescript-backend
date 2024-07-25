@@ -1,5 +1,5 @@
 import { executeArbitrage } from './trading/websocket/executeArbitrage';
-import { cancelAllOrders, closeAllPositions as closeAllPositionsAPI} from './trading/api/closePositions';
+import { cancelAllOrders, closeAllPositions as closeAllPositionsAPI } from './trading/api/closePositions';
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 import { Token } from './types/tokenTypes';
@@ -41,7 +41,7 @@ export async function shutdown() {
     }
 }
 
-// 바이낸스 하나의 웹소켓 API 연결은 24시간 동안만 유효하다.
+// 바이낸스 하나의 웹소켓 API 연결은 24시간 동안만 유효함
 // Set up a restart every  23 hours and 55 minutes
 function setupDailyRestart() {
     setTimeout(() => {

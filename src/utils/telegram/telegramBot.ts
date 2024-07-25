@@ -44,9 +44,9 @@ export async function sendTelegramMessage(
     let totalPnl: string | number = 0;
   
     if (binanceEnterPrice === 0 || binanceClosePrice === 0 || orderlyEnterPrice === 0 || orderlyClosePrice === 0) {
-        binancePnl = "Record Error: Price cannot be 0";
-        orderlyPnl = "Record Error: Price cannot be 0";
-        totalPnl = "Record Error: Price cannot be 0";
+        binancePnl = "Record Error";
+        orderlyPnl = "Record Error";
+        totalPnl = "Record Error";
       } else {
         // Calculate Binance PnL
         if (binanceSide === 'SELL') {

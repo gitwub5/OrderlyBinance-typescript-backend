@@ -1,11 +1,10 @@
 import { getOrderlyPrice } from '../../orderly/api/market';
 import { Token } from '../../types/tokenTypes';
-import { cancelAllOrders, closeAllPositions as closeAllPositionsAPI } from '../api/closePositions';
-import { closeAllPositions } from './closePositions';
+import { closeAllPositions as closeAllPositionsAPI } from '../api/closePositions';
+import { closeAllPositions, cancelAllOrders } from './closePositions';
 import { initClients, clients, disconnectClients } from './websocketManger';
 import { placeNewOrder, handleOrder, enterLongPosition, enterShortPosition } from './manageOrder';
 import { shutdown } from '../../index';
-import { setTimeout } from 'timers/promises';
 import { recordTrade } from '../../db/queries';
 import { sendTelegramMessage } from '../../utils/telegram/telegramBot';
 import { shouldStop, forceStop } from '../../globals';

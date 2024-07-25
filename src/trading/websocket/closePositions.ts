@@ -64,3 +64,4 @@ export async function cancelAllOrders(token : Token){
     console.error('Error during order cancelation:', error);
   }
 }
+
