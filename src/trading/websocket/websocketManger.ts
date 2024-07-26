@@ -50,7 +50,7 @@ export async function initClients(token: Token) {
     clearInterval(keepAliveInterval); // 오류 발생 시 interval 정지
     //shutdown 함수 추가
   }
-}, 1 * 60 * 1000); // 30분마다 실행
+}, 30 * 60 * 1000); // 30분마다 실행
 
   // Check stop condition periodically -> TODO: balance나 상황에 따라 실행을 멈춰야할 경우를 지정해야함
   // const checkStop = async () => {
