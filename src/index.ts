@@ -5,22 +5,19 @@ import { setShouldStop, setForceStop } from './globals';
 import { Token } from './types/tokenTypes';
 import { tokensArray } from './trading/stratgy';
 import { initClients, disconnectClients } from './trading/websocket/websocketManger';
+import { delay } from './utils/delay';
 
 //토큰 선택
 export const selectedTokens = [
     tokensArray[0],
-    // tokensArray[1],
-    // tokensArray[2],
-    // tokensArray[3],
-    // tokensArray[4],
-    // tokensArray[5],
-    // tokensArray[6]
+    tokensArray[1],
+    tokensArray[2],
+    tokensArray[3],
+    tokensArray[4],
+    tokensArray[5],
+    tokensArray[6]
 ];
 
-// Delay function to wait for a specified number of milliseconds
-function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 //여러 토큰 한 번에 병렬 처리
 async function manageMultipleTokens(tokens: Token[]) {

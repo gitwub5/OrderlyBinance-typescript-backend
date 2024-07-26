@@ -15,7 +15,7 @@ export async function keepListenKey(){
     };
   
     const res = await createSignAndRequest(endpoint, queryParams, 'PUT');
-    return res.listenKey;
+    return res;
 }
 
 export async function deleteListenKey(){

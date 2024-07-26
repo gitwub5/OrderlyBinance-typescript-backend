@@ -95,6 +95,8 @@ export class SocketClient {
   }
 }
 
+// import { keepListenKey } from './listenKey';
+
 // // 사용자 데이터 스트림에 연결하는 함수
 // async function connectUserDataStream() {
 //   try {
@@ -112,6 +114,19 @@ export class SocketClient {
 //     binanceUserDataStream.setHandler('POSITION_UPDATE', (message: any) => {
 //       console.log('Position Update:', message);
 //     });
+
+//     // ListenKey를 주기적으로 유지하는 함수
+//     const keepAliveInterval = setInterval(async () => {
+//       try {
+//         console.log(await keepListenKey());
+//       } catch (error) {
+//         console.error('Error keeping ListenKey alive:', error);
+//         clearInterval(keepAliveInterval); // 오류 발생 시 interval 정지
+//         //shutdown 함수 추가
+//       }
+//     }, 1 * 60 * 1000); // 30분마다 실행
+
+
 //   } catch (error) {
 //     console.error('Error connecting to user data stream:', error);
 //   }

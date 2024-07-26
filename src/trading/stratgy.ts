@@ -40,7 +40,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 2,
-            arbitrageThreshold: 0.61,
+            arbitrageThreshold: 0.58,
             closeThreshold: 0.22,
             precision: 3,
             state: new TokenState()

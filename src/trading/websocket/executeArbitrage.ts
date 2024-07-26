@@ -7,6 +7,7 @@ import { placeNewOrder, handleOrder, placeBuyOrder, placeSellOrder } from './man
 import { shutdown } from '../../index';
 import { recordTrade } from '../../db/queries';
 import { sendTelegramMessage } from '../../utils/telegram/telegramBot';
+import { delay } from '../../utils/delay'
 import { shouldStop, forceStop } from '../../globals';
 
 export async function executeArbitrage(token: Token) {
@@ -140,6 +141,7 @@ export async function executeArbitrage(token: Token) {
         token.state.setInitialPriceDifference(priceDifference);
         console.log(`<<<< Initial Price Difference: ${token.state.getInitialPriceDifference()} >>>>`);
       }
+      
       //포지션 정리되었을 때
       if (
         orderUpdate.s === token.binanceSymbol &&
@@ -206,6 +208,7 @@ export async function executeArbitrage(token: Token) {
             await closeAllPositions(binanceAPIws, token);
             await cancelAllOrders(token);
             token.state.reset();
+            await delay(2000);
             await executeArbitrage(token);
           }
         } else {
@@ -231,14 +234,18 @@ export async function executeArbitrage(token: Token) {
               ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
             
             console.log(`
-              ===================================
-              Token: ${token.symbol}
-              -----------------------------------
-              Binance Price:    ${binancePrice.toFixed(4)}
-              Orderly Price:    ${orderlyPrice.toFixed(4)}
-              Price Difference: ${priceDifference.toFixed(8)}%
-              ===================================
+              [${token.symbol}] Binance: ${binancePrice.toFixed(4)} | Orderly: ${orderlyPrice.toFixed(4)} | Diff: ${priceDifference.toFixed(8)}%
               `);
+
+            // console.log(`
+            //   ===================================
+            //   Token: ${token.symbol}
+            //   -----------------------------------
+            //   Binance Price:    ${binancePrice.toFixed(4)}
+            //   Orderly Price:    ${orderlyPrice.toFixed(4)}
+            //   Price Difference: ${priceDifference.toFixed(8)}%
+            //   ===================================
+            //   `);
 
             if(positionFilled){    
               // //버전#1: 손절 갭 임의로 설정

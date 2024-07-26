@@ -41,24 +41,30 @@ export async function initClients(token: Token) {
   // Store the clients in the dictionary
   clients[token.symbol] = { orderlyPublic, orderlyPrivate, binanceUserDataStream, binanceMarketStream, binanceAPIws };
 
-  // Keep listenKey active every hour
-  setInterval(async () => {
-    await keepListenKey();
-  }, 30 * 60 * 1000); // 30 min
+ // ListenKey를 주기적으로 유지하는 함수
+ const keepAliveInterval = setInterval(async () => {
+  try {
+    console.log(await keepListenKey());
+  } catch (error) {
+    console.error('Error keeping ListenKey alive:', error);
+    clearInterval(keepAliveInterval); // 오류 발생 시 interval 정지
+    //shutdown 함수 추가
+  }
+}, 1 * 60 * 1000); // 30분마다 실행
 
-  // Check stop condition periodically
-  const checkStop = async () => {
-    if (forceStop || shouldStop) {
-      orderlyPublic.disconnect();
-      orderlyPrivate.disconnectPrivate();
-      binanceUserDataStream.disconnect();
-      binanceMarketStream.disconnect();
-      binanceAPIws.disconnect();
-      await deleteListenKey();
-    }
-  };
+  // Check stop condition periodically -> TODO: balance나 상황에 따라 실행을 멈춰야할 경우를 지정해야함
+  // const checkStop = async () => {
+  //   if (forceStop || shouldStop) {
+  //     orderlyPublic.disconnect();
+  //     orderlyPrivate.disconnectPrivate();
+  //     binanceUserDataStream.disconnect();
+  //     binanceMarketStream.disconnect();
+  //     binanceAPIws.disconnect();
+  //     await deleteListenKey();
+  //   }
+  // };
 
-  setInterval(checkStop, 5000); // Check every 5 seconds
+  //setInterval(checkStop, 5000); // Check every 5 seconds
 }
 
 export async function disconnectClients(token : Token) {
