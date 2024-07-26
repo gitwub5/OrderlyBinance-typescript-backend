@@ -52,7 +52,7 @@ export class WebSocketManager {
     if (this.websocket) {
         this.websocket.close();
         this.websocket = null;
-        console.log('Orderly WebSocket connection disconnected.');
+        console.log('Orderly Public WebSocket connection disconnected.');
         this.stopPing();
     }
   }

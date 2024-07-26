@@ -7,12 +7,14 @@ export class WebSocketAPIClient {
   private ws: WebSocket | null;
   public messageCallback: ((message: any) => void) | null;
   private handlers: Map<string, Array<(message: any) => void>>;
+  private reconnectInterval: number;
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || BINANCE_WS_URL;
     this.ws = null;
-    this.handlers = new Map();
     this.messageCallback = null;
+    this.handlers = new Map();
+    this.reconnectInterval = 10000; // 10 seconds
   }
 
   async connect() {
@@ -20,23 +22,31 @@ export class WebSocketAPIClient {
 
     this.ws.on('open', () => {
       console.log('Binance API WebSocket connection established.');
+      this.heartBeat();
     });
 
     this.ws.on('pong', () => {
       console.log('Binance received pong from server');
+      // Reset reconnect interval
+      this.reconnectInterval = 10000;
     });
 
     this.ws.on('ping', (data) => {
       console.log('Binance received ping from server');
-      this.ws!.pong(data); // Send pong with the same payload as the ping frame
+      if (this.ws) {
+        this.ws.pong(data); // Send pong with the same payload as the ping frame
+        console.log('Sent pong back to server');
+      }
     });
 
     this.ws.on('close', () => {
       console.log('Binance WebSocket connection closed.');
+      this.reconnect();
     });
 
     this.ws.on('error', (err: WebSocket.ErrorEvent) => {
       console.error('Binance WebSocket connection error:', err.message);
+      this.reconnect();
     });
 
     this.ws.on('message', (message: any) => {
@@ -46,17 +56,28 @@ export class WebSocketAPIClient {
         this.messageCallback(data);
       }
     });
-
-    this.heartBeat();
   }
 
-  heartBeat() {
-    setInterval(() => {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.ping();
-        console.log('Binance ping server');
-      }
-    }, 300000);
+  private heartBeat() {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.ping();
+      console.log('Binance ping server');
+      setTimeout(() => this.heartBeat(), 180000); // Ping every 3 minutes
+    }
+  }
+
+  private reconnect() {
+    if (this.ws) {
+      this.ws.removeAllListeners();
+      this.ws = null;
+    }
+    setTimeout(() => {
+      console.log('Reconnecting to Binance WebSocket...');
+      this.connect();
+    }, this.reconnectInterval);
+
+    // Exponential backoff for reconnection attempts
+    this.reconnectInterval = Math.min(this.reconnectInterval * 2, 60000); // Max 1 minute
   }
 
   async setMessageCallback(callback: (message: any) => void) {
@@ -232,7 +253,7 @@ export class WebSocketAPIClient {
     if (this.ws) {
       this.ws.close();
       this.ws = null;
-      console.log('Binance WebSocket connection disconnected.');
+      console.log('Binance API WebSocket connection disconnected.');
     }
   }
 }

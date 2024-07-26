@@ -53,6 +53,7 @@ export async function initClients(token: Token) {
       orderlyPrivate.disconnectPrivate();
       binanceUserDataStream.disconnect();
       binanceMarketStream.disconnect();
+      binanceAPIws.disconnect();
       await deleteListenKey();
     }
   };

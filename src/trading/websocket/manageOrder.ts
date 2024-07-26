@@ -73,7 +73,7 @@ export async function handleOrder(
   }
 
   // 오덜리 숏 포지션 진입 (바이낸스가 롱 포지션일 때)
-export async function enterShortPosition(token: Token) {
+export async function placeSellOrder(token: Token) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', token.orderSize);
       const orderId = response.order_id;
@@ -86,13 +86,13 @@ export async function enterShortPosition(token: Token) {
 
       return sellPrice;
   } catch (error) {
-      console.error('Error in enterShortPosition:', error);
+      console.error('Error in placeSellOrder:', error);
       throw error;
   }
 }
 
 // 오덜리 롱 포지션 진입 (바이낸스가 숏 포지션일 때)
-export async function enterLongPosition(token: Token) {
+export async function placeBuyOrder(token: Token) {
   try {
       const response = await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', token.orderSize);
       const orderId = response.order_id;
@@ -105,7 +105,7 @@ export async function enterLongPosition(token: Token) {
 
       return buyPrice;
   } catch (error) {
-      console.error('Error in enterLongPosition:', error);
+      console.error('Error in placeBuyOrder:', error);
       throw error;
   }
 }

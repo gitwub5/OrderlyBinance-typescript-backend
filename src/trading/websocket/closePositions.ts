@@ -3,6 +3,7 @@ import { cancelAllBinanceOrders} from '../../binance/api/order';
 import { getPositionAmounts } from '../api/monitorPositions'
 import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
 import { Token } from '../../types/tokenTypes';
+import { tokensArray } from '../stratgy';
 
 async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
   if (orderlyAmt > 0) {
@@ -15,6 +16,24 @@ async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
     console.log(`<<<< [${token.symbol}] No Orderly position to close. >>>>`);
   }
 }
+
+// // Example of closing positions
+// async function closePositionsExample() {
+//   try {
+//     const { orderlyAmt, binanceAmt } = await getPositionAmounts(tokensArray[0]);
+//     await closeOrderlyPositions(tokensArray[0], orderlyAmt); // Pass the entire token object
+
+//     const apiclient = new WebSocketAPIClient();
+//     await apiclient.connect(); // Await WebSocket connection
+//     setTimeout(async () => {
+//       await closeBinancePositions(apiclient, tokensArray[0], binanceAmt);
+//     }, 1000);
+//   } catch (error) {
+//     console.error('Error closing positions:', error);
+//   }
+// }
+
+// closePositionsExample();
 
 // WebSocket version to close Binance positions
 async function closeBinancePositions(client: WebSocketAPIClient, token: Token, binanceAmt: number) {
