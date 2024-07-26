@@ -233,9 +233,7 @@ export async function executeArbitrage(token: Token) {
             const priceDifference =
               ((binancePrice - orderlyPrice) / orderlyPrice) * 100;
             
-            console.log(`
-              [${token.symbol}] Binance: ${binancePrice.toFixed(4)} | Orderly: ${orderlyPrice.toFixed(4)} | Diff: ${priceDifference.toFixed(8)}%
-              `);
+            console.log(`[${token.symbol}] Binance: ${binancePrice.toFixed(4)} | Orderly: ${orderlyPrice.toFixed(4)} | Diff: ${priceDifference.toFixed(8)}%`);
 
             // console.log(`
             //   ===================================
