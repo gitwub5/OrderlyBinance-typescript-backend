@@ -2,7 +2,6 @@ import { signEIP712Message, signAndSendRequest } from "./signer";
 import { orderlyAccountInfo, ORDERLY_API_URL } from "../../utils/utils";
 import { OrderlyBalanceResponse, OrderlyPosition, OrderlyPositionResponse } from "../types/types";
 import { formatDate } from "../utils/formatDate";
-import { userWalletAddress } from "../../utils/utils";
 
 //문제: PnL settlement를 해야지 됨
 export async function getOrderlyBalance(): Promise<number | null>{

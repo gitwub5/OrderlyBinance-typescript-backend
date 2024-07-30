@@ -27,7 +27,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 25,
-            arbitrageThreshold: 0.55,
+            arbitrageThreshold: 0.53,
             closeThreshold: 0.14,
             precision: 4,
             state: new TokenState()
@@ -53,7 +53,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 3,
-            arbitrageThreshold: 0.80,
+            arbitrageThreshold: 0.77,
             closeThreshold: 0.21,
             precision: 3,
             state: new TokenState()
@@ -73,13 +73,13 @@ export const tokensArray: Token[] = [
         };
     })(),
     (() => {
-        const symbol = 'ZK';
+        const symbol = 'WLD';
         return {
             symbol,
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 65,
-            arbitrageThreshold: 0.73,
+            arbitrageThreshold: 0.60,
             closeThreshold: 0.15,
             precision: 4,
             state: new TokenState()
@@ -92,7 +92,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 2,
-            arbitrageThreshold: 0.67,
+            arbitrageThreshold: 0.68,
             closeThreshold: 0.15,
             precision: 4,
             state: new TokenState()
