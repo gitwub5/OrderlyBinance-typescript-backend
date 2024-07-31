@@ -1,7 +1,7 @@
 import { Token } from '../../types/tokenTypes';
 import { WebSocketManager as OrderlyWs } from '../../orderly/websocket/public';
 import { SocketClient as BinanceWs } from '../../binance/websocketStream/socketClient';
-import { tokensArray } from '../stratgy';
+import { tokensArray } from '../strategy';
 
 async function monitorClosePositions(token : Token) {
     let orderlyPrice: number | null = null;

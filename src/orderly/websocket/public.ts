@@ -125,6 +125,16 @@ export class WebSocketManager {
     };
     this.unsubscribe(submessage);
   }
+
+  //시장 가격 불러오기 (1s)
+  async ticker(symbol : string){
+    const submessage = {
+      id: `id-24h_ticker`,
+      topic: `${symbol}@ticker`,
+      event: "subscribe",
+    };
+    this.sendSubscription(submessage);
+  }
 }
 
 // // // TEST
@@ -135,24 +145,30 @@ export class WebSocketManager {
 
 //   const symbol = 'PERP_TON_USDC';
 
-//   await wsClient.markPrice(symbol);
+//   await wsClient.ticker(symbol);
 
 //   wsClient.setMessageCallback((message) => {
-//     if (message.topic === `${symbol}@markprice`){
-//     const data = message.data;
-//     const price = data.price;
-//     console.log('Received price:', price);
-//     }
+//     console.log(message);
 //   });
 
-//   setTimeout(() => {
-//     wsClient.unsubMarkPrice(symbol);
-//   }, 5000); // Keep the connection open for 30 seconds
+//   // await wsClient.markPrice(symbol);
+
+//   // wsClient.setMessageCallback((message) => {
+//   //   if (message.topic === `${symbol}@markprice`){
+//   //   const data = message.data;
+//   //   const price = data.price;
+//   //   console.log('Received price:', price);
+//   //   }
+//   // });
+
+//   // setTimeout(() => {
+//   //   wsClient.unsubMarkPrice(symbol);
+//   // }, 5000); // Keep the connection open for 30 seconds
 
 //   // Wait some time to ensure the subscription is processed before disconnecting
-//   setTimeout(() => {
-//     wsClient.disconnect();
-//   }, 30000); // Keep the connection open for 30 seconds
+//   // setTimeout(() => {
+//   //   wsClient.disconnect();
+//   // }, 30000); // Keep the connection open for 30 seconds
 // }
 
 // main().catch(error => {

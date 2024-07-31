@@ -1,7 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
 import { closeAllPositions, cancelAllOrders } from '../../trading/api/closePositions';
-import { tokensArray } from '../../trading/stratgy';
+import { tokensArray } from '../../trading/strategy';
 import { selectedTokens } from '../../index';
 import { disconnectClients } from '../../trading/websocket/websocketManger';
 

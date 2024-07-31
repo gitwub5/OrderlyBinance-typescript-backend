@@ -3,6 +3,34 @@ import bs58 from 'bs58';
 import { ethers } from 'ethers';
 import { getMessage, encodeType } from 'eip-712';
 
+export function createSignatureMessage(
+  orderlyAccountId: string,
+  privateKey: Uint8Array | string,
+  input: URL | string,
+  method: string = 'GET',
+  body: Record<string, any> | string
+){
+  const timestamp = Date.now();
+  const encoder = new TextEncoder();
+
+  const url = new URL(input);
+  let message = `${String(timestamp)}${method}${url.pathname}${url.search}`;
+  if (body) {
+    message += body;
+  }
+  
+  const orderlySignature = ed25519.sign(encoder.encode(message), privateKey);
+
+  const header = {
+    'orderly-timestamp': String(timestamp),
+    'orderly-account-id': orderlyAccountId,
+    'orderly-key': `ed25519:${bs58.encode(ed25519.getPublicKey(privateKey))}`,
+    'orderly-signature': Buffer.from(orderlySignature).toString('base64url')
+  };
+
+  return header;
+}
+
 export async function signAndSendRequest(
   orderlyAccountId: string,
   privateKey: Uint8Array | string,

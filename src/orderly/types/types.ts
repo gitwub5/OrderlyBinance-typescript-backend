@@ -40,3 +40,11 @@ export interface OrderlyBalanceResponse {
     };
     timestamp: number;
   }
+
+  //Order Client Interfaces
+export interface OrderResponse {
+  success: boolean;
+  id: string;
+  [key: string]: any;
+}
+

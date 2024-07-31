@@ -3,7 +3,7 @@ import { cancelAllOrders, closeAllPositions as closeAllPositionsAPI } from './tr
 import { createTables } from './db/createTables';
 import { setShouldStop, setForceStop } from './globals';
 import { Token } from './types/tokenTypes';
-import { tokensArray } from './trading/stratgy';
+import { tokensArray } from './trading/strategy';
 import { initClients, disconnectClients } from './trading/websocket/websocketManger';
 import { delay } from './utils/delay';
 

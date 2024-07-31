@@ -3,7 +3,7 @@ import { cancelAllBinanceOrders} from '../../binance/api/order';
 import { getPositionAmounts } from '../api/monitorPositions'
 import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
 import { Token } from '../../types/tokenTypes';
-import { tokensArray } from '../stratgy';
+import { tokensArray } from '../strategy';
 
 async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
   if (orderlyAmt > 0) {

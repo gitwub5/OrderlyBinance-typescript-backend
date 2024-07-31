@@ -1,5 +1,5 @@
 // import { executeArbitrage } from '../src/trading/executeArbitrage';
-// import { tokensArray } from '../src/trading/stratgy';
+// import { tokensArray } from '../src/trading/strategy';
 // import * as manageOrders from '../src/trading/manageOrders';
 // import * as orderlyMarket from '../src/orderly/market';
 // import * as monitorPositions from '../src/trading/monitorPositions';

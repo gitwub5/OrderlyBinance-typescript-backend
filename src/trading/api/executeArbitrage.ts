@@ -2,7 +2,7 @@ import { getOrderlyPrice } from '../../orderly/api/market';
 import { shouldStop, forceStop } from '../../globals';
 import { placeNewOrder, handleOrder, enterShortPosition, enterLongPosition } from './manageOrders';
 import { monitorClosePositions } from './monitorPositions'
-import { interval } from '../stratgy';
+import { interval } from '../strategy';
 import { getBinanceOrderStatus } from '../../binance/api/order';
 import { recordTrade } from '../../db/queries';
 import { Token } from '../../types/tokenTypes';

@@ -22,6 +22,7 @@
         "mysql2": "^3.10.2",
         "near-api-js": "^4.0.2",
         "node-telegram-bot-api": "^0.63.0",
+        "sync-request": "^6.1.0",
         "ws": "^8.17.1"
     },
     "devDependencies": {

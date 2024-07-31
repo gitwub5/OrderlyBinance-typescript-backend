@@ -2,7 +2,7 @@ import { getOrderlyPositions } from "../../orderly/api/account";
 import { getBinancePositions } from "../../binance/api/account";
 import { getBinancePrice } from "../../binance/api/market";
 import { getOrderlyPrice } from "../../orderly/api/market";
-import { shortInterval } from "../stratgy";
+import { shortInterval } from "../strategy";
 import { cancelAllOrders, closeAllPositions } from "./closePositions";
 import { Token } from "../../types/tokenTypes";
 
