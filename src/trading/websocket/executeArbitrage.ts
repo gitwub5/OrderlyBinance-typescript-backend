@@ -115,7 +115,7 @@ export async function executeArbitrage(token: Token) {
         (orderUpdate.i === binanceBuyId || orderUpdate.i === binanceSellId)
       ) {
         positionFilled = true;
-        console.log("Binance order filled:", JSON.stringify(orderUpdate));
+        //console.log("Binance order filled:", JSON.stringify(orderUpdate));
         
         let orderlyEnterPrice;
         if (orderUpdate.S === 'BUY'){

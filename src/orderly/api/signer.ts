@@ -45,7 +45,7 @@ export async function signAndSendRequest(
   if (init?.body) {
     message += init.body;
   }
-  const orderlySignature = await ed25519.sign(encoder.encode(message), privateKey);
+  const orderlySignature = ed25519.sign(encoder.encode(message), privateKey);
 
   return fetch(input, {
     headers: {
@@ -55,7 +55,7 @@ export async function signAndSendRequest(
           : 'application/x-www-form-urlencoded',
       'orderly-timestamp': String(timestamp),
       'orderly-account-id': orderlyAccountId,
-      'orderly-key': `ed25519:${bs58.encode(await ed25519.getPublicKey(privateKey))}`,
+      'orderly-key': `ed25519:${bs58.encode(ed25519.getPublicKey(privateKey))}`,
       'orderly-signature': Buffer.from(orderlySignature).toString('base64url'),
       ...(init?.headers ?? {})
     },

@@ -34,15 +34,15 @@ export const tokensArray: Token[] = [
         };
     })(),
     (() => {
-        const symbol = 'LINK';
+        const symbol = 'XRP';
         return {
             symbol,
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
-            orderSize: 2,
-            arbitrageThreshold: 0.64,
+            orderSize: 25,
+            arbitrageThreshold: 0.60,
             closeThreshold: 0.22,
-            precision: 3,
+            precision: 4,
             state: new TokenState()
         };
     })(),
@@ -53,7 +53,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 3,
-            arbitrageThreshold: 0.77,
+            arbitrageThreshold: 0.75,
             closeThreshold: 0.21,
             precision: 3,
             state: new TokenState()
@@ -92,7 +92,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
             orderSize: 2,
-            arbitrageThreshold: 0.73,
+            arbitrageThreshold: 0.70,
             closeThreshold: 0.15,
             precision: 4,
             state: new TokenState()

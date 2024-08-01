@@ -1,6 +1,5 @@
 import { ORDERLY_API_URL, orderlyAccountInfo } from '../../utils/utils';
 import { signAndSendRequest, createSignatureMessage } from './signer'
-import request from 'sync-request';
 
 export class placeOrderlyOrder {
   private static async placeOrder(symbol: string, orderType: string, side: string, price: number | null, amount: number) {
@@ -61,58 +60,46 @@ export class placeOrderlyOrder {
   }
 }
 
-export function orderlyMarketOrder(symbol: string, side: string, amount: number) {
-  const url = `${ORDERLY_API_URL}/v1/order`;
-  const method = 'POST';
-  const body = {
+
+export async function orderlyMarketOrder(symbol: string, side: string, amount: number) {
+  const body = JSON.stringify({
     symbol: symbol,
     order_type: 'MARKET',
     side: side,
     order_quantity: amount
-  };
-
-  const headers = createSignatureMessage(orderlyAccountInfo.accountId, orderlyAccountInfo.privateKey, url, method, body);
+  });
 
   try {
-    const response = request(method, url, {
-      json: body,
-      headers: {
-        'Content-Type': 'application/json',
-        'orderly-timestamp': headers['orderly-timestamp'],
-        'orderly-account-id': headers['orderly-account-id'],
-        'orderly-key': headers['orderly-key'],
-        'orderly-signature': headers['orderly-signature']
+    const response = await signAndSendRequest(
+      orderlyAccountInfo.accountId,
+      orderlyAccountInfo.privateKey,
+      `${ORDERLY_API_URL}/v1/order`,
+      {
+        method: 'POST',
+        body: body
       }
-    });
-
-    if (response.statusCode === 200) {
-      const responseData = JSON.parse(response.getBody('utf8'));
-      console.log('Orderly Order Response:', JSON.stringify(responseData, undefined, 2));
-      return responseData.data;
-    } else {
-      console.error('Error creating order:', response.statusCode, response);
-      throw new Error(`Error creating order: ${response.statusCode} ${response}`);
-    }
+    );
+    const json = await response.json();
+    return json.data;
   } catch (error) {
-    console.error('Error during sync request:', error);
-    throw error;
+    console.error('Error creating order:', error);
   }
 }
 
-// Usage example:
-function example() {
-  const symbol = 'PERP_TON_USDC';
-  const side = 'BUY';
-  const amount = 2;
+// // Usage example:
+// function example() {
+//   const symbol = 'PERP_ZRO_USDC';
+//   const side = 'BUY';
+//   const amount = 3;
 
-  try {
-    const orderResponse = orderlyMarketOrder(symbol, side, amount);
-    console.log('Order Response:', orderResponse);
-  } catch (error) {
-    console.error('Order Error:', error);
-  }
-}
-example();
+//   try {
+//     const orderResponse = orderlyMarketOrder(symbol, side, amount);
+//     console.log('Order Response:', orderResponse);
+//   } catch (error) {
+//     console.error('Order Error:', error);
+//   }
+// }
+// example();
 
 export async function editOrderlyOrder(orderId: string, symbol: string, orderType: string, side: string, price: number | null, amount: number) {
   const body: Record<string, any> = {
