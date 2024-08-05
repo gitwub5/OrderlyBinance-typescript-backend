@@ -9,7 +9,7 @@ import { delay } from './utils/delay';
 
 //토큰 선택
 export const selectedTokens = [
-    // tokensArray[0],
+    tokensArray[0],
     tokensArray[1],
     tokensArray[2],
     tokensArray[3],
