@@ -1,7 +1,7 @@
 import { getOrderlyPrice } from '../../orderly/api/market';
 import { Token } from '../../types/tokenTypes';
 import { closeAllPositions as closeAllPositionsAPI } from '../api/closePositions';
-import { closeAllPositions, cancelAllOrders } from './closePositions';
+import { closeAllPositions, cancelAllOrders, closeOrderlyPositionsMarketOrder } from './closePositions';
 import { initClients, clients, disconnectClients } from './websocketManger';
 import { placeNewOrder, handleOrder, placeBuyOrder, placeSellOrder } from './manageOrder';
 import { shutdown } from '../../index';
@@ -50,6 +50,7 @@ export async function executeArbitrage(token: Token) {
     let orderlyPriceUpdated = false;
     let binancePriceUpdated = false;
     let positionFilled = false;
+    let isOrderlyPositionClosed = false;
 
     //오덜리 시장가 가져오기 (public)
     await orderlyPublic.markPrice(token.orderlySymbol);
@@ -92,11 +93,12 @@ export async function executeArbitrage(token: Token) {
         // 거래 FILLED 경우에 저장
         // && data.type === market 추가 고려 (limit 거래로 바꾸면 필요x)
         if (data.status === "FILLED") {
-          if (token.state.getOrderlySide() === "") {
+          if (!token.state.getOrderlySide()) {
             // enter
             token.state.setOrderlyEnterPrice(data.executedPrice);
             token.state.setOrderlySide(data.side);
-          } else if (data.side !== token.state.getOrderlySide()) {
+          } 
+          else {
             // close (반대 side)
             token.state.setOrderlyClosePrice(data.executedPrice);
           }
@@ -251,10 +253,17 @@ export async function executeArbitrage(token: Token) {
               // //버전#2: 초기 갭차이의 절반 이하로 떨어지면 손절
               if (Math.abs(priceDifference) < Math.abs(token.state.getInitialPriceDifference() / 2)) {
                 await closeAllPositions(binanceAPIws, token);
+
+                await orderlyPublic.unsubMarkPrice(token.orderlySymbol);
+
+                //ASK, BID 주문으로 포지션을 닫는 경우 -> 포지션이 닫힐 때까지 기다려야함
+                //지정가 주문 ->  주문 체결될때까지 대기  -> 웹소켓에 주문 체결 이벤트 오면 주문 번호랑 동일한지 확인하고 체결이 되면 그때부터 밑 코드 진행 
+                await waitForOrderlyPositionToClose(10000); // 최대 10초 대기
+                isOrderlyPositionClosed = false;
+
                 await cancelAllOrders(token);
                 console.log(`<<<< [${token.symbol}] Arbitrage close complete: Positions closed and orders canceled >>>>`);
 
-                await orderlyPublic.unsubMarkPrice(token.orderlySymbol);
                 positionFilled = false;
 
                 token.state.setClosePriceDifference(priceDifference);
@@ -305,6 +314,26 @@ export async function executeArbitrage(token: Token) {
         binancePriceUpdated = false;
       }
     }
+
+    async function waitForOrderlyPositionToClose(maxWaitTime = 10000) {
+      const startTime = Date.now();
+    
+      return new Promise<void>((resolve, reject) => {
+        const checkInterval = setInterval(async () => {
+          const elapsed = Date.now() - startTime;
+    
+          if (isOrderlyPositionClosed) {
+            clearInterval(checkInterval);
+            resolve();
+          } else if (elapsed >= maxWaitTime) {
+            clearInterval(checkInterval);
+            await closeOrderlyPositionsMarketOrder(token);
+            reject(new Error('Limit Order not filled within the maximum wait time.'));
+          }
+        }, 1000); // 1초마다 체크
+      });
+    }
+    
   } catch (error) {
     console.error('Error in executeArbitrage:', error);
     await closeAllPositionsAPI(token);

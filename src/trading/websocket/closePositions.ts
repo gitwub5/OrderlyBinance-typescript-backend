@@ -7,6 +7,22 @@ import { tokensArray } from '../strategy';
 
 async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
   if (orderlyAmt > 0) {
+    await placeOrderlyOrder.askOrder(token.orderlySymbol, 'SELL', orderlyAmt);
+    //await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', orderlyAmt);
+    console.log(`<<<< [${token.symbol}] Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
+  } else if (orderlyAmt < 0) {
+    await placeOrderlyOrder.bidOrder(token.orderlySymbol, 'BUY', -orderlyAmt);
+    //await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'BUY', -orderlyAmt);
+    console.log(`<<<< [${token.symbol}] Closing Orderly short position: BUY ${-orderlyAmt} >>>>`);
+  } else {
+    console.log(`<<<< [${token.symbol}] No Orderly position to close. >>>>`);
+  }
+}
+
+export async function closeOrderlyPositionsMarketOrder(token: Token) {
+  const { orderlyAmt } = await getPositionAmounts(token);
+
+  if (orderlyAmt > 0) {
     await placeOrderlyOrder.marketOrder(token.orderlySymbol, 'SELL', orderlyAmt);
     console.log(`<<<< [${token.symbol}] Closing Orderly long position: SELL ${orderlyAmt} >>>>`);
   } else if (orderlyAmt < 0) {
@@ -36,6 +52,7 @@ async function closeOrderlyPositions(token: Token, orderlyAmt: number) {
 // closePositionsExample();
 
 // WebSocket version to close Binance positions
+// !여기서도 오더북 가져와서 Best price에 지정가 거래로 수정
 async function closeBinancePositions(client: WebSocketAPIClient, token: Token, binanceAmt: number) {
   if (binanceAmt > 0) {
     client.placeOrder(token.binanceSymbol, null, binanceAmt, 'SELL', 'MARKET');

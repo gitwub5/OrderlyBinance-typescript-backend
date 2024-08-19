@@ -14,7 +14,7 @@ export const tokensArray: Token[] = [
             binanceSymbol: reconstructBinanceSymbol(symbol), // 바이낸스 버전 심볼 -> TONUSDT
             orderlySymbol: reconstructOrderlySymbol(symbol), // 오덜리 버전 심볼 -> PERP_TON_USDC
             orderSize: 2, // 주문수량
-            arbitrageThreshold: 0.50, // 아비트리지 허용 임계값 (%)
+            arbitrageThreshold: 0.60, // 아비트리지 허용 임계값 (%)
             closeThreshold: 0.12, // 청산 포지션 임계값(%)
             precision: 4,
             state: new TokenState()
@@ -34,12 +34,12 @@ export const tokensArray: Token[] = [
         };
     })(),
     (() => {
-        const symbol = 'XRP';
+        const symbol = 'LINK';
         return {
             symbol,
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
-            orderSize: 25,
+            orderSize: 2,
             arbitrageThreshold: 0.60,
             closeThreshold: 0.22,
             precision: 4,
@@ -47,12 +47,12 @@ export const tokensArray: Token[] = [
         };
     })(),
     (() => {
-        const symbol = 'ZRO';
+        const symbol = 'DOGE';
         return {
             symbol,
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
-            orderSize: 3,
+            orderSize: 200,
             arbitrageThreshold: 0.75,
             closeThreshold: 0.21,
             precision: 3,
@@ -60,12 +60,12 @@ export const tokensArray: Token[] = [
         };
     })(),
     (() => {
-        const symbol = 'ONDO';
+        const symbol = 'SOL';
         return {
             symbol,
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
-            orderSize: 12,
+            orderSize: 0.1,
             arbitrageThreshold: 0.65,
             closeThreshold: 0.14,
             precision: 4,
@@ -86,12 +86,12 @@ export const tokensArray: Token[] = [
         };
     })(),
     (() => {
-        const symbol = 'TIA';
+        const symbol = 'ETH';
         return {
             symbol,
             binanceSymbol: reconstructBinanceSymbol(symbol),
             orderlySymbol: reconstructOrderlySymbol(symbol),
-            orderSize: 2,
+            orderSize: 0.01,
             arbitrageThreshold: 0.70,
             closeThreshold: 0.15,
             precision: 4,
