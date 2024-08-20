@@ -42,7 +42,7 @@ export const tokensArray: Token[] = [
             orderSize: 2,
             arbitrageThreshold: 0.60,
             closeThreshold: 0.22,
-            precision: 4,
+            precision: 3,
             state: new TokenState()
         };
     })(),
@@ -55,7 +55,7 @@ export const tokensArray: Token[] = [
             orderSize: 200,
             arbitrageThreshold: 0.75,
             closeThreshold: 0.21,
-            precision: 3,
+            precision: 5,
             state: new TokenState()
         };
     })(),
@@ -68,7 +68,7 @@ export const tokensArray: Token[] = [
             orderSize: 0.1,
             arbitrageThreshold: 0.65,
             closeThreshold: 0.14,
-            precision: 4,
+            precision: 3,
             state: new TokenState()
         };
     })(),
@@ -94,7 +94,7 @@ export const tokensArray: Token[] = [
             orderSize: 0.01,
             arbitrageThreshold: 0.70,
             closeThreshold: 0.15,
-            precision: 4,
+            precision: 2,
             state: new TokenState()
         };
     })()

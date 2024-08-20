@@ -12,10 +12,10 @@ export const selectedTokens = [
     tokensArray[0],
     tokensArray[1],
     tokensArray[2],
-    tokensArray[3],
-    tokensArray[4],
-    tokensArray[5],
-    tokensArray[6]
+    // tokensArray[3],
+    // tokensArray[4],
+    // tokensArray[5],
+    // tokensArray[6]
 ];
 
 
