@@ -1,7 +1,7 @@
 import { WebSocketManager as OrderlyPublicWs } from '../../orderly/websocket/public';
 import { WebSocketManager as OrderlyPrivateWs } from '../../orderly/websocket/private';
 import { SocketClient as BinanceWs } from '../../binance/websocketStream/socketClient';
-import { WebSocketAPIClient as BinanceAPI} from '../../binance/websocketAPI/websocektAPI';
+import { WebSocketAPIClient as BinanceAPI} from '../../binance/websocketAPI/websocketAPI';
 import { deleteListenKey, getListenKey, keepListenKey } from '../../binance/websocketStream/listenKey';
 import { forceStop, shouldStop } from '../../globals';
 import { Token } from '../../types/tokenTypes';

@@ -56,7 +56,7 @@ export class WebSocketManager {
 
       const timestamp = new Date().getTime().toString();
       const messageStr = [timestamp].join("");
-
+ 
       const messageBytes = new TextEncoder().encode(messageStr);
       const keyPair = await getOrderlyKeyPair(
         orderlyAccountInfo.privateKeyBase58

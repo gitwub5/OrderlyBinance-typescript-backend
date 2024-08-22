@@ -1,5 +1,5 @@
 import { Token } from "../../types/tokenTypes";
-import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
+import { WebSocketAPIClient } from "../../binance/websocketAPI/websocketAPI";
 import { placeOrderlyOrder, getOrderlyOrderById } from '../../orderly/api/order';
 import { placeBinanceOrder } from "../../binance/api/order";
 

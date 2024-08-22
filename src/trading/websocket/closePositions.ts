@@ -1,7 +1,7 @@
 import { cancelAllOrderlyOrders, placeOrderlyOrder } from '../../orderly/api/order';
 import { cancelAllBinanceOrders} from '../../binance/api/order';
 import { getPositionAmounts } from '../api/monitorPositions'
-import { WebSocketAPIClient } from "../../binance/websocketAPI/websocektAPI";
+import { WebSocketAPIClient } from "../../binance/websocketAPI/websocketAPI";
 import { Token } from '../../types/tokenTypes';
 import { tokensArray } from '../strategy';
 
@@ -32,24 +32,6 @@ export async function closeOrderlyPositionsMarketOrder(token: Token) {
     console.log(`<<<< [${token.symbol}] No Orderly position to close. >>>>`);
   }
 }
-
-// // Example of closing positions
-// async function closePositionsExample() {
-//   try {
-//     const { orderlyAmt, binanceAmt } = await getPositionAmounts(tokensArray[0]);
-//     await closeOrderlyPositions(tokensArray[0], orderlyAmt); // Pass the entire token object
-
-//     const apiclient = new WebSocketAPIClient();
-//     await apiclient.connect(); // Await WebSocket connection
-//     setTimeout(async () => {
-//       await closeBinancePositions(apiclient, tokensArray[0], binanceAmt);
-//     }, 1000);
-//   } catch (error) {
-//     console.error('Error closing positions:', error);
-//   }
-// }
-
-// closePositionsExample();
 
 // WebSocket version to close Binance positions
 // !여기서도 오더북 가져와서 Best price에 지정가 거래로 수정

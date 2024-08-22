@@ -196,7 +196,7 @@ export async function executeArbitrage(token: Token) {
     });
 
     //바이낸스 API 웹소켓 핸들러
-    binanceAPIws.setMessageCallback(async (message) => {
+    binanceAPIws.setMessageCallback(async (message: any) => {
       //주문가 변경시 에러 3번 연속으로 발생 시 종료 (재시작)
       if (message.error) {
         console.log(`${token.symbol}:`, message.error);
